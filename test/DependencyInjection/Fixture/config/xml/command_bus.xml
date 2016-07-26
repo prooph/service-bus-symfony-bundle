@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+
+<srv:container xmlns="http://getprooph.org/schemas/symfony-dic/prooph"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xmlns:srv="http://symfony.com/schema/dic/services"
+               xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd
+                        http://getprooph.org/schemas/symfony-dic/prooph http://getprooph.org/schemas/symfony-dic/prooph/service_bus-5.1.xsd">
+
+    <config>
+        <command_bus name="main" message_factory="Prooph\Common\Messaging\MessageFactory">
+            <plugin>Prooph\ServiceBus\Plugin\InvokeStrategy\OnEventStrategy</plugin>
+            <plugin>Prooph\ServiceBus\Plugin\InvokeStrategy\OnEventStrategy2</plugin>
+            <router type="Prooph\ServiceBus\Plugin\Router\CommandRouter">
+                <route command="Prooph\ProophessorDo\Model\User\Command\RegisterUser">Prooph\ProophessorDo\Model\User\Handler\RegisterUserHandler</route>
+                <route command="Prooph\ProophessorDo\Model\User\Command\UpdateUser">Prooph\ProophessorDo\Model\User\Handler\UpdateUserHandler</route>
+            </router>
+        </command_bus>
+    </config>
+</srv:container>

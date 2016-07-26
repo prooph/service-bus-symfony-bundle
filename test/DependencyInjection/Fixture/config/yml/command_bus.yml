@@ -1,0 +1,11 @@
+prooph_service_bus:
+  command_buses:
+    main:
+      message_factory: 'Prooph\Common\Messaging\MessageFactory'
+      router:
+        type: 'Prooph\ServiceBus\Plugin\Router\CommandRouter'
+        routes:
+          'Prooph\ProophessorDo\Model\User\Command\RegisterUser': 'Prooph\ProophessorDo\Model\User\Handler\RegisterUserHandler'
+          'Prooph\ProophessorDo\Model\User\Command\UpdateUser': 'Prooph\ProophessorDo\Model\User\Handler\UpdateUserHandler'
+      plugins:
+        - 'Prooph\ServiceBus\Plugin\InvokeStrategy\OnEventStrategy'

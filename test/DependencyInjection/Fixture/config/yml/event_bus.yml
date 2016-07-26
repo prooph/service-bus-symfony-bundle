@@ -1,0 +1,10 @@
+prooph_service_bus:
+  event_buses:
+    main:
+      router:
+        routes:
+          'Prooph\ProophessorDo\Model\Todo\Event\TodoWasPosted':
+            - 'Prooph\ProophessorDo\Projection\Todo\TodoProjector'
+            - 'Prooph\ProophessorDo\Projection\User\UserProjector'
+      plugins:
+        - 'Prooph\ServiceBus\Plugin\InvokeStrategy\OnEventStrategy'
