@@ -1,8 +1,6 @@
 prooph_service_bus:
   event_buses:
     main:
-      plugins:
-        - 'Prooph\ServiceBus\Plugin\InvokeStrategy\OnEventStrategy'
       message_factory: 'Prooph\Common\Messaging\MessageFactory'
       router:
         type: 'Prooph\ServiceBus\Plugin\Router\EventRouter'
@@ -10,3 +8,5 @@ prooph_service_bus:
           'Prooph\ProophessorDo\Model\Todo\Event\TodoWasPosted':
             - 'Prooph\ProophessorDo\Projection\Todo\TodoProjector'
             - 'Prooph\ProophessorDo\Projection\User\UserProjector'
+      plugins:
+        - 'Prooph\ServiceBus\Plugin\InvokeStrategy\OnEventStrategy'

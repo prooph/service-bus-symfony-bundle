@@ -26,12 +26,31 @@ abstract class AbtractServiceBusExtensionTestCase extends TestCase
 
         $config = $container->getDefinition('prooph_service_bus.command_bus.main_bus');
 
-        self::assertEquals('Prooph\ServiceBus\CommandBus', $config->getClass());
+        self::assertEquals(CommandBus::class, $config->getClass());
 
         /* @var $commandBus CommandBus */
         $commandBus = $container->get('prooph_service_bus.command_bus.main_bus');
 
         self::assertInstanceOf(CommandBus::class, $commandBus);
+    }
+
+    /**
+     * @test
+     */
+    public function it_creates_multiple_command_buses()
+    {
+        $container = $this->loadContainer('command_bus_multiple');
+
+        foreach (['main', 'second'] as $name) {
+            $config = $container->getDefinition('prooph_service_bus.command_bus.' . $name . '_bus');
+
+            self::assertEquals(CommandBus::class, $config->getClass());
+
+            /* @var $commandBus CommandBus */
+            $commandBus = $container->get('prooph_service_bus.command_bus.' . $name . '_bus');
+
+            self::assertInstanceOf(CommandBus::class, $commandBus);
+        }
     }
 
     /**
@@ -43,12 +62,31 @@ abstract class AbtractServiceBusExtensionTestCase extends TestCase
 
         $config = $container->getDefinition('prooph_service_bus.query_bus.main_bus');
 
-        self::assertEquals('Prooph\ServiceBus\QueryBus', $config->getClass());
+        self::assertEquals(QueryBus::class, $config->getClass());
 
         /* @var $queryBus QueryBus */
         $queryBus = $container->get('prooph_service_bus.query_bus.main_bus');
 
         self::assertInstanceOf(QueryBus::class, $queryBus);
+    }
+
+    /**
+     * @test
+     */
+    public function it_creates_multiple_query_buses()
+    {
+        $container = $this->loadContainer('query_bus_multiple');
+
+        foreach (['main', 'second'] as $name) {
+            $config = $container->getDefinition('prooph_service_bus.query_bus.' . $name . '_bus');
+
+            self::assertEquals(QueryBus::class, $config->getClass());
+
+            /* @var $queryBus QueryBus */
+            $queryBus = $container->get('prooph_service_bus.query_bus.' . $name . '_bus');
+
+            self::assertInstanceOf(QueryBus::class, $queryBus);
+        }
     }
 
     /**
@@ -60,12 +98,32 @@ abstract class AbtractServiceBusExtensionTestCase extends TestCase
 
         $config = $container->getDefinition('prooph_service_bus.event_bus.main_bus');
 
-        self::assertEquals('Prooph\ServiceBus\EventBus', $config->getClass());
+        self::assertEquals(EventBus::class, $config->getClass());
 
         /* @var $eventBus EventBus */
         $eventBus = $container->get('prooph_service_bus.event_bus.main_bus');
 
         self::assertInstanceOf(EventBus::class, $eventBus);
+    }
+
+    /**
+     * @test
+     */
+    public function it_creates_multiple_event_buses()
+    {
+        $container = $this->loadContainer('event_bus_multiple');
+
+
+        foreach (['main', 'second'] as $name) {
+            $config = $container->getDefinition('prooph_service_bus.event_bus.' . $name . '_bus');
+
+            self::assertEquals(EventBus::class, $config->getClass());
+
+            /* @var $eventBus EventBus */
+            $eventBus = $container->get('prooph_service_bus.event_bus.' . $name . '_bus');
+
+            self::assertInstanceOf(EventBus::class, $eventBus);
+        }
     }
 
     private function loadContainer($fixture, CompilerPassInterface $compilerPass = null)

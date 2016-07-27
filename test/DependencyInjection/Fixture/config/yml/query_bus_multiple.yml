@@ -9,3 +9,13 @@ prooph_service_bus:
         routes:
           'Prooph\ProophessorDo\Model\User\Query\UserList': 'Prooph\ProophessorDo\Model\User\Query\UserListUserHandler'
           'Prooph\ProophessorDo\Model\Todo\Query\TodoList': 'Prooph\ProophessorDo\Model\User\Query\TodoListHandler'
+
+    # uses default values
+    second:
+      plugins:
+        - 'Prooph\ServiceBus\Plugin\InvokeStrategy\OnEventStrategy'
+        - 'Prooph\ServiceBus\Plugin\InvokeStrategy\OnEventStrategy'
+      router:
+        routes:
+          'Prooph\ProophessorDo\Model\User\Query\UserList': 'Prooph\ProophessorDo\Model\User\Query\UserListUserHandler'
+          'Prooph\ProophessorDo\Model\Todo\Query\TodoList': 'Prooph\ProophessorDo\Model\User\Query\TodoListHandler'
