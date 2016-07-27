@@ -7,7 +7,7 @@
  * @license   https://github.com/prooph/service-bus-symfony-bundle/blob/master/LICENSE.md New BSD License
  */
 
-declare(strict_types = 1);
+declare (strict_types = 1);
 
 namespace Prooph\Bundle\ServiceBus\DependencyInjection;
 
@@ -22,8 +22,6 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 final class Configuration implements ConfigurationInterface
 {
     private $debug;
-
-    private $availableBuses = ['command_bus', 'event_bus', 'query_bus'];
 
     /**
      * Constructor
@@ -45,34 +43,9 @@ final class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('prooph_service_bus');
 
-        // cycle through bus types and add XML normalization
-        foreach ($this->availableBuses as $bus) {
-            $rootNode
-                ->beforeNormalization()
-                ->ifTrue
-                (
-                    // check for XML config neither command_buses or command_bus, but not both
-                    function ($v) use ($bus) {
-                        return is_array($v) && !array_key_exists('command_buses', $v) && !array_key_exists('command_bus', $v);
-//                        return !isset($v[$bus . 'es']) && isset($v[$bus]) && !isset($v[$bus]) && is_array($v[$bus]);
-                    }
-                )
-                ->then(function ($v) use ($bus) {
-                    // normalize XML config
-                    $command_bus = [];
-                    foreach ($v[$bus] as $key => $value) {
-                        $command_bus[$key] = $v[$bus][$key];
-                    }
-                    unset($v[$bus]);
-                    $v[$bus . 'es'] = $command_bus;
-
-                    return $v;
-                });
-        }
-
         $this->addServiceBusSections('command',  CommandRouter::class, $rootNode);
-//        $this->addServiceBusSections('event',  EventRouter::class, $rootNode);
-//        $this->addServiceBusSections('query',  QueryRouter::class, $rootNode);
+        $this->addServiceBusSections('event',  EventRouter::class, $rootNode);
+        $this->addServiceBusSections('query',  QueryRouter::class, $rootNode);
 
         return $treeBuilder;
     }
@@ -86,27 +59,37 @@ final class Configuration implements ConfigurationInterface
      */
     private function addServiceBusSections(string $type, string $routerClass, ArrayNodeDefinition $node)
     {
+        $treeBuilder = new TreeBuilder();
+        $routesNode = $treeBuilder->root('routes');
+
+        /** @var $routesNode ArrayNodeDefinition */
+        $listenerNode = $routesNode
+            ->requiresAtLeastOneElement()
+            ->useAttributeAsKey($type)
+            ->prototype('event' === $type ? 'array' : 'scalar')
+        ;
+
+        if ('event' === $type) {
+            $listenerNode
+                    ->beforeNormalization()
+                        ->ifTrue(function ($v) {
+                            // XML uses listener nodes
+                            return isset($v['listener']);
+                        })
+                        ->then(function ($v) {
+                            // fix single node in XML
+                            return (array)$v['listener'];
+                        })
+                    ->end()
+                    ->prototype('scalar')->end()
+                ->end()
+            ;
+        }
+
         $node
             ->fixXmlConfig($type . '_bus', $type . '_buses')
             ->children()
             ->arrayNode($type . '_buses')
-                ->beforeNormalization()
-                    ->always(function ($v) {
-
-                        $bus = 'command';
-                        // normalize XML config
-
-                        return $v;
-                        $command_bus = [];
-                        foreach ($v[$bus] as $key => $value) {
-                            $command_bus[$key] = $v[$bus][$key];
-                        }
-                        unset($v[$bus]);
-                        $v[$bus . 'es'] = $command_bus;
-
-                        return $v;
-                    })
-                    ->end()
                 ->requiresAtLeastOneElement()
                 ->useAttributeAsKey('name')
                 ->prototype('array')
@@ -124,98 +107,11 @@ final class Configuration implements ConfigurationInterface
                         ->fixXmlConfig('route', 'routes')
                         ->children()
                             ->scalarNode('type')->defaultValue($routerClass)->end()
-                            ->arrayNode('routes')
-                                ->useAttributeAsKey($type)
-                                    ->prototype('scalar')->end()
-                                ->end()
-                            ->end()
-                        ->end()
-                    ->end()
-                ->end()
-            ->end()
-            // dbal
-//            ->fixXmlConfig($type . '_bus')
-//            ->children()
-//                ->append($this->getServiceBusNode($type, $routerClass))
-//            ->end()
-        ;
-    }
-
-    /**
-     * Return the service bus node
-     *
-     * @return ArrayNodeDefinition
-     */
-    private function getServiceBusNode($type, $routerClass)
-    {
-        $treeBuilder = new TreeBuilder();
-        $node = $treeBuilder->root($type . '_buses');
-
-        $node->beforeNormalization()
-            ->ifTrue
-            (
-            // check for XML config
-                function ($v) {
-                    $bus = 'command';
-                    return !isset($v[$bus . 'es']) && isset($v[$bus]) && is_array($v[$bus]);
-                }
-            )
-            ->then(function ($v) {
-
-                $bus = 'command';
-                // normalize XML config
-                $command_bus = [];
-                foreach ($v[$bus] as $key => $value) {
-                    $command_bus[$key] = $v[$bus][$key];
-                }
-                unset($v[$bus]);
-                $v[$bus . 'es'] = $command_bus;
-
-                return $v;
-            })
-            ->end();
-
-        /** @var $serviceBusNode ArrayNodeDefinition */
-        $serviceBusNode = $node
-            ->requiresAtLeastOneElement()
-            ->useAttributeAsKey('name')
-            ->prototype('array')
-        ;
-
-        $serviceBusNode
-            ->fixXmlConfig('plugin', 'plugins')
-            ->children()
-                ->scalarNode('message_factory')->defaultValue(MessageFactory::class)->end()
-                ->arrayNode('plugins')
-                    ->beforeNormalization()
-                        // fix single node in XML
-                        ->ifString()->then(function ($v) { return [$v];})
-                    ->end()
-                    ->prototype('scalar')->end()
-                ->end()
-                ->arrayNode('router')
-                    ->fixXmlConfig('route', 'routes')
-                    ->children()
-                        ->scalarNode('type')->defaultValue($routerClass)->end()
-                        ->arrayNode('routes')
-                            ->useAttributeAsKey('name')
-                            ->prototype('array')
-                                ->beforeNormalization()
-                                    ->ifString()
-                                    ->then(function ($v) {
-                                        return array('class' => $v);
-                                    })
-                                ->end()
-                                ->children()
-                                    ->scalarNode('class')->isRequired()->end()
-                                ->end()
-                            ->end()
+                            ->append($routesNode)
                         ->end()
                     ->end()
                 ->end()
             ->end()
         ;
-
-        return $node;
     }
 }

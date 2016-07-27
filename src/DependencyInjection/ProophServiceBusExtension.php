@@ -7,21 +7,18 @@
  * @license   https://github.com/prooph/service-bus-symfony-bundle/blob/master/LICENSE.md New BSD License
  */
 
-declare(strict_types = 1);
+declare (strict_types = 1);
 
 namespace Prooph\Bundle\ServiceBus\DependencyInjection;
 
-use Prooph\ServiceBus\{
-    CommandBus,
-    EventBus,
-    QueryBus,
-    Exception\RuntimeException,
-    Plugin\MessageFactoryPlugin,
-    Plugin\Router\CommandRouter,
-    Plugin\Router\EventRouter,
-    Plugin\Router\QueryRouter
-};
-
+use Prooph\ServiceBus\CommandBus;
+use Prooph\ServiceBus\EventBus;
+use Prooph\ServiceBus\QueryBus;
+use Prooph\ServiceBus\Exception\RuntimeException;
+use Prooph\ServiceBus\Plugin\MessageFactoryPlugin;
+use Prooph\ServiceBus\Plugin\Router\CommandRouter;
+use Prooph\ServiceBus\Plugin\Router\EventRouter;
+use Prooph\ServiceBus\Plugin\Router\QueryRouter;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
@@ -33,7 +30,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
  */
 final class ProophServiceBusExtension extends Extension
 {
-    private $buses = [
+    private $availableBuses = [
         'command_bus' => CommandBus::class,
         'event_bus' => EventBus::class,
         'query_bus' => QueryBus::class,
@@ -58,7 +55,7 @@ final class ProophServiceBusExtension extends Extension
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('service_bus.xml');
 
-        foreach ($this->buses as $bus => $class) {
+        foreach ($this->availableBuses as $bus => $class) {
             if (!empty($config[$bus . 'es'])) {
                 $this->busLoad($bus, $class, $config, $container, $loader);
             }
@@ -94,12 +91,12 @@ final class ProophServiceBusExtension extends Extension
         $loader->load($type . '.xml');
 
         $typePlural = $type . 'es';
-        $commandBuses = [];
+        $serviceBuses = [];
 
         foreach (array_keys($config[$typePlural]) as $name) {
-            $commandBuses[$name] = sprintf('prooph_service_bus.' . $type . '.%s_bus', $name);
+            $serviceBuses[$name] = sprintf('prooph_service_bus.' . $type . '.%s_bus', $name);
         }
-        $container->setParameter('prooph_service_bus.' . $typePlural, $commandBuses);
+        $container->setParameter('prooph_service_bus.' . $typePlural, $serviceBuses);
 
         $def = $container->getDefinition('prooph_service_bus.' . $type);
         $def->setClass($class);
@@ -110,7 +107,7 @@ final class ProophServiceBusExtension extends Extension
     }
 
     /**
-     * Initializes service bus class with plugins and routes
+     * Initializes specific service bus class with plugins and routes
      *
      * @param string $type
      * @param string $name
@@ -119,7 +116,7 @@ final class ProophServiceBusExtension extends Extension
      */
     private function loadBus(string $type, string $name, array $options, ContainerBuilder $container)
     {
-        $commandBusDefinition = $container->setDefinition(
+        $serviceBusDefinition = $container->setDefinition(
             sprintf('prooph_service_bus.%s.%s_bus', $type, $name),
             new DefinitionDecorator('prooph_service_bus.' . $type)
         );
@@ -133,17 +130,17 @@ final class ProophServiceBusExtension extends Extension
                     ));
                 }
 
-                $commandBusDefinition->addMethodCall('utilize', [$container->get($util)]);
+                $serviceBusDefinition->addMethodCall('utilize', [$container->get($util)]);
             }
         }
 
-        $commandBusDefinition->addMethodCall(
+        $serviceBusDefinition->addMethodCall(
             'utilize',
             [new MessageFactoryPlugin($container->get($options['message_factory']))]
         );
 
         if (!empty($options['router']['routes'])) {
-            $commandBusDefinition->addMethodCall('utilize', [$this->attachRouter($options['router'])]);
+            $serviceBusDefinition->addMethodCall('utilize', [$this->attachRouter($options['router'])]);
         }
     }
 
@@ -153,5 +150,4 @@ final class ProophServiceBusExtension extends Extension
 
         return new $routerClass($routerConfig['routes'] ?? []);
     }
-
 }

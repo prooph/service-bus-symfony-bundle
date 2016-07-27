@@ -1,7 +1,9 @@
 <?php
 $finder = Symfony\CS\Finder\DefaultFinder::create()
+    ->exclude('DependencyInjection/Fixture/config')
+    ->exclude('Resources/config')
     ->in('src')
-    ->in('test')
+    ->in('test');
 $config = Symfony\CS\Config\Config::create();
 $config->level(null);
 $config->fixers(
