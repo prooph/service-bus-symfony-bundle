@@ -2,7 +2,7 @@
 
 ## Installation
 
-Installation of this module uses composer. For composer documentation, please refer to
+Installation of this Symfony bundle uses Composer. For Composer documentation, please refer to
 [getcomposer.org](http://getcomposer.org/).
 
 Run `composer require prooph/service-bus-symfony-bundle` to install prooph service-bus-symfony-bundle.
