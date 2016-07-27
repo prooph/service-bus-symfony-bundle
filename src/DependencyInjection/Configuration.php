@@ -120,6 +120,10 @@ final class Configuration implements ConfigurationInterface
             ->children()
                 ->scalarNode('message_factory')->defaultValue(MessageFactory::class)->end()
                 ->arrayNode('plugins')
+                    ->beforeNormalization()
+                        // fix single node in XML
+                        ->ifString()->then(function ($v) { return [$v];})
+                    ->end()
                     ->prototype('scalar')->end()
                 ->end()
                 ->arrayNode('router')
