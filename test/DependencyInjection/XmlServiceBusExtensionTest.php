@@ -12,7 +12,7 @@ class XmlServiceBusExtensionTest extends AbtractServiceBusExtensionTestCase
 {
     protected function loadFromFile(ContainerBuilder $container, $file)
     {
-        $loadYaml = new XmlFileLoader($container, new FileLocator(__DIR__.'/Fixture/config/xml'));
-        $loadYaml->load($file.'.xml');
+        $loadXml = new XmlFileLoader($container, new FileLocator(__DIR__.'/Fixture/config/xml'));
+        $loadXml->load($file.'.xml');
     }
 }

@@ -10,8 +10,8 @@
             <plugin>Prooph\ServiceBus\Plugin\InvokeStrategy\OnEventStrategy</plugin>
             <router type="Prooph\ServiceBus\Plugin\Router\EventRouter">
                 <route event="Prooph\ProophessorDo\Model\Todo\Event\TodoWasPosted">
-                    <value>Prooph\ProophessorDo\Projection\Todo\TodoProjector</value>
-                    <value>Prooph\ProophessorDo\Projection\Todo\UserProjector</value>
+                    <listener>Prooph\ProophessorDo\Projection\Todo\TodoProjector</listener>
+                    <listener>Prooph\ProophessorDo\Projection\Todo\UserProjector</listener>
                 </route>
             </router>
         </event_bus>

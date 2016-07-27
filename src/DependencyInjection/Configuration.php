@@ -23,7 +23,7 @@ final class Configuration implements ConfigurationInterface
 {
     private $debug;
 
-    private $buses = ['command_bus', 'event_bus', 'query_bus'];
+    private $availableBuses = ['command_bus', 'event_bus', 'query_bus'];
 
     /**
      * Constructor
@@ -46,12 +46,12 @@ final class Configuration implements ConfigurationInterface
         $rootNode = $treeBuilder->root('prooph_service_bus');
 
         // cycle through bus types and add XML normalization
-        foreach ($this->buses as $bus) {
+        foreach ($this->availableBuses as $bus) {
             $rootNode
                 ->beforeNormalization()
                 ->ifTrue
                 (
-                // check for XML config
+                    // check for XML config
                     function ($v) use ($bus) {
                         return !isset($v[$bus . 'es']) && isset($v[$bus]) && is_array($v[$bus]);
                     }

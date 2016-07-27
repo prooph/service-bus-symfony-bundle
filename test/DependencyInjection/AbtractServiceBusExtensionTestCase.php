@@ -99,7 +99,7 @@ abstract class AbtractServiceBusExtensionTestCase extends TestCase
             'kernel.bundles' => $map,
             'kernel.cache_dir' => sys_get_temp_dir(),
             'kernel.environment' => 'test',
-            'kernel.root_dir' => __DIR__ . '/../../src', // src dir
+            'kernel.root_dir' => __DIR__ . '/../../src',
         ]));
     }
 
