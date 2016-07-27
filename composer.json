@@ -5,7 +5,17 @@
   "license": "BSD-3-Clause",
   "type": "service-bus-symfony-bundle",
   "keywords": [
-    "php"
+    "prooph",
+    "Messaging",
+    "CQRS",
+    "Symfony",
+    "Bundle",
+    "Service Bus",
+    "Event Bus",
+    "Query Bus",
+    "Message Bus",
+    "DDD",
+    "PHP"
   ],
   "authors": [
     {
@@ -13,6 +23,10 @@
       "email": "contact@prooph.de",
       "homepage": "http://www.prooph.de",
       "role": "maintainer"
+    },
+    {
+      "name": "Sascha-Oliver Prolic",
+      "email": "saschaprolic@googlemail.com"
     },
     {
       "name": "Sandro Keil",
