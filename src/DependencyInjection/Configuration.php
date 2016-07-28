@@ -43,9 +43,9 @@ final class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('prooph_service_bus');
 
-        $this->addServiceBusSections('command',  CommandRouter::class, $rootNode);
-        $this->addServiceBusSections('event',  EventRouter::class, $rootNode);
-        $this->addServiceBusSections('query',  QueryRouter::class, $rootNode);
+        $this->addServiceBusSection('command',  CommandRouter::class, $rootNode);
+        $this->addServiceBusSection('event',  EventRouter::class, $rootNode);
+        $this->addServiceBusSection('query',  QueryRouter::class, $rootNode);
 
         return $treeBuilder;
     }
@@ -55,9 +55,11 @@ final class Configuration implements ConfigurationInterface
      *
      * @link https://github.com/prooph/service-bus
      *
+     * @param string $type Bus type
+     * @param string $routerClass Bus router class
      * @param ArrayNodeDefinition $node
      */
-    private function addServiceBusSections(string $type, string $routerClass, ArrayNodeDefinition $node)
+    private function addServiceBusSection(string $type, string $routerClass, ArrayNodeDefinition $node)
     {
         $treeBuilder = new TreeBuilder();
         $routesNode = $treeBuilder->root('routes');
