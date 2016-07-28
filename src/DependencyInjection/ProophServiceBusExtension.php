@@ -15,7 +15,6 @@ use Prooph\ServiceBus\CommandBus;
 use Prooph\ServiceBus\EventBus;
 use Prooph\ServiceBus\QueryBus;
 use Prooph\ServiceBus\Exception\RuntimeException;
-use Prooph\ServiceBus\Plugin\MessageFactoryPlugin;
 use Prooph\ServiceBus\Plugin\Router\CommandRouter;
 use Prooph\ServiceBus\Plugin\Router\EventRouter;
 use Prooph\ServiceBus\Plugin\Router\QueryRouter;
@@ -23,6 +22,7 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /**
@@ -107,12 +107,16 @@ final class ProophServiceBusExtension extends Extension
     }
 
     /**
-     * Initializes specific service bus class with plugins and routes
+     * Initializes specific service bus class with plugins and routes. Each class dependency must be set via a container
+     * or reference definition.
      *
      * @param string $type
      * @param string $name
      * @param array $options
      * @param ContainerBuilder $container
+     * @throws \Symfony\Component\DependencyInjection\Exception\BadMethodCallException
+     * @throws \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @throws \Prooph\ServiceBus\Exception\RuntimeException
      */
     private function loadBus(string $type, string $name, array $options, ContainerBuilder $container)
     {
@@ -130,24 +134,34 @@ final class ProophServiceBusExtension extends Extension
                     ));
                 }
 
-                $serviceBusDefinition->addMethodCall('utilize', [$container->get($util)]);
+                $serviceBusDefinition->addMethodCall('utilize', [new Reference($util)]);
             }
         }
+        // define message factory plugin
+        $messageFactoryId = 'prooph_service_bus.message_factory_plugin.' . $name;
 
-        $serviceBusDefinition->addMethodCall(
-            'utilize',
-            [new MessageFactoryPlugin($container->get($options['message_factory']))]
-        );
+        $container
+            ->setDefinition(
+                $messageFactoryId,
+                new DefinitionDecorator('prooph_service_bus.message_factory_plugin')
+            )
+            ->setArguments([new Reference($options['message_factory'])]);
 
-        if (!empty($options['router']['routes'])) {
-            $serviceBusDefinition->addMethodCall('utilize', [$this->attachRouter($options['router'])]);
+        $serviceBusDefinition->addMethodCall('utilize', [new Reference($messageFactoryId)]);
+
+
+        // define router
+        if (!empty($options['router'])) {
+            $routerId = sprintf('prooph_service_bus.%s.%s', $type . '_router', $name);
+
+            $routerDefinition = $container->setDefinition(
+                $routerId,
+                new DefinitionDecorator('prooph_service_bus.' . $type . '_router')
+            );
+            $routerDefinition->setClass($options['router']['type']);
+            $routerDefinition->setArguments([$options['router']['routes'] ?? []]);
+
+            $serviceBusDefinition->addMethodCall('utilize', [new Reference($routerId)]);
         }
-    }
-
-    private function attachRouter(array $routerConfig)
-    {
-        $routerClass = (string)$routerConfig['type'];
-
-        return new $routerClass($routerConfig['routes'] ?? []);
     }
 }

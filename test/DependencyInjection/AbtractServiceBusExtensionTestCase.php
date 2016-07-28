@@ -19,6 +19,9 @@ use Prooph\ServiceBus\QueryBus;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ResolveDefinitionTemplatesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Dumper\Dumper;
+use Symfony\Component\DependencyInjection\Dumper\XmlDumper;
+use Symfony\Component\DependencyInjection\Dumper\YamlDumper;
 use \Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 abstract class AbtractServiceBusExtensionTestCase extends TestCase
@@ -64,6 +67,14 @@ abstract class AbtractServiceBusExtensionTestCase extends TestCase
     /**
      * @test
      */
+    public function it_dumps_multiple_command_buses()
+    {
+        $this->dump('command_bus_multiple');
+    }
+
+    /**
+     * @test
+     */
     public function it_creates_a_query_bus()
     {
         $container = $this->loadContainer('query_bus');
@@ -95,6 +106,14 @@ abstract class AbtractServiceBusExtensionTestCase extends TestCase
 
             self::assertInstanceOf(QueryBus::class, $queryBus);
         }
+    }
+
+    /**
+     * @test
+     */
+    public function it_dumps_multiple_query_buses()
+    {
+        $this->dump('query_bus_multiple');
     }
 
     /**
@@ -132,6 +151,14 @@ abstract class AbtractServiceBusExtensionTestCase extends TestCase
 
             self::assertInstanceOf(EventBus::class, $eventBus);
         }
+    }
+
+    /**
+     * @test
+     */
+    public function it_dumps_multiple_event_buses()
+    {
+        $this->dump('event_bus_multiple');
     }
 
     private function loadContainer($fixture, CompilerPassInterface $compilerPass = null)
@@ -174,5 +201,19 @@ abstract class AbtractServiceBusExtensionTestCase extends TestCase
         $container->getCompilerPassConfig()->setOptimizationPasses([new ResolveDefinitionTemplatesPass()]);
         $container->getCompilerPassConfig()->setRemovingPasses([]);
         $container->compile();
+    }
+
+    private function dump(string $configFile)
+    {
+        $container = $this->loadContainer($configFile);
+        $dumper = null;
+
+        if ($this instanceof XmlServiceBusExtensionTest) {
+            $dumper = new XmlDumper($container);
+        } elseif ($this instanceof YamlServiceBusExtensionTest) {
+            $dumper = new YamlDumper($container);
+        }
+        self::assertInstanceOf(Dumper::class, $dumper, sprintf('Test type "%s" not supported', get_class($this)));
+        self::assertNotEmpty($dumper->dump());
     }
 }
