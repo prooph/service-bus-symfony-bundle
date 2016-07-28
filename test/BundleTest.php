@@ -9,7 +9,7 @@
 
 declare (strict_types = 1);
 
-namespace ProophTest\Bundle;
+namespace ProophTest\Bundle\ServiceBus;
 
 use PHPUnit_Framework_TestCase as TestCase;
 use Prooph\Bundle\ServiceBus\ProophServiceBusBundle;

@@ -11,10 +11,10 @@ declare (strict_types = 1);
 
 namespace Prooph\Bundle\ServiceBus\DependencyInjection;
 
+use Prooph\Bundle\ServiceBus\Exception\RuntimeException;
 use Prooph\ServiceBus\CommandBus;
 use Prooph\ServiceBus\EventBus;
 use Prooph\ServiceBus\QueryBus;
-use Prooph\ServiceBus\Exception\RuntimeException;
 use Prooph\ServiceBus\Plugin\Router\CommandRouter;
 use Prooph\ServiceBus\Plugin\Router\EventRouter;
 use Prooph\ServiceBus\Plugin\Router\QueryRouter;
@@ -116,7 +116,7 @@ final class ProophServiceBusExtension extends Extension
      * @param ContainerBuilder $container
      * @throws \Symfony\Component\DependencyInjection\Exception\BadMethodCallException
      * @throws \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @throws \Prooph\ServiceBus\Exception\RuntimeException
+     * @throws \Prooph\Bundle\ServiceBus\Exception\RuntimeException
      */
     private function loadBus(string $type, string $name, array $options, ContainerBuilder $container)
     {
