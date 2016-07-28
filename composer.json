@@ -3,7 +3,7 @@
   "description": "",
   "homepage": "https://github.com/prooph/service-bus-symfony-bundle",
   "license": "BSD-3-Clause",
-  "type": "service-bus-symfony-bundle",
+  "type": "symfony-bundle",
   "keywords": [
     "prooph",
     "Messaging",
