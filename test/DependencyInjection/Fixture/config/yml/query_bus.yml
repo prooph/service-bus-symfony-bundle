@@ -1,0 +1,11 @@
+prooph_service_bus:
+  query_buses:
+    main:
+      plugins:
+        - 'Prooph\ServiceBus\Plugin\InvokeStrategy\OnEventStrategy'
+      message_factory: 'Prooph\Common\Messaging\MessageFactory'
+      router:
+        type: 'Prooph\ServiceBus\Plugin\Router\QueryRouter'
+        routes:
+          'Prooph\ProophessorDo\Model\User\Query\UserList': 'Prooph\ProophessorDo\Model\User\Query\UserListUserHandler'
+          'Prooph\ProophessorDo\Model\Todo\Query\TodoList': 'Prooph\ProophessorDo\Model\User\Query\TodoListHandler'

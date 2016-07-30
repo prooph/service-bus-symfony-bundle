@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+
+<srv:container xmlns="http://getprooph.org/schemas/symfony-dic/prooph"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xmlns:srv="http://symfony.com/schema/dic/services"
+               xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd
+                        http://getprooph.org/schemas/symfony-dic/prooph http://getprooph.org/schemas/symfony-dic/prooph/service_bus-5.1.xsd">
+
+    <config>
+        <query_bus name="main" message_factory="Prooph\Common\Messaging\MessageFactory">
+            <plugin>Prooph\ServiceBus\Plugin\InvokeStrategy\OnEventStrategy</plugin>
+            <router type="Prooph\ServiceBus\Plugin\Router\QueryRouter">
+                <route query="Prooph\ProophessorDo\Model\User\Query\UserList">
+                    Prooph\ProophessorDo\Model\User\Query\UserListUserHandler
+                </route>
+                <route query="Prooph\ProophessorDo\Model\Todo\Query\TodoList">
+                    Prooph\ProophessorDo\Model\User\Query\TodoListHandler
+                </route>
+            </router>
+        </query_bus>
+    </config>
+</srv:container>
