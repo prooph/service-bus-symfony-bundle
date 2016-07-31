@@ -7,7 +7,7 @@
  * @license   https://github.com/prooph/service-bus-symfony-bundle/blob/master/LICENSE.md New BSD License
  */
 
-declare(strict_types = 1);
+declare (strict_types = 1);
 
 namespace Prooph\Bundle\ServiceBus\Container;
 
@@ -33,7 +33,6 @@ class SymfonyContainerWrapper implements ContainerInterface
     public function get($id)
     {
         return $this->innerContainer->get($id);
-
     }
 
     /**

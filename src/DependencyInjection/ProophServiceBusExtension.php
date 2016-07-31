@@ -164,7 +164,7 @@ final class ProophServiceBusExtension extends Extension
 
             $serviceBusDefinition->addMethodCall('utilize', [new Reference($routerId)]);
         }
-        
+
         //Add container plugin
         $containerWrapperId = 'prooph_service_bus.container_wrapper.' . $name;
 
@@ -174,7 +174,7 @@ final class ProophServiceBusExtension extends Extension
         );
 
         $containerWrapperDefinition->setArguments([new Reference('service_container')]);
-        
+
         $containerPluginId = 'prooph_service_bus.container_plugin.' . $name;
 
         $containerPluginDefinition = $container->setDefinition(
