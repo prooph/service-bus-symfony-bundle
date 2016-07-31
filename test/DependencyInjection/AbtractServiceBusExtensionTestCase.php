@@ -16,6 +16,8 @@ use Prooph\Bundle\ServiceBus\DependencyInjection\ProophServiceBusExtension;
 use Prooph\ServiceBus\CommandBus;
 use Prooph\ServiceBus\EventBus;
 use Prooph\ServiceBus\QueryBus;
+use ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AcmeRegisterUserCommand;
+use ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AcmeRegisterUserHandler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ResolveDefinitionTemplatesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -70,6 +72,26 @@ abstract class AbtractServiceBusExtensionTestCase extends TestCase
     public function it_dumps_multiple_command_buses()
     {
         $this->dump('command_bus_multiple');
+    }
+
+    /**
+     * @test
+     */
+    public function it_adds_default_container_plugin()
+    {
+        $container = $this->loadContainer('command_bus');
+
+        /* @var $commandBus CommandBus */
+        $commandBus = $container->get('prooph_service_bus.command_bus.main_bus');
+
+        /** @var AcmeRegisterUserHandler $mockHandler */
+        $mockHandler = $container->get('Acme\RegisterUserHandler');
+
+        $command = new AcmeRegisterUserCommand(['name' => 'John Doe']);
+
+        $commandBus->dispatch($command);
+
+        $this->assertSame($command, $mockHandler->lastCommand());
     }
 
     /**

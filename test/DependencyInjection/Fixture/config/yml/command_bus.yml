@@ -5,7 +5,11 @@ prooph_service_bus:
       router:
         type: 'Prooph\ServiceBus\Plugin\Router\CommandRouter'
         routes:
-          'Prooph\ProophessorDo\Model\User\Command\RegisterUser': 'Prooph\ProophessorDo\Model\User\Handler\RegisterUserHandler'
-          'Prooph\ProophessorDo\Model\User\Command\UpdateUser': 'Prooph\ProophessorDo\Model\User\Handler\UpdateUserHandler'
+          'Acme\RegisterUser': 'Acme\RegisterUserHandler'
+          'Acme\UpdateUser': 'Acme\UpdateUserHandler'
       plugins:
         - 'Prooph\ServiceBus\Plugin\InvokeStrategy\OnEventStrategy'
+
+services:
+  'Acme\RegisterUserHandler':
+    class: ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AcmeRegisterUserHandler
