@@ -11,7 +11,6 @@ declare (strict_types = 1);
 
 namespace Prooph\Bundle\ServiceBus\DependencyInjection;
 
-use Prooph\Bundle\ServiceBus\Exception\RuntimeException;
 use Prooph\ServiceBus\CommandBus;
 use Prooph\ServiceBus\EventBus;
 use Prooph\ServiceBus\QueryBus;
@@ -128,13 +127,6 @@ final class ProophServiceBusExtension extends Extension
 
         if (!empty($options['plugins'])) {
             foreach ($options['plugins'] as $index => $util) {
-                if (!is_string($util) || !$container->has($util)) {
-                    throw new RuntimeException(sprintf(
-                        'Wrong message bus utility "%s" configured. It is unknown by the container.',
-                        $util
-                    ));
-                }
-
                 $serviceBusDefinition->addMethodCall('utilize', [new Reference($util)]);
             }
         }
