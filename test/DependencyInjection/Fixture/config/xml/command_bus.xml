@@ -10,9 +10,13 @@
         <command_bus name="main" message_factory="Prooph\Common\Messaging\MessageFactory">
             <plugin>Prooph\ServiceBus\Plugin\InvokeStrategy\OnEventStrategy</plugin>
             <router type="Prooph\ServiceBus\Plugin\Router\CommandRouter">
-                <route command="Prooph\ProophessorDo\Model\User\Command\RegisterUser">Prooph\ProophessorDo\Model\User\Handler\RegisterUserHandler</route>
-                <route command="Prooph\ProophessorDo\Model\User\Command\UpdateUser">Prooph\ProophessorDo\Model\User\Handler\UpdateUserHandler</route>
+                <route command="Acme\RegisterUser">Acme\RegisterUserHandler</route>
+                <route command="Acme\UpdateUser">Acme\UpdateUserHandler</route>
             </router>
         </command_bus>
     </config>
+
+    <srv:services>
+        <srv:service id="Acme\RegisterUserHandler" class="ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AcmeRegisterUserHandler" />
+    </srv:services>
 </srv:container>

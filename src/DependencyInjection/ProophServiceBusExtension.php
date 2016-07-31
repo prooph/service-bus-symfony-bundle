@@ -20,6 +20,7 @@ use Prooph\ServiceBus\Plugin\Router\EventRouter;
 use Prooph\ServiceBus\Plugin\Router\QueryRouter;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
@@ -163,5 +164,26 @@ final class ProophServiceBusExtension extends Extension
 
             $serviceBusDefinition->addMethodCall('utilize', [new Reference($routerId)]);
         }
+        
+        //Add container plugin
+        $containerWrapperId = 'prooph_service_bus.container_wrapper.' . $name;
+
+        $containerWrapperDefinition = $container->setDefinition(
+            $containerWrapperId,
+            new DefinitionDecorator('prooph_service_bus.container_wrapper')
+        );
+
+        $containerWrapperDefinition->setArguments([new Reference('service_container')]);
+        
+        $containerPluginId = 'prooph_service_bus.container_plugin.' . $name;
+
+        $containerPluginDefinition = $container->setDefinition(
+            $containerPluginId,
+            new DefinitionDecorator('prooph_service_bus.container_plugin')
+        );
+
+        $containerPluginDefinition->setArguments([new Reference($containerWrapperId)]);
+
+        $serviceBusDefinition->addMethodCall('utilize', [new Reference($containerPluginId)]);
     }
 }
