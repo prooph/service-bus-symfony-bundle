@@ -7,17 +7,15 @@
                         http://getprooph.org/schemas/symfony-dic/prooph http://getprooph.org/schemas/symfony-dic/prooph/service_bus-5.1.xsd">
 
     <config>
-        <query_bus name="main" message_factory="Prooph\Common\Messaging\MessageFactory">
+        <query_bus name="main" message_factory="prooph_service_bus.message_factory">
             <plugin>Prooph\ServiceBus\Plugin\InvokeStrategy\OnEventStrategy</plugin>
-            <router type="Prooph\ServiceBus\Plugin\Router\QueryRouter">
+            <router type="prooph_service_bus.query_bus_router">
                 <route query="Prooph\ProophessorDo\Model\User\Query\UserList">Prooph\ProophessorDo\Model\User\Query\UserListUserHandler</route>
                 <route query="Prooph\ProophessorDo\Model\Todo\Query\TodoList">Prooph\ProophessorDo\Model\User\Query\TodoListHandler</route>
             </router>
         </query_bus>
         <!-- uses default values -->
         <query_bus name="second">
-            <plugin>Prooph\ServiceBus\Plugin\InvokeStrategy\OnEventStrategy</plugin>
-            <plugin>Prooph\ServiceBus\Plugin\InvokeStrategy\OnEventStrategy</plugin>
             <router>
                 <route query="Prooph\ProophessorDo\Model\User\Query\UserList">Prooph\ProophessorDo\Model\User\Query\UserListUserHandler</route>
                 <route query="Prooph\ProophessorDo\Model\Todo\Query\TodoList">Prooph\ProophessorDo\Model\User\Query\TodoListHandler</route>

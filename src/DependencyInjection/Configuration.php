@@ -11,10 +11,6 @@ declare (strict_types = 1);
 
 namespace Prooph\Bundle\ServiceBus\DependencyInjection;
 
-use Prooph\Common\Messaging\MessageFactory;
-use Prooph\ServiceBus\Plugin\Router\CommandRouter;
-use Prooph\ServiceBus\Plugin\Router\EventRouter;
-use Prooph\ServiceBus\Plugin\Router\QueryRouter;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -43,9 +39,9 @@ final class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('prooph_service_bus');
 
-        $this->addServiceBusSection('command',  CommandRouter::class, $rootNode);
-        $this->addServiceBusSection('event',  EventRouter::class, $rootNode);
-        $this->addServiceBusSection('query',  QueryRouter::class, $rootNode);
+        $this->addServiceBusSection('command', $rootNode);
+        $this->addServiceBusSection('event',  $rootNode);
+        $this->addServiceBusSection('query', $rootNode);
 
         return $treeBuilder;
     }
@@ -56,10 +52,9 @@ final class Configuration implements ConfigurationInterface
      * @link https://github.com/prooph/service-bus
      *
      * @param string $type Bus type
-     * @param string $routerClass Bus router class
      * @param ArrayNodeDefinition $node
      */
-    private function addServiceBusSection(string $type, string $routerClass, ArrayNodeDefinition $node)
+    private function addServiceBusSection(string $type, ArrayNodeDefinition $node)
     {
         $treeBuilder = new TreeBuilder();
         $routesNode = $treeBuilder->root('routes');
@@ -97,7 +92,7 @@ final class Configuration implements ConfigurationInterface
                 ->prototype('array')
                 ->fixXmlConfig('plugin', 'plugins')
                 ->children()
-                    ->scalarNode('message_factory')->defaultValue(MessageFactory::class)->end()
+                    ->scalarNode('message_factory')->defaultValue('prooph_service_bus.message_factory')->end()
                     ->arrayNode('plugins')
                         ->beforeNormalization()
                             // fix single node in XML
@@ -108,7 +103,7 @@ final class Configuration implements ConfigurationInterface
                     ->arrayNode('router')
                         ->fixXmlConfig('route', 'routes')
                         ->children()
-                            ->scalarNode('type')->defaultValue($routerClass)->end()
+                            ->scalarNode('type')->defaultValue('prooph_service_bus.' . $type . '_bus_router')->end()
                             ->append($routesNode)
                         ->end()
                     ->end()

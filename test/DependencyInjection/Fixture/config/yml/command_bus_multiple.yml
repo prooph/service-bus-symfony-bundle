@@ -1,20 +1,15 @@
 prooph_service_bus:
   command_buses:
     main:
-      plugins:
-        - 'Prooph\ServiceBus\Plugin\InvokeStrategy\OnEventStrategy'
-      message_factory: 'Prooph\Common\Messaging\MessageFactory'
+      message_factory: 'prooph_service_bus.message_factory'
       router:
-        type: 'Prooph\ServiceBus\Plugin\Router\CommandRouter'
+        type: 'prooph_service_bus.command_bus_router'
         routes:
           'Prooph\ProophessorDo\Model\User\Command\RegisterUser': 'Prooph\ProophessorDo\Model\User\Handler\RegisterUserHandler'
           'Prooph\ProophessorDo\Model\User\Command\UpdateUser': 'Prooph\ProophessorDo\Model\User\Handler\UpdateUserHandler'
 
     # uses default values
     second:
-      plugins:
-        - 'Prooph\ServiceBus\Plugin\InvokeStrategy\OnEventStrategy'
-        - 'Prooph\ServiceBus\Plugin\InvokeStrategy\OnEventStrategy'
       router:
         routes:
           'Prooph\ProophessorDo\Model\User\Command\RegisterUser': 'Prooph\ProophessorDo\Model\User\Handler\RegisterUserHandler'
