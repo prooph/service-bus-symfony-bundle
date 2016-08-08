@@ -3,9 +3,9 @@ prooph_service_bus:
     main:
       plugins:
         - 'Prooph\ServiceBus\Plugin\InvokeStrategy\OnEventStrategy'
-      message_factory: 'Prooph\Common\Messaging\MessageFactory'
+      message_factory: 'prooph_service_bus.message_factory'
       router:
-        type: 'Prooph\ServiceBus\Plugin\Router\EventRouter'
+        type: 'prooph_service_bus.event_bus_router'
         routes:
           'Prooph\ProophessorDo\Model\Todo\Event\TodoWasPosted':
             - 'Prooph\ProophessorDo\Projection\Todo\TodoProjector'

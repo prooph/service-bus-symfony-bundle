@@ -6,10 +6,11 @@
 
     <parameters>
         <parameter key="prooph_service_bus.command_bus_router.class">Prooph\ServiceBus\Plugin\Router\CommandRouter</parameter>
+        <parameter key="prooph_service_bus.command_bus.class">Prooph\ServiceBus\CommandBus</parameter>
     </parameters>
 
     <services>
-        <service id="prooph_service_bus.command_bus" class="Prooph\ServiceBus\CommandBus" abstract="true" />
+        <service id="prooph_service_bus.command_bus" class="%prooph_service_bus.command_bus.class%" abstract="true" />
         <service id="prooph_service_bus.command_bus_router" class="%prooph_service_bus.command_bus_router.class%" public="false" abstract="true" />
     </services>
 </container>

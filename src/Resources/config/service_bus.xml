@@ -6,6 +6,7 @@
 
     <parameters>
         <parameter key="prooph_service_bus.message_factory_plugin.class">Prooph\ServiceBus\Plugin\MessageFactoryPlugin</parameter>
+        <parameter key="prooph_service_bus.message_factory.class">Prooph\Common\Messaging\FQCNMessageFactory</parameter>
         <parameter key="prooph_service_bus.container_plugin.class">Prooph\ServiceBus\Plugin\ServiceLocatorPlugin</parameter>
         <parameter key="prooph_service_bus.container_wrapper.class">Prooph\Bundle\ServiceBus\Container\SymfonyContainerWrapper</parameter>
     </parameters>
@@ -15,8 +16,6 @@
         <service id="prooph_service_bus.message_factory_plugin" class="%prooph_service_bus.message_factory_plugin.class%" public="false" abstract="true" />
         <service id="prooph_service_bus.container_plugin" class="%prooph_service_bus.container_plugin.class%" public="false" abstract="true" />
         <service id="prooph_service_bus.container_wrapper" class="%prooph_service_bus.container_wrapper.class%" public="false" abstract="true" />
-
-        <!-- we use interfaces as id here, to define default classes -->
-        <service id="Prooph\Common\Messaging\MessageFactory" class="Prooph\Common\Messaging\FQCNMessageFactory" />
+        <service id="prooph_service_bus.message_factory" class="%prooph_service_bus.message_factory.class%" />
     </services>
 </container>

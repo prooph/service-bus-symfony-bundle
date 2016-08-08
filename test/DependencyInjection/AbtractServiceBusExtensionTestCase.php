@@ -15,6 +15,9 @@ use PHPUnit_Framework_TestCase as TestCase;
 use Prooph\Bundle\ServiceBus\DependencyInjection\ProophServiceBusExtension;
 use Prooph\ServiceBus\CommandBus;
 use Prooph\ServiceBus\EventBus;
+use Prooph\ServiceBus\Plugin\Router\CommandRouter;
+use Prooph\ServiceBus\Plugin\Router\EventRouter;
+use Prooph\ServiceBus\Plugin\Router\QueryRouter;
 use Prooph\ServiceBus\QueryBus;
 use ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AcmeRegisterUserCommand;
 use ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AcmeRegisterUserHandler;
@@ -45,6 +48,10 @@ abstract class AbtractServiceBusExtensionTestCase extends TestCase
         $commandBus = $container->get('prooph_service_bus.command_bus.main_bus');
 
         self::assertInstanceOf(CommandBus::class, $commandBus);
+
+        $router = $container->get('prooph_service_bus.command_bus_router.main');
+
+        self::assertInstanceOf(CommandRouter::class, $router);
     }
 
     /**
@@ -63,6 +70,10 @@ abstract class AbtractServiceBusExtensionTestCase extends TestCase
             $commandBus = $container->get('prooph_service_bus.command_bus.' . $name . '_bus');
 
             self::assertInstanceOf(CommandBus::class, $commandBus);
+
+            $router = $container->get('prooph_service_bus.command_bus_router.main');
+
+            self::assertInstanceOf(CommandRouter::class, $router);
         }
     }
 
@@ -91,7 +102,7 @@ abstract class AbtractServiceBusExtensionTestCase extends TestCase
 
         $commandBus->dispatch($command);
 
-        $this->assertSame($command, $mockHandler->lastCommand());
+        self::assertSame($command, $mockHandler->lastCommand());
     }
 
     /**
@@ -109,6 +120,10 @@ abstract class AbtractServiceBusExtensionTestCase extends TestCase
         $queryBus = $container->get('prooph_service_bus.query_bus.main_bus');
 
         self::assertInstanceOf(QueryBus::class, $queryBus);
+
+        $router = $container->get('prooph_service_bus.query_bus_router.main');
+
+        self::assertInstanceOf(QueryRouter::class, $router);
     }
 
     /**
@@ -127,6 +142,10 @@ abstract class AbtractServiceBusExtensionTestCase extends TestCase
             $queryBus = $container->get('prooph_service_bus.query_bus.' . $name . '_bus');
 
             self::assertInstanceOf(QueryBus::class, $queryBus);
+
+            $router = $container->get('prooph_service_bus.query_bus_router.main');
+
+            self::assertInstanceOf(QueryRouter::class, $router);
         }
     }
 
@@ -153,6 +172,10 @@ abstract class AbtractServiceBusExtensionTestCase extends TestCase
         $eventBus = $container->get('prooph_service_bus.event_bus.main_bus');
 
         self::assertInstanceOf(EventBus::class, $eventBus);
+
+        $router = $container->get('prooph_service_bus.event_bus_router.main');
+
+        self::assertInstanceOf(EventRouter::class, $router);
     }
 
     /**
@@ -172,6 +195,10 @@ abstract class AbtractServiceBusExtensionTestCase extends TestCase
             $eventBus = $container->get('prooph_service_bus.event_bus.' . $name . '_bus');
 
             self::assertInstanceOf(EventBus::class, $eventBus);
+
+            $router = $container->get('prooph_service_bus.event_bus_router.main');
+
+            self::assertInstanceOf(EventRouter::class, $router);
         }
     }
 

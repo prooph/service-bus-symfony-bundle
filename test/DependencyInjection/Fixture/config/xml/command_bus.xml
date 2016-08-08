@@ -7,9 +7,9 @@
                         http://getprooph.org/schemas/symfony-dic/prooph http://getprooph.org/schemas/symfony-dic/prooph/service_bus-5.1.xsd">
 
     <config>
-        <command_bus name="main" message_factory="Prooph\Common\Messaging\MessageFactory">
+        <command_bus name="main" message_factory="prooph_service_bus.message_factory">
             <plugin>Prooph\ServiceBus\Plugin\InvokeStrategy\OnEventStrategy</plugin>
-            <router type="Prooph\ServiceBus\Plugin\Router\CommandRouter">
+            <router type="prooph_service_bus.command_bus_router">
                 <route command="Acme\RegisterUser">Acme\RegisterUserHandler</route>
                 <route command="Acme\UpdateUser">Acme\UpdateUserHandler</route>
             </router>

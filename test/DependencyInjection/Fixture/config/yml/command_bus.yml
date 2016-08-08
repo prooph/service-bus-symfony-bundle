@@ -1,14 +1,12 @@
 prooph_service_bus:
   command_buses:
     main:
-      message_factory: 'Prooph\Common\Messaging\MessageFactory'
+      message_factory: 'prooph_service_bus.message_factory'
       router:
-        type: 'Prooph\ServiceBus\Plugin\Router\CommandRouter'
+        type: 'prooph_service_bus.command_bus_router'
         routes:
           'Acme\RegisterUser': 'Acme\RegisterUserHandler'
           'Acme\UpdateUser': 'Acme\UpdateUserHandler'
-      plugins:
-        - 'Prooph\ServiceBus\Plugin\InvokeStrategy\OnEventStrategy'
 
 services:
   'Acme\RegisterUserHandler':

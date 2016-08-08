@@ -19,7 +19,6 @@ use Prooph\ServiceBus\Plugin\Router\EventRouter;
 use Prooph\ServiceBus\Plugin\Router\QueryRouter;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
@@ -88,6 +87,7 @@ final class ProophServiceBusExtension extends Extension
         ContainerBuilder $container,
         XmlFileLoader $loader
     ) {
+        // load specific bus configuration e.g. command_bus
         $loader->load($type . '.xml');
 
         $typePlural = $type . 'es';
@@ -130,18 +130,26 @@ final class ProophServiceBusExtension extends Extension
                 $serviceBusDefinition->addMethodCall('utilize', [new Reference($util)]);
             }
         }
-        // define message factory plugin
-        $messageFactoryId = 'prooph_service_bus.message_factory_plugin.' . $name;
+        // define message factory
+        $messageFactoryId = 'prooph_service_bus.message_factory.' . $name;
 
         $container
             ->setDefinition(
                 $messageFactoryId,
+                new DefinitionDecorator($options['message_factory'])
+            );
+
+        // define message factory plugin
+        $messageFactoryPluginId = 'prooph_service_bus.message_factory_plugin.' . $name;
+
+        $container
+            ->setDefinition(
+                $messageFactoryPluginId,
                 new DefinitionDecorator('prooph_service_bus.message_factory_plugin')
             )
-            ->setArguments([new Reference($options['message_factory'])]);
+            ->setArguments([new Reference($messageFactoryId)]);
 
-        $serviceBusDefinition->addMethodCall('utilize', [new Reference($messageFactoryId)]);
-
+        $serviceBusDefinition->addMethodCall('utilize', [new Reference($messageFactoryPluginId)]);
 
         // define router
         if (!empty($options['router'])) {
@@ -149,9 +157,8 @@ final class ProophServiceBusExtension extends Extension
 
             $routerDefinition = $container->setDefinition(
                 $routerId,
-                new DefinitionDecorator('prooph_service_bus.' . $type . '_router')
+                new DefinitionDecorator($options['router']['type'])
             );
-            $routerDefinition->setClass($options['router']['type']);
             $routerDefinition->setArguments([$options['router']['routes'] ?? []]);
 
             $serviceBusDefinition->addMethodCall('utilize', [new Reference($routerId)]);
