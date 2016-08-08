@@ -1,6 +1,6 @@
 prooph_service_bus:
   command_buses:
-    main:
+    main_command_bus:
       message_factory: 'prooph_service_bus.message_factory'
       router:
         type: 'prooph_service_bus.command_bus_router'

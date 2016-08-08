@@ -1,6 +1,6 @@
 prooph_service_bus:
   event_buses:
-    main:
+    main_event_bus:
       plugins:
         - 'Prooph\ServiceBus\Plugin\InvokeStrategy\OnEventStrategy'
       message_factory: 'prooph_service_bus.message_factory'

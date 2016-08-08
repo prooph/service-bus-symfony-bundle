@@ -6,7 +6,7 @@
                xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd
                         http://getprooph.org/schemas/symfony-dic/prooph http://getprooph.org/schemas/symfony-dic/prooph/service_bus-5.1.xsd">
     <config>
-        <event_bus name="main" message_factory="prooph_service_bus.message_factory">
+        <event_bus name="main_event_bus" message_factory="prooph_service_bus.message_factory">
             <plugin>Prooph\ServiceBus\Plugin\InvokeStrategy\OnEventStrategy</plugin>
             <router type="prooph_service_bus.event_bus_router">
                 <route event="Prooph\ProophessorDo\Model\Todo\Event\TodoWasPosted">

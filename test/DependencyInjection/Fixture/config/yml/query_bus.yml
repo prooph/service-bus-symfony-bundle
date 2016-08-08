@@ -1,6 +1,6 @@
 prooph_service_bus:
   query_buses:
-    main:
+    main_query_bus:
       message_factory: 'prooph_service_bus.message_factory'
       router:
         type: 'prooph_service_bus.query_bus_router'

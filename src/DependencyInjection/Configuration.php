@@ -39,9 +39,9 @@ final class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('prooph_service_bus');
 
-        $this->addServiceBusSection('command', $rootNode);
-        $this->addServiceBusSection('event',  $rootNode);
-        $this->addServiceBusSection('query', $rootNode);
+        foreach (ProophServiceBusExtension::AVAILABLE_BUSES as $type => $class) {
+            $this->addServiceBusSection($type, $rootNode);
+        }
 
         return $treeBuilder;
     }
@@ -60,14 +60,14 @@ final class Configuration implements ConfigurationInterface
         $routesNode = $treeBuilder->root('routes');
 
         /** @var $routesNode ArrayNodeDefinition */
-        $listenerNode = $routesNode
+        $handlerNode = $routesNode
             ->requiresAtLeastOneElement()
             ->useAttributeAsKey($type)
             ->prototype('event' === $type ? 'array' : 'scalar')
         ;
 
         if ('event' === $type) {
-            $listenerNode
+            $handlerNode
                     ->beforeNormalization()
                         ->ifTrue(function ($v) {
                             // XML uses listener nodes

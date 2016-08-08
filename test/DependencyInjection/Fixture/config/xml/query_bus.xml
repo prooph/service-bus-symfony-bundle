@@ -7,7 +7,7 @@
                         http://getprooph.org/schemas/symfony-dic/prooph http://getprooph.org/schemas/symfony-dic/prooph/service_bus-5.1.xsd">
 
     <config>
-        <query_bus name="main" message_factory="prooph_service_bus.message_factory">
+        <query_bus name="main_query_bus" message_factory="prooph_service_bus.message_factory">
             <plugin>Prooph\ServiceBus\Plugin\InvokeStrategy\OnEventStrategy</plugin>
             <router type="prooph_service_bus.query_bus_router">
                 <route query="Prooph\ProophessorDo\Model\User\Query\UserList">
