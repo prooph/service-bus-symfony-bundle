@@ -12,15 +12,19 @@ declare (strict_types = 1);
 namespace ProophTest\Bundle\ServiceBus\DependencyInjection;
 
 use PHPUnit_Framework_TestCase as TestCase;
+use Prooph\Bundle\ServiceBus\DependencyInjection\Compiler\PluginsPass;
 use Prooph\Bundle\ServiceBus\DependencyInjection\ProophServiceBusExtension;
 use Prooph\ServiceBus\CommandBus;
 use Prooph\ServiceBus\EventBus;
+use Prooph\ServiceBus\Exception\CommandDispatchException;
+use Prooph\ServiceBus\Exception\MessageDispatchException;
 use Prooph\ServiceBus\Plugin\Router\CommandRouter;
 use Prooph\ServiceBus\Plugin\Router\EventRouter;
 use Prooph\ServiceBus\Plugin\Router\QueryRouter;
 use Prooph\ServiceBus\QueryBus;
 use ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AcmeRegisterUserCommand;
 use ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AcmeRegisterUserHandler;
+use ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\MockPlugin;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ResolveDefinitionTemplatesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -103,6 +107,72 @@ abstract class AbtractServiceBusExtensionTestCase extends TestCase
         $commandBus->dispatch($command);
 
         self::assertSame($command, $mockHandler->lastCommand());
+    }
+
+    /**
+     * @test
+     */
+    public function it_adds_plugins_based_on_tags()
+    {
+        $container = $this->loadContainer('plugins', new PluginsPass());
+
+        /** @var MockPlugin $globalPlugin */
+        $globalPlugin = $container->get('global_plugin');
+
+        /** @var MockPlugin $commandTypePlugin */
+        $commandTypePlugin = $container->get('command_type_plugin');
+
+        /** @var MockPlugin $mainCommandBusPlugin */
+        $mainCommandBusPlugin = $container->get('main_command_bus_plugin');
+
+        $reset = function () use ($globalPlugin, $commandTypePlugin, $mainCommandBusPlugin) {
+            $globalPlugin->reset();
+            $commandTypePlugin->reset();
+            $mainCommandBusPlugin->reset();
+        };
+
+        /* @var $mainCommandBus CommandBus */
+        $mainCommandBus = $container->get('prooph_service_bus.main_command_bus');
+
+        /* @var $secondCommandBus CommandBus */
+        $secondCommandBus = $container->get('prooph_service_bus.second_command_bus');
+
+        /* @var $mainEventBus EventBus */
+        $mainEventBus = $container->get('prooph_service_bus.main_event_bus');
+
+        try {
+            $mainCommandBus->dispatch('a message');
+        } catch (CommandDispatchException $ex) {
+            //ignore
+        }
+
+        $this->assertTrue($globalPlugin->wasFired());
+        $this->assertTrue($commandTypePlugin->wasFired());
+        $this->assertTrue($mainCommandBusPlugin->wasFired());
+
+        $reset();
+
+        try {
+            $secondCommandBus->dispatch('a message');
+        } catch (CommandDispatchException $ex) {
+            //ignore
+        }
+
+        $this->assertTrue($globalPlugin->wasFired());
+        $this->assertTrue($commandTypePlugin->wasFired());
+        $this->assertFalse($mainCommandBusPlugin->wasFired());
+
+        $reset();
+
+        try {
+            $mainEventBus->dispatch('a message');
+        } catch (MessageDispatchException $ex) {
+            //ignore
+        }
+
+        $this->assertTrue($globalPlugin->wasFired());
+        $this->assertFalse($commandTypePlugin->wasFired());
+        $this->assertFalse($mainCommandBusPlugin->wasFired());
     }
 
     /**

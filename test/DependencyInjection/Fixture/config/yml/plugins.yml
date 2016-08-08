@@ -1,0 +1,44 @@
+prooph_service_bus:
+  command_buses:
+    main_command_bus:
+      message_factory: 'prooph_service_bus.message_factory'
+      router:
+        type: 'prooph_service_bus.command_bus_router'
+        routes:
+          'Prooph\ProophessorDo\Model\User\Command\RegisterUser': 'Prooph\ProophessorDo\Model\User\Handler\RegisterUserHandler'
+          'Prooph\ProophessorDo\Model\User\Command\UpdateUser': 'Prooph\ProophessorDo\Model\User\Handler\UpdateUserHandler'
+
+    # uses default values
+    second_command_bus:
+      router:
+        routes:
+          'Prooph\ProophessorDo\Model\User\Command\RegisterUser': 'Prooph\ProophessorDo\Model\User\Handler\RegisterUserHandler'
+          'Prooph\ProophessorDo\Model\User\Command\UpdateUser': 'Prooph\ProophessorDo\Model\User\Handler\UpdateUserHandler'
+
+  event_buses:
+    main_event_bus:
+      plugins:
+        - 'Prooph\ServiceBus\Plugin\InvokeStrategy\OnEventStrategy'
+      message_factory: 'prooph_service_bus.message_factory'
+      router:
+        type: 'prooph_service_bus.event_bus_router'
+        routes:
+          'Prooph\ProophessorDo\Model\Todo\Event\TodoWasPosted':
+            - 'Prooph\ProophessorDo\Projection\Todo\TodoProjector'
+            - 'Prooph\ProophessorDo\Projection\User\UserProjector'
+
+services:
+  'global_plugin':
+    class: 'ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\GlobalPlugin'
+    tags:
+      - { name: prooph_service_bus.plugin }
+
+  'command_type_plugin':
+      class: 'ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\CommandTypePlugin'
+      tags:
+        - { name: prooph_service_bus.command_bus.plugin }
+
+  'main_command_bus_plugin':
+      class: 'ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\MainCommandBusPlugin'
+      tags:
+        - { name: prooph_service_bus.main_command_bus.plugin }
