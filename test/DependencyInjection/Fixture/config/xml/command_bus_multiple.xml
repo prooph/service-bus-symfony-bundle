@@ -7,7 +7,7 @@
                         http://getprooph.org/schemas/symfony-dic/prooph http://getprooph.org/schemas/symfony-dic/prooph/service_bus-5.1.xsd">
 
     <config>
-        <command_bus name="main" message_factory="prooph_service_bus.message_factory">
+        <command_bus name="main_command_bus" message_factory="prooph_service_bus.message_factory">
             <plugin>Prooph\ServiceBus\Plugin\InvokeStrategy\OnEventStrategy</plugin>
             <router type="prooph_service_bus.command_bus_router">
                 <route command="Prooph\ProophessorDo\Model\User\Command\RegisterUser">Prooph\ProophessorDo\Model\User\Handler\RegisterUserHandler</route>
@@ -15,7 +15,7 @@
             </router>
         </command_bus>
         <!-- uses default values -->
-        <command_bus name="second">
+        <command_bus name="second_command_bus">
             <plugin>Prooph\ServiceBus\Plugin\InvokeStrategy\OnEventStrategy</plugin>
             <plugin>Prooph\ServiceBus\Plugin\InvokeStrategy\OnEventStrategy</plugin>
             <router>

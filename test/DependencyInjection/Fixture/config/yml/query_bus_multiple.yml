@@ -1,6 +1,6 @@
 prooph_service_bus:
   query_buses:
-    main:
+    main_query_bus:
       message_factory: 'prooph_service_bus.message_factory'
       router:
         type: 'prooph_service_bus.query_bus_router'
@@ -9,7 +9,7 @@ prooph_service_bus:
           'Prooph\ProophessorDo\Model\Todo\Query\TodoList': 'Prooph\ProophessorDo\Model\User\Query\TodoListHandler'
 
     # uses default values
-    second:
+    second_query_bus:
       router:
         routes:
           'Prooph\ProophessorDo\Model\User\Query\UserList': 'Prooph\ProophessorDo\Model\User\Query\UserListUserHandler'

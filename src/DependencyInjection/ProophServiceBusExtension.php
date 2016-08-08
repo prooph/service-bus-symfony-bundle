@@ -29,10 +29,10 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
  */
 final class ProophServiceBusExtension extends Extension
 {
-    private $availableBuses = [
-        'command_bus' => CommandBus::class,
-        'event_bus' => EventBus::class,
-        'query_bus' => QueryBus::class,
+    const AVAILABLE_BUSES = [
+        'command' => CommandBus::class,
+        'event' => EventBus::class,
+        'query' => QueryBus::class,
     ];
 
     public function getNamespace()
@@ -54,9 +54,9 @@ final class ProophServiceBusExtension extends Extension
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('service_bus.xml');
 
-        foreach ($this->availableBuses as $bus => $class) {
-            if (!empty($config[$bus . 'es'])) {
-                $this->busLoad($bus, $class, $config, $container, $loader);
+        foreach (self::AVAILABLE_BUSES as $type => $bus) {
+            if (!empty($config[$type . '_buses'])) {
+                $this->busLoad($type, $bus, $config[$type . '_buses'], $container, $loader);
             }
         }
 
@@ -88,20 +88,18 @@ final class ProophServiceBusExtension extends Extension
         XmlFileLoader $loader
     ) {
         // load specific bus configuration e.g. command_bus
-        $loader->load($type . '.xml');
+        $loader->load($type . '_bus.xml');
 
-        $typePlural = $type . 'es';
         $serviceBuses = [];
-
-        foreach (array_keys($config[$typePlural]) as $name) {
-            $serviceBuses[$name] = sprintf('prooph_service_bus.' . $type . '.%s_bus', $name);
+        foreach (array_keys($config) as $name) {
+            $serviceBuses[$name] = sprintf('prooph_service_bus.%s', $name);
         }
-        $container->setParameter('prooph_service_bus.' . $typePlural, $serviceBuses);
+        $container->setParameter('prooph_service_bus.' . $type . '_buses', $serviceBuses);
 
-        $def = $container->getDefinition('prooph_service_bus.' . $type);
+        $def = $container->getDefinition('prooph_service_bus.' . $type . '_bus');
         $def->setClass($class);
 
-        foreach ($config[$typePlural] as $name => $options) {
+        foreach ($config as $name => $options) {
             $this->loadBus($type, $name, $options, $container);
         }
     }
@@ -121,8 +119,8 @@ final class ProophServiceBusExtension extends Extension
     private function loadBus(string $type, string $name, array $options, ContainerBuilder $container)
     {
         $serviceBusDefinition = $container->setDefinition(
-            sprintf('prooph_service_bus.%s.%s_bus', $type, $name),
-            new DefinitionDecorator('prooph_service_bus.' . $type)
+            sprintf('prooph_service_bus.%s', $name),
+            new DefinitionDecorator('prooph_service_bus.' . $type . '_bus')
         );
 
         if (!empty($options['plugins'])) {
@@ -153,7 +151,7 @@ final class ProophServiceBusExtension extends Extension
 
         // define router
         if (!empty($options['router'])) {
-            $routerId = sprintf('prooph_service_bus.%s.%s', $type . '_router', $name);
+            $routerId = sprintf('prooph_service_bus.%s.router', $name);
 
             $routerDefinition = $container->setDefinition(
                 $routerId,
@@ -163,26 +161,8 @@ final class ProophServiceBusExtension extends Extension
 
             $serviceBusDefinition->addMethodCall('utilize', [new Reference($routerId)]);
         }
-
+        
         //Add container plugin
-        $containerWrapperId = 'prooph_service_bus.container_wrapper.' . $name;
-
-        $containerWrapperDefinition = $container->setDefinition(
-            $containerWrapperId,
-            new DefinitionDecorator('prooph_service_bus.container_wrapper')
-        );
-
-        $containerWrapperDefinition->setArguments([new Reference('service_container')]);
-
-        $containerPluginId = 'prooph_service_bus.container_plugin.' . $name;
-
-        $containerPluginDefinition = $container->setDefinition(
-            $containerPluginId,
-            new DefinitionDecorator('prooph_service_bus.container_plugin')
-        );
-
-        $containerPluginDefinition->setArguments([new Reference($containerWrapperId)]);
-
-        $serviceBusDefinition->addMethodCall('utilize', [new Reference($containerPluginId)]);
+        $serviceBusDefinition->addMethodCall('utilize', [new Reference('prooph_service_bus.container_plugin')]);
     }
 }
