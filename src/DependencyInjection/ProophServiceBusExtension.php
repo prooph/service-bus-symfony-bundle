@@ -161,7 +161,7 @@ final class ProophServiceBusExtension extends Extension
 
             $serviceBusDefinition->addMethodCall('utilize', [new Reference($routerId)]);
         }
-        
+
         //Add container plugin
         $serviceBusDefinition->addMethodCall('utilize', [new Reference('prooph_service_bus.container_plugin')]);
     }
