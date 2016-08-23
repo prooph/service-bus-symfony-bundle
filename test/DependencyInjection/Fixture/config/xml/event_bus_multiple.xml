@@ -7,7 +7,7 @@
                         http://getprooph.org/schemas/symfony-dic/prooph http://getprooph.org/schemas/symfony-dic/prooph/service_bus-5.1.xsd">
     <config>
         <event_bus name="main_event_bus" message_factory="prooph_service_bus.message_factory">
-            <plugin>Prooph\ServiceBus\Plugin\InvokeStrategy\OnEventStrategy</plugin>
+            <plugin>prooph_service_bus.on_event_invoke_strategy</plugin>
             <router type="prooph_service_bus.event_bus_router">
                 <route event="Prooph\ProophessorDo\Model\Todo\Event\TodoWasPosted">
                     <listener>Prooph\ProophessorDo\Projection\Todo\TodoProjector</listener>

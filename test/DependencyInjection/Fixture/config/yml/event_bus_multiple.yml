@@ -9,12 +9,13 @@ prooph_service_bus:
             - 'Prooph\ProophessorDo\Projection\Todo\TodoProjector'
             - 'Prooph\ProophessorDo\Projection\User\UserProjector'
       plugins:
-        - 'Prooph\ServiceBus\Plugin\InvokeStrategy\OnEventStrategy'
+        - 'prooph_service_bus.on_event_invoke_strategy'
 
     # uses default values
     second_event_bus:
       plugins:
-        - 'Prooph\ServiceBus\Plugin\InvokeStrategy\OnEventStrategy'
+        - 'prooph_service_bus.on_event_invoke_strategy'
+        - 'prooph_service_bus.on_event_invoke_strategy'
       router:
         routes:
           'Prooph\ProophessorDo\Model\Todo\Event\TodoWasPosted':

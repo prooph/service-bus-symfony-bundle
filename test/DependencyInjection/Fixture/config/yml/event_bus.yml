@@ -2,7 +2,7 @@ prooph_service_bus:
   event_buses:
     main_event_bus:
       plugins:
-        - 'Prooph\ServiceBus\Plugin\InvokeStrategy\OnEventStrategy'
+        - 'prooph_service_bus.on_event_invoke_strategy'
       message_factory: 'prooph_service_bus.message_factory'
       router:
         type: 'prooph_service_bus.event_bus_router'

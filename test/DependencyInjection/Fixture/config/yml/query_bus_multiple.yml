@@ -1,6 +1,8 @@
 prooph_service_bus:
   query_buses:
     main_query_bus:
+      plugins:
+        - 'prooph_service_bus.finder_invoke_strategy'
       message_factory: 'prooph_service_bus.message_factory'
       router:
         type: 'prooph_service_bus.query_bus_router'
@@ -10,6 +12,9 @@ prooph_service_bus:
 
     # uses default values
     second_query_bus:
+      plugins:
+        - 'prooph_service_bus.finder_invoke_strategy'
+        - 'prooph_service_bus.finder_invoke_strategy'
       router:
         routes:
           'Prooph\ProophessorDo\Model\User\Query\UserList': 'Prooph\ProophessorDo\Model\User\Query\UserListUserHandler'

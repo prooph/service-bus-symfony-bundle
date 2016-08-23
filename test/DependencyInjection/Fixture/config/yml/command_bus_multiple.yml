@@ -1,6 +1,8 @@
 prooph_service_bus:
   command_buses:
     main_command_bus:
+      plugins:
+        - 'prooph_service_bus.handle_command_invoke_strategy'
       message_factory: 'prooph_service_bus.message_factory'
       router:
         type: 'prooph_service_bus.command_bus_router'
@@ -10,6 +12,9 @@ prooph_service_bus:
 
     # uses default values
     second_command_bus:
+      plugins:
+        - 'prooph_service_bus.handle_command_invoke_strategy'
+        - 'prooph_service_bus.handle_command_invoke_strategy'
       router:
         routes:
           'Prooph\ProophessorDo\Model\User\Command\RegisterUser': 'Prooph\ProophessorDo\Model\User\Handler\RegisterUserHandler'

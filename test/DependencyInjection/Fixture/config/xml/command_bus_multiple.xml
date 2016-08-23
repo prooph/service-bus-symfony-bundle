@@ -8,7 +8,7 @@
 
     <config>
         <command_bus name="main_command_bus" message_factory="prooph_service_bus.message_factory">
-            <plugin>Prooph\ServiceBus\Plugin\InvokeStrategy\OnEventStrategy</plugin>
+            <plugin>prooph_service_bus.handle_command_invoke_strategy</plugin>
             <router type="prooph_service_bus.command_bus_router">
                 <route command="Prooph\ProophessorDo\Model\User\Command\RegisterUser">Prooph\ProophessorDo\Model\User\Handler\RegisterUserHandler</route>
                 <route command="Prooph\ProophessorDo\Model\User\Command\UpdateUser">Prooph\ProophessorDo\Model\User\Handler\UpdateUserHandler</route>
@@ -16,8 +16,8 @@
         </command_bus>
         <!-- uses default values -->
         <command_bus name="second_command_bus">
-            <plugin>Prooph\ServiceBus\Plugin\InvokeStrategy\OnEventStrategy</plugin>
-            <plugin>Prooph\ServiceBus\Plugin\InvokeStrategy\OnEventStrategy</plugin>
+            <plugin>prooph_service_bus.handle_command_invoke_strategy</plugin>
+            <plugin>prooph_service_bus.handle_command_invoke_strategy</plugin>
             <router>
                 <route command="Prooph\ProophessorDo\Model\User\Command\RegisterUser">Prooph\ProophessorDo\Model\User\Handler\RegisterUserHandler</route>
                 <route command="Prooph\ProophessorDo\Model\User\Command\UpdateUser">Prooph\ProophessorDo\Model\User\Handler\UpdateUserHandler</route>

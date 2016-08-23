@@ -12,7 +12,9 @@
     </parameters>
 
     <services>
-        <service id="Prooph\ServiceBus\Plugin\InvokeStrategy\OnEventStrategy" class="Prooph\ServiceBus\Plugin\InvokeStrategy\OnEventStrategy" />
+        <service id="prooph_service_bus.handle_command_invoke_strategy" class="Prooph\ServiceBus\Plugin\InvokeStrategy\HandleCommandStrategy" />
+        <service id="prooph_service_bus.finder_invoke_strategy" class="Prooph\ServiceBus\Plugin\InvokeStrategy\FinderInvokeStrategy" />
+        <service id="prooph_service_bus.on_event_invoke_strategy" class="Prooph\ServiceBus\Plugin\InvokeStrategy\OnEventStrategy" />
         <service id="prooph_service_bus.message_factory_plugin" class="%prooph_service_bus.message_factory_plugin.class%" public="false" abstract="true" />
         <service id="prooph_service_bus.message_factory" class="%prooph_service_bus.message_factory.class%" />
         <service id="prooph_service_bus.container_plugin" class="%prooph_service_bus.container_plugin.class%" public="false">

@@ -8,7 +8,7 @@
 
     <config>
         <query_bus name="main_query_bus" message_factory="prooph_service_bus.message_factory">
-            <plugin>Prooph\ServiceBus\Plugin\InvokeStrategy\OnEventStrategy</plugin>
+            <plugin>prooph_service_bus.finder_invoke_strategy</plugin>
             <router type="prooph_service_bus.query_bus_router">
                 <route query="Prooph\ProophessorDo\Model\User\Query\UserList">
                     Prooph\ProophessorDo\Model\User\Query\UserListUserHandler
