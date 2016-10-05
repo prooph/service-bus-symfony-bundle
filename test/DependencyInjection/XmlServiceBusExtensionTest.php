@@ -15,7 +15,7 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 
-class XmlServiceBusExtensionTest extends AbtractServiceBusExtensionTestCase
+class XmlServiceBusExtensionTest extends AbstractServiceBusExtensionTestCase
 {
     protected function loadFromFile(ContainerBuilder $container, $file)
     {

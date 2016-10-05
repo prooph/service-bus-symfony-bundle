@@ -24,6 +24,7 @@ use Prooph\ServiceBus\Plugin\Router\QueryRouter;
 use Prooph\ServiceBus\QueryBus;
 use ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AcmeRegisterUserCommand;
 use ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AcmeRegisterUserHandler;
+use ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AcmeUserWasRegisteredEvent;
 use ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\MockPlugin;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ResolveDefinitionTemplatesPass;
@@ -33,7 +34,7 @@ use Symfony\Component\DependencyInjection\Dumper\XmlDumper;
 use Symfony\Component\DependencyInjection\Dumper\YamlDumper;
 use \Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
-abstract class AbtractServiceBusExtensionTestCase extends TestCase
+abstract class AbstractServiceBusExtensionTestCase extends TestCase
 {
     abstract protected function loadFromFile(ContainerBuilder $container, $file);
 
@@ -280,6 +281,42 @@ abstract class AbtractServiceBusExtensionTestCase extends TestCase
         $this->dump('event_bus_multiple');
     }
 
+    /**
+     * @test
+     */
+    public function it_allows_command_handlers_prefixed_with_at()
+    {
+        $container = $this->loadContainer('command_bus_routes_with_@');
+
+        /* @var $commandBus CommandBus */
+        $commandBus = $container->get('prooph_service_bus.main_command_bus');
+
+        /** @var AcmeRegisterUserHandler $mockHandler */
+        $mockHandler = $container->get('Acme\RegisterUserHandler');
+
+        $command = new AcmeRegisterUserCommand(['name' => 'John Doe']);
+
+        $commandBus->dispatch($command);
+
+        self::assertSame($command, $mockHandler->lastCommand());
+    }
+
+    /**
+     * @test
+     */
+    public function it_allows_event_listeners_prefixed_with_at()
+    {
+        $container = $this->loadContainer('event_bus_routes_with_@');
+
+        $event = new AcmeUserWasRegisteredEvent([]);
+        $eventBus = $container->get('prooph_service_bus.main_event_bus');
+        $eventBus->dispatch($event);
+
+        $mockListener = $container->get('Acme\UserListener');
+
+        self::assertSame($event, $mockListener->lastEvent());
+    }
+
     private function loadContainer($fixture, CompilerPassInterface $compilerPass = null)
     {
         $container = $this->getContainer();
@@ -329,7 +366,7 @@ abstract class AbtractServiceBusExtensionTestCase extends TestCase
 
         if ($this instanceof XmlServiceBusExtensionTest) {
             $dumper = new XmlDumper($container);
-        } elseif ($this instanceof YamlServiceBusExtensionTest) {
+        } else {
             $dumper = new YamlDumper($container);
         }
         self::assertInstanceOf(Dumper::class, $dumper, sprintf('Test type "%s" not supported', get_class($this)));
