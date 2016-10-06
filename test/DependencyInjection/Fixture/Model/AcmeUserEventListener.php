@@ -7,18 +7,13 @@
  * @license   https://github.com/prooph/service-bus-symfony-bundle/blob/master/LICENSE.md New BSD License
  */
 
-declare (strict_types = 1);
+declare(strict_types=1);
 
 namespace ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model;
 
 class AcmeUserEventListener
 {
     private $lastEvent;
-
-    public function __invoke($event)
-    {
-        //die('test');
-    }
 
     public function onUserWasRegistered(AcmeUserWasRegisteredEvent $event)
     {
