@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+
+<srv:container xmlns="http://getprooph.org/schemas/symfony-dic/prooph"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xmlns:srv="http://symfony.com/schema/dic/services"
+               xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd
+                        http://getprooph.org/schemas/symfony-dic/prooph http://getprooph.org/schemas/symfony-dic/prooph/service_bus-5.1.xsd">
+    <config>
+        <event_bus name="main_event_bus" message_factory="prooph_service_bus.message_factory">
+            <plugin>prooph_service_bus.on_event_invoke_strategy</plugin>
+            <router type="prooph_service_bus.event_bus_router" />
+        </event_bus>
+    </config>
+
+    <srv:services>
+        <srv:service id="Acme\UserListener" class="ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AcmeUserEventListener">
+            <srv:tag name="prooph_service_bus.main_event_bus.route_target" />
+        </srv:service>
+    </srv:services>
+</srv:container>

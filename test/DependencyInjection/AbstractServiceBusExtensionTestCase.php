@@ -13,6 +13,7 @@ namespace ProophTest\Bundle\ServiceBus\DependencyInjection;
 
 use PHPUnit_Framework_TestCase as TestCase;
 use Prooph\Bundle\ServiceBus\DependencyInjection\Compiler\PluginsPass;
+use Prooph\Bundle\ServiceBus\DependencyInjection\Compiler\RoutePass;
 use Prooph\Bundle\ServiceBus\DependencyInjection\ProophServiceBusExtension;
 use Prooph\ServiceBus\CommandBus;
 use Prooph\ServiceBus\EventBus;
@@ -307,6 +308,42 @@ abstract class AbstractServiceBusExtensionTestCase extends TestCase
     public function it_allows_event_listeners_prefixed_with_at()
     {
         $container = $this->loadContainer('event_bus_routes_with_@');
+
+        $event = new AcmeUserWasRegisteredEvent([]);
+        $eventBus = $container->get('prooph_service_bus.main_event_bus');
+        $eventBus->dispatch($event);
+
+        $mockListener = $container->get('Acme\UserListener');
+
+        self::assertSame($event, $mockListener->lastEvent());
+    }
+
+    /**
+     * @test
+     */
+    public function it_adds_command_bus_routes_based_on_tags()
+    {
+        $container = $this->loadContainer('command_bus_with_tags', new RoutePass());
+
+        /* @var $commandBus CommandBus */
+        $commandBus = $container->get('prooph_service_bus.main_command_bus');
+
+        /** @var AcmeRegisterUserHandler $mockHandler */
+        $mockHandler = $container->get('Acme\RegisterUserHandler');
+
+        $command = new AcmeRegisterUserCommand(['name' => 'John Doe']);
+
+        $commandBus->dispatch($command);
+
+        self::assertSame($command, $mockHandler->lastCommand());
+    }
+
+    /**
+     * @test
+     */
+    public function it_adds_event_bus_routes_based_on_tags()
+    {
+        $container = $this->loadContainer('event_bus_with_tags', new RoutePass());
 
         $event = new AcmeUserWasRegisteredEvent([]);
         $eventBus = $container->get('prooph_service_bus.main_event_bus');
