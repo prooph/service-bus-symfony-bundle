@@ -42,36 +42,46 @@ class RoutePass implements CompilerPassInterface
                 $handlers = $container->findTaggedServiceIds(sprintf('prooph_service_bus.%s.route_target', $name));
 
                 foreach ($handlers as $id => $args) {
-                    $handlerReflection = new ReflectionClass($container->getDefinition($id)->getClass());
+                    foreach ($args as $eachArgs) {
+                        $messageNames = $this->recognizeMessageNames($container, $id, $eachArgs);
 
-                    $methodsWithMessageParameter = array_filter(
-                        $handlerReflection->getMethods(ReflectionMethod::IS_PUBLIC),
-                        function (ReflectionMethod $method) {
-                            return $method->getNumberOfRequiredParameters() === 1
-                                && $method->getParameters()[0]->getClass()
-                                && $method->getParameters()[0]->getClass()->implementsInterface(Message::class);
+                        if ($type === 'event') {
+                            $routerArguments[0] = array_merge_recursive(
+                                $routerArguments[0],
+                                array_combine($messageNames, array_fill(0, count($messageNames), [$id]))
+                            );
+                            $routerArguments[0] = array_map('array_unique', $routerArguments[0]);
+                        } else {
+                            $routerArguments[0] = array_merge(
+                                $routerArguments[0],
+                                array_combine($messageNames, array_fill(0, count($messageNames), $id))
+                            );
                         }
-                    );
-
-                    $messageNames = array_filter(array_unique(array_map(function (ReflectionMethod $method) {
-                        return self::tryToDetectMessageName($method->getParameters()[0]->getClass());
-                    }, $methodsWithMessageParameter)));
-
-                    if ($type === 'event') {
-                        $routerArguments[0] = array_merge_recursive(
-                            $routerArguments[0],
-                            array_combine($messageNames, array_fill(0, count($messageNames), [$id]))
-                        );
-                        $routerArguments[0] = array_map('array_unique', $routerArguments[0]);
-                    } else {
-                        $routerArguments[0] = array_merge(
-                            $routerArguments[0],
-                            array_combine($messageNames, array_fill(0, count($messageNames), $id))
-                        );
                     }
                 }
                 $router->setArguments($routerArguments);
             }
         }
+    }
+
+    private function recognizeMessageNames(ContainerBuilder $container, $id, array $args)
+    {
+        if (isset($args['message'])) {
+            return [$args['message']];
+        }
+        $handlerReflection = new ReflectionClass($container->getDefinition($id)->getClass());
+
+        $methodsWithMessageParameter = array_filter(
+            $handlerReflection->getMethods(ReflectionMethod::IS_PUBLIC),
+            function (ReflectionMethod $method) {
+                return $method->getNumberOfRequiredParameters() === 1
+                && $method->getParameters()[0]->getClass()
+                && $method->getParameters()[0]->getClass()->implementsInterface(Message::class);
+            }
+        );
+
+        return array_filter(array_unique(array_map(function (ReflectionMethod $method) {
+            return self::tryToDetectMessageName($method->getParameters()[0]->getClass());
+        }, $methodsWithMessageParameter)));
     }
 }

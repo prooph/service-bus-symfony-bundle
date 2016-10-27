@@ -321,9 +321,29 @@ abstract class AbstractServiceBusExtensionTestCase extends TestCase
     /**
      * @test
      */
-    public function it_adds_command_bus_routes_based_on_tags()
+    public function it_adds_command_bus_routes_based_on_tags_with_automatic_message_detection()
     {
         $container = $this->loadContainer('command_bus_with_tags', new RoutePass());
+
+        /* @var $commandBus CommandBus */
+        $commandBus = $container->get('prooph_service_bus.main_command_bus');
+
+        /** @var AcmeRegisterUserHandler $mockHandler */
+        $mockHandler = $container->get('Acme\RegisterUserHandler');
+
+        $command = new AcmeRegisterUserCommand(['name' => 'John Doe']);
+
+        $commandBus->dispatch($command);
+
+        self::assertSame($command, $mockHandler->lastCommand());
+    }
+
+    /**
+     * @test
+     */
+    public function it_adds_command_bus_routes_based_on_tags_with_message_configuration()
+    {
+        $container = $this->loadContainer('command_bus_with_tags_and_explicit_message', new RoutePass());
 
         /* @var $commandBus CommandBus */
         $commandBus = $container->get('prooph_service_bus.main_command_bus');
