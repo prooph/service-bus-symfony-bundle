@@ -7,7 +7,7 @@
  * @license   https://github.com/prooph/service-bus-symfony-bundle/blob/master/LICENSE.md New BSD License
  */
 
-declare (strict_types = 1);
+declare(strict_types=1);
 
 namespace ProophTest\Bundle\ServiceBus\DependencyInjection;
 
@@ -15,7 +15,7 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 
-class XmlServiceBusExtensionTest extends AbtractServiceBusExtensionTestCase
+class XmlServiceBusExtensionTest extends AbstractServiceBusExtensionTestCase
 {
     protected function loadFromFile(ContainerBuilder $container, $file)
     {

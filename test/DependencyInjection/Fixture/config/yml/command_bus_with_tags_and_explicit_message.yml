@@ -1,0 +1,16 @@
+prooph_service_bus:
+  command_buses:
+    main_command_bus:
+      plugins:
+        - 'prooph_service_bus.handle_command_invoke_strategy'
+      message_factory: 'prooph_service_bus.message_factory'
+      router:
+        type: 'prooph_service_bus.command_bus_router'
+        routes:
+          'Acme\UpdateUser': 'Acme\UpdateUserHandler'
+
+services:
+  'Acme\RegisterUserHandler':
+    class: ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AcmeRegisterUserHandler
+    tags:
+      - { name: 'prooph_service_bus.main_command_bus.route_target', message: 'Acme\RegisterUser' }

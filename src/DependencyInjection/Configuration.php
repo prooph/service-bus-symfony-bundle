@@ -7,7 +7,7 @@
  * @license   https://github.com/prooph/service-bus-symfony-bundle/blob/master/LICENSE.md New BSD License
  */
 
-declare (strict_types = 1);
+declare(strict_types=1);
 
 namespace Prooph\Bundle\ServiceBus\DependencyInjection;
 
@@ -78,9 +78,28 @@ final class Configuration implements ConfigurationInterface
                             return (array)$v['listener'];
                         })
                     ->end()
-                    ->prototype('scalar')->end()
+                    ->prototype('scalar')
+                        ->beforeNormalization()
+                            ->ifTrue(function ($v) {
+                                return strpos($v, '@') === 0;
+                            })
+                            ->then(function ($v) {
+                                return substr($v, 1);
+                            })
+                        ->end()
+                    ->end()
                 ->end()
             ;
+        } else {
+            $handlerNode
+                ->beforeNormalization()
+                    ->ifTrue(function ($v) {
+                        return strpos($v, '@') === 0;
+                    })
+                    ->then(function ($v) {
+                        return substr($v, 1);
+                    })
+                ->end();
         }
 
         $node
@@ -92,18 +111,49 @@ final class Configuration implements ConfigurationInterface
                 ->prototype('array')
                 ->fixXmlConfig('plugin', 'plugins')
                 ->children()
-                    ->scalarNode('message_factory')->defaultValue('prooph_service_bus.message_factory')->end()
+                    ->scalarNode('message_factory')
+                        ->beforeNormalization()
+                            ->ifTrue(function ($v) {
+                                return strpos($v, '@') === 0;
+                            })
+                            ->then(function ($v) {
+                                return substr($v, 1);
+                            })
+                        ->end()
+                        ->defaultValue('prooph_service_bus.message_factory')
+                    ->end()
                     ->arrayNode('plugins')
                         ->beforeNormalization()
                             // fix single node in XML
-                            ->ifString()->then(function ($v) { return [$v];})
+                            ->ifString()->then(function ($v) {
+                                return [$v];
+                            })
                         ->end()
-                        ->prototype('scalar')->end()
+                        ->prototype('scalar')
+                            ->beforeNormalization()
+                                ->ifTrue(function ($v) {
+                                    return strpos($v, '@') === 0;
+                                })
+                                ->then(function ($v) {
+                                    return substr($v, 1);
+                                })
+                            ->end()
+                        ->end()
                     ->end()
                     ->arrayNode('router')
                         ->fixXmlConfig('route', 'routes')
                         ->children()
-                            ->scalarNode('type')->defaultValue('prooph_service_bus.' . $type . '_bus_router')->end()
+                            ->scalarNode('type')
+                                ->beforeNormalization()
+                                    ->ifTrue(function ($v) {
+                                        return strpos($v, '@') === 0;
+                                    })
+                                    ->then(function ($v) {
+                                        return substr($v, 1);
+                                    })
+                                ->end()
+                                ->defaultValue('prooph_service_bus.' . $type . '_bus_router')
+                            ->end()
                             ->append($routesNode)
                         ->end()
                     ->end()

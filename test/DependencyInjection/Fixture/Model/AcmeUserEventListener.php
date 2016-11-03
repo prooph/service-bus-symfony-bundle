@@ -11,16 +11,17 @@ declare(strict_types=1);
 
 namespace ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model;
 
-use Prooph\Common\Messaging\Command;
-use Prooph\Common\Messaging\PayloadConstructable;
-use Prooph\Common\Messaging\PayloadTrait;
-
-final class AcmeRegisterUserCommand extends Command implements PayloadConstructable
+class AcmeUserEventListener
 {
-    use PayloadTrait;
+    private $lastEvent;
 
-    public function messageName()
+    public function onUserWasRegistered(AcmeUserWasRegisteredEvent $event)
     {
-        return 'Acme\RegisterUser';
+        $this->lastEvent = $event;
+    }
+
+    public function lastEvent()
+    {
+        return $this->lastEvent;
     }
 }

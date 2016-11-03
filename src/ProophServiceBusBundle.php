@@ -7,11 +7,12 @@
  * @license   https://github.com/prooph/service-bus-symfony-bundle/blob/master/LICENSE.md New BSD License
  */
 
-declare (strict_types = 1);
+declare(strict_types=1);
 
 namespace Prooph\Bundle\ServiceBus;
 
 use Prooph\Bundle\ServiceBus\DependencyInjection\Compiler\PluginsPass;
+use Prooph\Bundle\ServiceBus\DependencyInjection\Compiler\RoutePass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -21,5 +22,6 @@ final class ProophServiceBusBundle extends Bundle
     {
         parent::build($container);
         $container->addCompilerPass(new PluginsPass());
+        $container->addCompilerPass(new RoutePass());
     }
 }

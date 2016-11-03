@@ -11,16 +11,16 @@ declare(strict_types=1);
 
 namespace ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model;
 
-use Prooph\Common\Messaging\Command;
+use Prooph\Common\Messaging\DomainEvent;
 use Prooph\Common\Messaging\PayloadConstructable;
 use Prooph\Common\Messaging\PayloadTrait;
 
-final class AcmeRegisterUserCommand extends Command implements PayloadConstructable
+class AcmeUserWasRegisteredEvent extends DomainEvent implements PayloadConstructable
 {
     use PayloadTrait;
 
     public function messageName()
     {
-        return 'Acme\RegisterUser';
+        return 'Acme\UserWasRegistered';
     }
 }

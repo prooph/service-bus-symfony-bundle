@@ -1,0 +1,14 @@
+prooph_service_bus:
+  event_buses:
+    main_event_bus:
+      plugins:
+        - 'prooph_service_bus.on_event_invoke_strategy'
+      message_factory: 'prooph_service_bus.message_factory'
+      router:
+        type: 'prooph_service_bus.event_bus_router'
+
+services:
+  Acme\UserListener:
+    class: ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AcmeUserEventListener
+    tags:
+      - { name: 'prooph_service_bus.main_event_bus.route_target' }
