@@ -1,9 +1,9 @@
 {
   "title": "prooph service-bus Symfony bundle",
   "content": [
-    {"getting-started": "book/getting-started/bookdown.json"},
-    {"reference": "book/reference/bookdown.json"},
-    {"contribute": "book/contribute/bookdown.json"}
+    {"into": "../README.md"},
+    {"getting_started": "getting_started.md"},
+    {"configuration_reference": "configuration_reference.md"}
   ],
   "target": "./html",
   "tocDepth": 2,
