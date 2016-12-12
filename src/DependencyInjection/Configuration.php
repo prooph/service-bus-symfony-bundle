@@ -142,6 +142,7 @@ final class Configuration implements ConfigurationInterface
                     ->end()
                     ->arrayNode('router')
                         ->fixXmlConfig('route', 'routes')
+                        ->addDefaultsIfNotSet()
                         ->children()
                             ->scalarNode('type')
                                 ->beforeNormalization()
