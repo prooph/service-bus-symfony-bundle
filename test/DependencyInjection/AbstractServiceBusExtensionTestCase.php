@@ -63,6 +63,16 @@ abstract class AbstractServiceBusExtensionTestCase extends TestCase
     /**
      * @test
      */
+    public function it_allows_a_minimal_bus_configuration()
+    {
+        $container = $this->loadContainer('command_bus_minimal');
+        self::assertInstanceOf(CommandBus::class, $container->get('prooph_service_bus.main_command_bus'));
+        self::assertInstanceOf(CommandRouter::class, $container->get('prooph_service_bus.main_command_bus.router'));
+    }
+
+    /**
+     * @test
+     */
     public function it_creates_multiple_command_buses()
     {
         $container = $this->loadContainer('command_bus_multiple');
