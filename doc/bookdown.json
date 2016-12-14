@@ -1,7 +1,7 @@
 {
   "title": "prooph service-bus Symfony bundle",
   "content": [
-    {"into": "../README.md"},
+    {"intro": "../README.md"},
     {"getting_started": "getting_started.md"},
     {"configuration_reference": "configuration_reference.md"}
   ],
