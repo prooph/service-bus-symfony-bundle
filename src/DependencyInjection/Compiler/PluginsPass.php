@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace Prooph\Bundle\ServiceBus\DependencyInjection\Compiler;
 
 use Prooph\Bundle\ServiceBus\DependencyInjection\ProophServiceBusExtension;
-use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
@@ -32,12 +31,13 @@ class PluginsPass implements CompilerPassInterface
                 $typePlugins = $container->findTaggedServiceIds(sprintf('prooph_service_bus.%s.plugin', $type . '_bus'));
                 $plugins = $container->findTaggedServiceIds(sprintf('prooph_service_bus.%s.plugin', $name));
 
-                $plugins = array_merge($globalPlugins, $typePlugins, $plugins);
+                $plugins = array_merge(array_keys($globalPlugins), array_keys($typePlugins), array_keys($plugins));
 
-                foreach ($plugins as $id => $args) {
-                    $definition = $container->findDefinition('prooph_service_bus.' . $name);
-                    $definition->addMethodCall('utilize', [new Reference($id)]);
-                }
+                $busDefinition = $container->getDefinition($bus);
+                $busPlugins = $busDefinition->getArgument(2);
+
+                $finalPlugins = array_merge($busPlugins, $plugins);
+                $busDefinition->replaceArgument(2, $finalPlugins);
             }
         }
     }

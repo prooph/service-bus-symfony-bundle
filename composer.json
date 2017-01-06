@@ -50,11 +50,11 @@
     }
   },
   "require": {
-    "php": "^7.0",
+    "php": "^7.1",
     "symfony/config": "~2.8 || ~3.0",
     "symfony/dependency-injection": "~2.8 || ~3.0",
     "symfony/http-kernel": "~2.8 || ~3.0",
-    "prooph/service-bus": "^5.1",
+    "prooph/service-bus": "6.0.x-dev",
     "container-interop/container-interop": "^1.1"
   },
   "require-dev": {
@@ -62,7 +62,9 @@
     "phpunit/php-invoker": "^1.1.4",
     "fabpot/php-cs-fixer": "^1.11",
     "bookdown/bookdown": "1.x-dev as 1.0.0",
-    "tobiju/bookdown-bootswatch-templates": "1.0.x-dev"
+    "tobiju/bookdown-bootswatch-templates": "1.0.x-dev",
+    "satooshi/php-coveralls": "^1.0",
+    "phpspec/prophecy": "dev-patch-1 as 1.6.2"
   },
   "suggest": {
   },
@@ -71,7 +73,7 @@
   "extra": {
     "branch-alias": {
       "dev-master": "1.0-dev",
-      "dev-develop": "1.1-dev"
+      "dev-prooph_v7": "0.3-dev"
     }
   },
   "scripts": {
@@ -94,5 +96,11 @@
       "phpunit.xml*",
       "test"
     ]
-  }
+  },
+  "repositories": [
+    {
+      "type": "git",
+      "url": "https://github.com/prolic/prophecy.git"
+    }
+  ]
 }

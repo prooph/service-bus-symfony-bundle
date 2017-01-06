@@ -11,12 +11,13 @@ declare(strict_types=1);
 
 namespace Prooph\Bundle\ServiceBus\DependencyInjection;
 
+use Prooph\Bundle\ServiceBus\Exception\RuntimeException;
 use Prooph\ServiceBus\CommandBus;
 use Prooph\ServiceBus\EventBus;
-use Prooph\ServiceBus\QueryBus;
 use Prooph\ServiceBus\Plugin\Router\CommandRouter;
 use Prooph\ServiceBus\Plugin\Router\EventRouter;
 use Prooph\ServiceBus\Plugin\Router\QueryRouter;
+use Prooph\ServiceBus\QueryBus;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
@@ -34,6 +35,7 @@ final class ProophServiceBusExtension extends Extension
         'event' => EventBus::class,
         'query' => QueryBus::class,
     ];
+
 
     public function getNamespace()
     {
@@ -118,51 +120,65 @@ final class ProophServiceBusExtension extends Extension
      */
     private function loadBus(string $type, string $name, array $options, ContainerBuilder $container)
     {
+        $serviceBusName = sprintf('prooph_service_bus.%s', $name);
         $serviceBusDefinition = $container->setDefinition(
-            sprintf('prooph_service_bus.%s', $name),
+            $serviceBusName,
             new DefinitionDecorator('prooph_service_bus.' . $type . '_bus')
         );
 
+
         if (!empty($options['plugins'])) {
             foreach ($options['plugins'] as $index => $util) {
-                $serviceBusDefinition->addMethodCall('utilize', [new Reference($util)]);
+                if (! $container->hasDefinition($util)) {
+                    throw new RuntimeException(
+                        "A plugin must be a string representing an configured container service"
+                    );
+                }
             }
         }
-        // define message factory
-        $messageFactoryId = 'prooph_service_bus.message_factory.' . $name;
 
-        $container
-            ->setDefinition(
+        // define message factory
+        $messageFactoryId = 'prooph_service_bus.message_factory.'.$name;
+        $container->setDefinition(
                 $messageFactoryId,
                 new DefinitionDecorator($options['message_factory'])
             );
 
+
         // define message factory plugin
-        $messageFactoryPluginId = 'prooph_service_bus.message_factory_plugin.' . $name;
+        $messageFactoryPluginId = 'prooph_service_bus.message_factory_plugin.'.$name;
+        $messageFactoryPluginDefinition = new DefinitionDecorator('prooph_service_bus.message_factory_plugin');
+        $messageFactoryPluginDefinition->setArguments([new Reference($messageFactoryId)]);
 
-        $container
-            ->setDefinition(
+        $container->setDefinition(
                 $messageFactoryPluginId,
-                new DefinitionDecorator('prooph_service_bus.message_factory_plugin')
-            )
-            ->setArguments([new Reference($messageFactoryId)]);
+                $messageFactoryPluginDefinition
+            );
 
-        $serviceBusDefinition->addMethodCall('utilize', [new Reference($messageFactoryPluginId)]);
 
         // define router
+        $routerId = null;
         if (!empty($options['router'])) {
             $routerId = sprintf('prooph_service_bus.%s.router', $name);
-
-            $routerDefinition = $container->setDefinition(
-                $routerId,
-                new DefinitionDecorator($options['router']['type'])
-            );
+            $routerDefinition = new DefinitionDecorator($options['router']['type']);
             $routerDefinition->setArguments([$options['router']['routes'] ?? []]);
-
-            $serviceBusDefinition->addMethodCall('utilize', [new Reference($routerId)]);
+            $container->setDefinition($routerId, $routerDefinition);
         }
 
-        //Add container plugin
-        $serviceBusDefinition->addMethodCall('utilize', [new Reference('prooph_service_bus.container_plugin')]);
+        //Attach container plugin
+        $containerPluginId = 'prooph_service_bus.container_plugin';
+        $pluginIds = array_filter(array_merge($options['plugins'], [$containerPluginId, $messageFactoryPluginId, $routerId]));
+
+
+        // Wrap the message bus creation into factory to call attachToMessageBus on the plugins
+        $serviceBusDefinition
+            ->setFactory([new Reference('prooph_service_bus.'.$type.'_bus_factory'), 'create'])
+            ->setArguments(
+                [
+                    $container->getDefinition('prooph_service_bus.'.$type.'_bus')->getClass(),
+                    new Reference('service_container'),
+                    $pluginIds,
+                ]
+            );
     }
 }
