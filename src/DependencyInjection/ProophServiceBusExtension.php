@@ -166,7 +166,6 @@ final class ProophServiceBusExtension extends Extension
         $containerPluginId = 'prooph_service_bus.container_plugin';
         $pluginIds = array_filter(array_merge($options['plugins'], [$containerPluginId, $messageFactoryPluginId, $routerId]));
 
-
         // Wrap the message bus creation into factory to call attachToMessageBus on the plugins
         $serviceBusDefinition
             ->setFactory([new Reference('prooph_service_bus.'.$type.'_bus_factory'), 'create'])
