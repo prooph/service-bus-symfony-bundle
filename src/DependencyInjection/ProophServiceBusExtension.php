@@ -126,7 +126,6 @@ final class ProophServiceBusExtension extends Extension
             new DefinitionDecorator('prooph_service_bus.' . $type . '_bus')
         );
 
-
         if (!empty($options['plugins'])) {
             foreach ($options['plugins'] as $index => $util) {
                 if (! $container->hasDefinition($util)) {
