@@ -36,7 +36,6 @@ final class ProophServiceBusExtension extends Extension
         'query' => QueryBus::class,
     ];
 
-
     public function getNamespace()
     {
         return 'http://getprooph.org/schemas/symfony-dic/prooph';
@@ -51,7 +50,6 @@ final class ProophServiceBusExtension extends Extension
     {
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
-
 
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('service_bus.xml');
@@ -94,7 +92,7 @@ final class ProophServiceBusExtension extends Extension
 
         $serviceBuses = [];
         foreach (array_keys($config) as $name) {
-            $serviceBuses[$name] = sprintf('prooph_service_bus.%s', $name);
+            $serviceBuses[$name] = 'prooph_service_bus.' . $name;
         }
         $container->setParameter('prooph_service_bus.' . $type . '_buses', $serviceBuses);
 
@@ -120,9 +118,9 @@ final class ProophServiceBusExtension extends Extension
      */
     private function loadBus(string $type, string $name, array $options, ContainerBuilder $container)
     {
-        $serviceBusName = sprintf('prooph_service_bus.%s', $name);
+        $serviceBusId = 'prooph_service_bus.' . $name;
         $serviceBusDefinition = $container->setDefinition(
-            $serviceBusName,
+            $serviceBusId,
             new DefinitionDecorator('prooph_service_bus.' . $type . '_bus')
         );
 
@@ -158,7 +156,7 @@ final class ProophServiceBusExtension extends Extension
         // define router
         $routerId = null;
         if (!empty($options['router'])) {
-            $routerId = sprintf('prooph_service_bus.%s.router', $name);
+            $routerId = 'prooph_service_bus.' . $name . '.router';
             $routerDefinition = new DefinitionDecorator($options['router']['type']);
             $routerDefinition->setArguments([$options['router']['routes'] ?? []]);
             $container->setDefinition($routerId, $routerDefinition);
