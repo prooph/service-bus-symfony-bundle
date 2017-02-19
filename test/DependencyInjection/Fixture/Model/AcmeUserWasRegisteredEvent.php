@@ -19,7 +19,7 @@ class AcmeUserWasRegisteredEvent extends DomainEvent implements PayloadConstruct
 {
     use PayloadTrait;
 
-    public function messageName()
+    public function messageName() : string
     {
         return 'Acme\UserWasRegistered';
     }

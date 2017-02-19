@@ -20,6 +20,11 @@ final class AcmeRegisterUserHandler
         $this->lastCommand = $command;
     }
 
+    public function handle(AcmeRegisterUserCommand $command)
+    {
+        $this->lastCommand = $command;
+    }
+
     public function lastCommand()
     {
         return $this->lastCommand;

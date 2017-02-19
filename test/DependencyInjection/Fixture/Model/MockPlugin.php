@@ -12,11 +12,11 @@ namespace ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model;
 
 use Prooph\Common\Event\ActionEvent;
 use Prooph\Common\Event\ActionEventEmitter;
-use Prooph\Common\Event\ActionEventListenerAggregate;
 use Prooph\Common\Event\DetachAggregateHandlers;
 use Prooph\ServiceBus\MessageBus;
+use Prooph\ServiceBus\Plugin\AbstractPlugin;
 
-class MockPlugin implements ActionEventListenerAggregate
+class MockPlugin extends AbstractPlugin
 {
     use DetachAggregateHandlers;
 
@@ -30,9 +30,13 @@ class MockPlugin implements ActionEventListenerAggregate
     /**
      * @param ActionEventEmitter $dispatcher
      */
-    public function attach(ActionEventEmitter $dispatcher)
+    public function attachToMessageBus(MessageBus $bus) : void
     {
-        $this->trackHandler($dispatcher->attachListener(MessageBus::EVENT_INITIALIZE, [$this, 'onInitialize']));
+        $this->trackHandler($bus->attach(
+            MessageBus::EVENT_DISPATCH,
+            [$this, 'onInitialize'],
+            MessageBus::PRIORITY_INITIALIZE
+        ));
     }
 
     public function onInitialize(ActionEvent $event)

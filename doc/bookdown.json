@@ -7,6 +7,6 @@
   ],
   "target": "./html",
   "tocDepth": 2,
-  "template": "../vendor/tobiju/bookdown-bootswatch-templates/templates/main.php",
-  "copyright": "Copyright (c) 2016 <a href=\"http://getprooph.org/\" title=\"prooph software GmbH\">prooph software GmbH</a> <br/> Powered by <a href=\"https://github.com/tobiju/bookdown-bootswatch-templates\" title=\"Visit project to generate your own docs\">Bookdown Bootswatch Templates</a>"
+  "template": "../vendor/prooph/bookdown-template/templates/main.php",
+  "copyright": "Copyright (c) 2017 <a href=\"http://getprooph.org/\" title=\"prooph software GmbH\">prooph software GmbH</a> <br/> Powered by <a href=\"https://github.com/tobiju/bookdown-bootswatch-templates\" title=\"Visit project to generate your own docs\">Bookdown Bootswatch Templates</a>"
 }

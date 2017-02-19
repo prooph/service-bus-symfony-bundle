@@ -10,7 +10,10 @@
     </parameters>
 
     <services>
-        <service id="prooph_service_bus.event_bus" class="%prooph_service_bus.event_bus.class%" abstract="true" />
+        <service id="prooph_service_bus.event_bus" class="%prooph_service_bus.event_bus.class%" abstract="true" >
+            <factory service="prooph_service_bus.event_bus_factory" method="create"/>
+        </service>
+        <service id="prooph_service_bus.event_bus_factory" class="%prooph_service_bus.message_bus_factory.class%" public="false"/>
         <service id="prooph_service_bus.event_bus_router" class="%prooph_service_bus.event_bus_router.class%" public="false" abstract="true" />
     </services>
 </container>

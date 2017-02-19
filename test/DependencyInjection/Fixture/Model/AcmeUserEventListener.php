@@ -15,7 +15,12 @@ class AcmeUserEventListener
 {
     private $lastEvent;
 
-    public function onUserWasRegistered(AcmeUserWasRegisteredEvent $event)
+    public function __invoke(AcmeUserWasRegisteredEvent $event)
+    {
+        $this->lastEvent = $event;
+    }
+
+    public function onEvent(AcmeUserWasRegisteredEvent $event)
     {
         $this->lastEvent = $event;
     }
