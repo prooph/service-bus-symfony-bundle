@@ -1,5 +1,11 @@
 # ProophServiceBus (PSB) Symfony bundle
 
+## A note about versions
+
+Version 0.4 of the bundle works with `prooph/service-bus` v6.0 and above.
+
+Use version 0.3 for `prooph/service-bus` 5.x.
+
 ## Installation
 
 Installation of this Symfony bundle uses Composer. For Composer documentation, please refer to
