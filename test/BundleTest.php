@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace ProophTest\Bundle\ServiceBus;
 
-use PHPUnit_Framework_TestCase as TestCase;
+use PHPUnit\Framework\TestCase;
 use Prooph\Bundle\ServiceBus\ProophServiceBusBundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 

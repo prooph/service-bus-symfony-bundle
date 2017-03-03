@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace ProophTest\Bundle\ServiceBus\DependencyInjection;
 
-use PHPUnit_Framework_TestCase as TestCase;
+use PHPUnit\Framework\TestCase;
 use Prooph\Bundle\ServiceBus\DependencyInjection\Compiler\PluginsPass;
 use Prooph\Bundle\ServiceBus\DependencyInjection\Compiler\RoutePass;
 use Prooph\Bundle\ServiceBus\DependencyInjection\ProophServiceBusExtension;
