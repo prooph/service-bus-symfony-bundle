@@ -9,6 +9,7 @@
 
 namespace ProophTest\Bundle\ServiceBus\DependencyInjection;
 
+use PHPUnit\Framework\TestCase;
 use Prooph\Bundle\ServiceBus\MessageBusFactory;
 use Prooph\ServiceBus\CommandBus;
 use Prooph\ServiceBus\EventBus;
@@ -17,7 +18,7 @@ use ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\MockPlugin;
 use Prophecy\Argument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class MessageBusFactoryTest extends \PHPUnit_Framework_TestCase
+class MessageBusFactoryTest extends TestCase
 {
 
     /**
