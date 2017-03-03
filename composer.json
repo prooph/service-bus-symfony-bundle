@@ -82,13 +82,13 @@
     "container-interop/container-interop": "^1.1"
   },
   "require-dev": {
-    "phpunit/phpunit": "^5.3",
+    "phpunit/phpunit": "^6.0",
     "phpunit/php-invoker": "^1.1.4",
     "fabpot/php-cs-fixer": "^1.11",
     "bookdown/bookdown": "1.x-dev as 1.0.0",
     "prooph/bookdown-template": "^0.2.0",
     "satooshi/php-coveralls": "^1.0",
-    "phpspec/prophecy": "dev-patch-1 as 1.6.2"
+    "phpspec/prophecy": "^1.7"
   },
   "suggest": {
   },
@@ -119,11 +119,5 @@
       "phpunit.xml*",
       "test"
     ]
-  },
-  "repositories": [
-    {
-      "type": "git",
-      "url": "https://github.com/prolic/prophecy.git"
-    }
-  ]
+  }
 }
