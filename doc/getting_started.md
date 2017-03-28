@@ -88,7 +88,7 @@ services:
         tags:
             - { name: 'prooph_service_bus.acme_command_bus.route_target' }
 ```
-The bundle will try to detect the name of the command by itself.
+The bundle will try to detect the name of the command by itself. You just need to overload the `messageName()` function and return the container service-id, which should handle the command.
 
 If this feels like too much magic or if the detection fails, you can still pass the name of the command as attribute:
 ```yaml
