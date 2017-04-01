@@ -146,6 +146,7 @@ final class ProophServiceBusExtension extends Extension
         $messageFactoryPluginId = 'prooph_service_bus.message_factory_plugin.'.$name;
         $messageFactoryPluginDefinition = new DefinitionDecorator('prooph_service_bus.message_factory_plugin');
         $messageFactoryPluginDefinition->setArguments([new Reference($messageFactoryId)]);
+        $messageFactoryPluginDefinition->setPublic(true);
 
         $container->setDefinition(
                 $messageFactoryPluginId,
@@ -159,6 +160,7 @@ final class ProophServiceBusExtension extends Extension
             $routerId = 'prooph_service_bus.' . $name . '.router';
             $routerDefinition = new DefinitionDecorator($options['router']['type']);
             $routerDefinition->setArguments([$options['router']['routes'] ?? []]);
+            $routerDefinition->setPublic(true);
             $container->setDefinition($routerId, $routerDefinition);
         }
 
