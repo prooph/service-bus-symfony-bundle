@@ -124,16 +124,6 @@ final class ProophServiceBusExtension extends Extension
             new DefinitionDecorator('prooph_service_bus.' . $type . '_bus')
         );
 
-        if (!empty($options['plugins'])) {
-            foreach ($options['plugins'] as $index => $util) {
-                if (! $container->hasDefinition($util)) {
-                    throw new RuntimeException(
-                        "A plugin must be a string representing an configured container service"
-                    );
-                }
-            }
-        }
-
         // define message factory
         $messageFactoryId = 'prooph_service_bus.message_factory.'.$name;
         $container->setDefinition(
