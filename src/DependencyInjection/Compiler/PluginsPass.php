@@ -12,15 +12,15 @@ declare(strict_types=1);
 namespace Prooph\Bundle\ServiceBus\DependencyInjection\Compiler;
 
 use Prooph\Bundle\ServiceBus\DependencyInjection\ProophServiceBusExtension;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class PluginsPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
         foreach (ProophServiceBusExtension::AVAILABLE_BUSES as $type => $busClass) {
-            if (!$container->hasParameter('prooph_service_bus.' . $type . '_buses')) {
+            if (! $container->hasParameter('prooph_service_bus.' . $type . '_buses')) {
                 continue;
             }
 

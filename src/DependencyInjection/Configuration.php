@@ -26,13 +26,13 @@ final class Configuration implements ConfigurationInterface
      */
     public function __construct($debug)
     {
-        $this->debug = (Boolean)$debug;
+        $this->debug = (bool) $debug;
     }
 
     /**
      * Normalizes XML config and defines config tree
      *
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getConfigTreeBuilder()
     {
@@ -63,8 +63,7 @@ final class Configuration implements ConfigurationInterface
         $handlerNode = $routesNode
             ->requiresAtLeastOneElement()
             ->useAttributeAsKey($type)
-            ->prototype('event' === $type ? 'array' : 'scalar')
-        ;
+            ->prototype('event' === $type ? 'array' : 'scalar');
 
         if ('event' === $type) {
             $handlerNode
@@ -75,7 +74,7 @@ final class Configuration implements ConfigurationInterface
                         })
                         ->then(function ($v) {
                             // fix single node in XML
-                            return (array)$v['listener'];
+                            return (array) $v['listener'];
                         })
                     ->end()
                     ->prototype('scalar')
@@ -88,8 +87,7 @@ final class Configuration implements ConfigurationInterface
                             })
                         ->end()
                     ->end()
-                ->end()
-            ;
+                ->end();
         } else {
             $handlerNode
                 ->beforeNormalization()
@@ -159,7 +157,6 @@ final class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
-            ->end()
-        ;
+            ->end();
     }
 }

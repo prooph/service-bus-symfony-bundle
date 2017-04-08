@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class MessageBusFactory
 {
-    public function create(string $class, ContainerInterface $container, array $plugins = []) : MessageBus
+    public function create(string $class, ContainerInterface $container, array $plugins = []): MessageBus
     {
         /** @var MessageBus $bus */
         $bus = new $class();

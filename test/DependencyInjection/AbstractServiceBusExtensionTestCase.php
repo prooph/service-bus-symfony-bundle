@@ -33,7 +33,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\Dumper;
 use Symfony\Component\DependencyInjection\Dumper\XmlDumper;
 use Symfony\Component\DependencyInjection\Dumper\YamlDumper;
-use \Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 abstract class AbstractServiceBusExtensionTestCase extends TestCase
 {
@@ -266,7 +266,6 @@ abstract class AbstractServiceBusExtensionTestCase extends TestCase
     public function it_creates_multiple_event_buses()
     {
         $container = $this->loadContainer('event_bus_multiple');
-
 
         foreach (['main_event_bus', 'second_event_bus'] as $name) {
             $config = $container->getDefinition('prooph_service_bus.' . $name);

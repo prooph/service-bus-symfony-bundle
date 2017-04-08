@@ -30,7 +30,7 @@ class MockPlugin extends AbstractPlugin
     /**
      * @param ActionEventEmitter $dispatcher
      */
-    public function attachToMessageBus(MessageBus $bus) : void
+    public function attachToMessageBus(MessageBus $bus): void
     {
         $this->trackHandler($bus->attach(
             MessageBus::EVENT_DISPATCH,

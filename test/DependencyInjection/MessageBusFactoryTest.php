@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * prooph (http://getprooph.org/)
  *
@@ -20,7 +22,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class MessageBusFactoryTest extends TestCase
 {
-
     /**
      * @test
      * @dataProvider getBusTypes

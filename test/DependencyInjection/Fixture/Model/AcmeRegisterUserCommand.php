@@ -19,7 +19,7 @@ final class AcmeRegisterUserCommand extends Command implements PayloadConstructa
 {
     use PayloadTrait;
 
-    public function messageName() : string
+    public function messageName(): string
     {
         return 'Acme\RegisterUser';
     }

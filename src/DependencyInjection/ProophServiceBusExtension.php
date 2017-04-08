@@ -11,7 +11,6 @@ declare(strict_types=1);
 
 namespace Prooph\Bundle\ServiceBus\DependencyInjection;
 
-use Prooph\Bundle\ServiceBus\Exception\RuntimeException;
 use Prooph\ServiceBus\CommandBus;
 use Prooph\ServiceBus\EventBus;
 use Prooph\ServiceBus\Plugin\Router\CommandRouter;
@@ -55,7 +54,7 @@ final class ProophServiceBusExtension extends Extension
         $loader->load('service_bus.xml');
 
         foreach (self::AVAILABLE_BUSES as $type => $bus) {
-            if (!empty($config[$type . '_buses'])) {
+            if (! empty($config[$type . '_buses'])) {
                 $this->busLoad($type, $bus, $config[$type . '_buses'], $container, $loader);
             }
         }
@@ -131,7 +130,6 @@ final class ProophServiceBusExtension extends Extension
                 new DefinitionDecorator($options['message_factory'])
             );
 
-
         // define message factory plugin
         $messageFactoryPluginId = 'prooph_service_bus.message_factory_plugin.'.$name;
         $messageFactoryPluginDefinition = new DefinitionDecorator('prooph_service_bus.message_factory_plugin');
@@ -143,10 +141,9 @@ final class ProophServiceBusExtension extends Extension
                 $messageFactoryPluginDefinition
             );
 
-
         // define router
         $routerId = null;
-        if (!empty($options['router'])) {
+        if (! empty($options['router'])) {
             $routerId = 'prooph_service_bus.' . $name . '.router';
             $routerDefinition = new DefinitionDecorator($options['router']['type']);
             $routerDefinition->setArguments([$options['router']['routes'] ?? []]);

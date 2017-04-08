@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 namespace Prooph\Bundle\ServiceBus\DependencyInjection\Compiler;
 
@@ -23,6 +24,7 @@ class RoutePass implements CompilerPassInterface
             $init->setAccessible(true);
             $init->invoke($instance);
         }
+
         return $instance->messageName();
     }
 

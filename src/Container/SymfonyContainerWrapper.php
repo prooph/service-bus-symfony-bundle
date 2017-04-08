@@ -26,9 +26,8 @@ class SymfonyContainerWrapper implements ContainerInterface
         $this->innerContainer = $container;
     }
 
-
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function get($id)
     {
@@ -36,7 +35,7 @@ class SymfonyContainerWrapper implements ContainerInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function has($id)
     {
