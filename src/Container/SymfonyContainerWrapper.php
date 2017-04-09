@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace Prooph\Bundle\ServiceBus\Container;
 
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface as SymfonyContainer;
 
 class SymfonyContainerWrapper implements ContainerInterface
