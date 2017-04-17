@@ -30,9 +30,9 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 final class ProophServiceBusExtension extends Extension
 {
     const AVAILABLE_BUSES = [
-        'command' => CommandBus::class,
-        'event' => EventBus::class,
-        'query' => QueryBus::class,
+        'command',
+        'event',
+        'query',
     ];
 
     public function getNamespace()
@@ -53,9 +53,9 @@ final class ProophServiceBusExtension extends Extension
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('service_bus.xml');
 
-        foreach (self::AVAILABLE_BUSES as $type => $bus) {
+        foreach (self::AVAILABLE_BUSES as $type) {
             if (! empty($config[$type . '_buses'])) {
-                $this->busLoad($type, $bus, $config[$type . '_buses'], $container, $loader);
+                $this->busLoad($type, $config[$type . '_buses'], $container, $loader);
             }
         }
 
@@ -81,7 +81,6 @@ final class ProophServiceBusExtension extends Extension
      */
     private function busLoad(
         string $type,
-        string $class,
         array $config,
         ContainerBuilder $container,
         XmlFileLoader $loader
@@ -96,7 +95,7 @@ final class ProophServiceBusExtension extends Extension
         $container->setParameter('prooph_service_bus.' . $type . '_buses', $serviceBuses);
 
         $def = $container->getDefinition('prooph_service_bus.' . $type . '_bus');
-        $def->setClass($class);
+        $def->setClass($container->getParameter('prooph_service_bus.' . $type . '_bus.class'));
 
         foreach ($config as $name => $options) {
             $this->loadBus($type, $name, $options, $container);

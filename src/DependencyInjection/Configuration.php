@@ -39,7 +39,7 @@ final class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('prooph_service_bus');
 
-        foreach (ProophServiceBusExtension::AVAILABLE_BUSES as $type => $class) {
+        foreach (ProophServiceBusExtension::AVAILABLE_BUSES as $type) {
             $this->addServiceBusSection($type, $rootNode);
         }
 
