@@ -6,7 +6,7 @@
 
     <parameters>
         <parameter key="prooph_service_bus.query_bus_router.class">Prooph\ServiceBus\Plugin\Router\QueryRouter</parameter>
-        <parameter key="prooph_service_bus.query_bus.class">Prooph\ServiceBus\EventBus</parameter>
+        <parameter key="prooph_service_bus.query_bus.class">Prooph\ServiceBus\QueryBus</parameter>
     </parameters>
 
     <services>
