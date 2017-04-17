@@ -30,7 +30,7 @@ class RoutePass implements CompilerPassInterface
 
     public function process(ContainerBuilder $container)
     {
-        foreach (ProophServiceBusExtension::AVAILABLE_BUSES as $type => $busClass) {
+        foreach (ProophServiceBusExtension::AVAILABLE_BUSES as $type) {
             if (! $container->hasParameter('prooph_service_bus.' . $type . '_buses')) {
                 continue;
             }
