@@ -5,7 +5,6 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="prooph_service_bus.message_bus_factory.class">Prooph\Bundle\ServiceBus\MessageBusFactory</parameter>
         <parameter key="prooph_service_bus.message_factory_plugin.class">Prooph\ServiceBus\Plugin\MessageFactoryPlugin</parameter>
         <parameter key="prooph_service_bus.message_factory.class">Prooph\Common\Messaging\FQCNMessageFactory</parameter>
         <parameter key="prooph_service_bus.container_plugin.class">Prooph\ServiceBus\Plugin\ServiceLocatorPlugin</parameter>
@@ -18,11 +17,19 @@
         <service id="prooph_service_bus.on_event_invoke_strategy" class="Prooph\ServiceBus\Plugin\InvokeStrategy\OnEventStrategy" />
         <service id="prooph_service_bus.message_factory_plugin" class="%prooph_service_bus.message_factory_plugin.class%" public="false" abstract="true" />
         <service id="prooph_service_bus.message_factory" class="%prooph_service_bus.message_factory.class%" />
+
         <service id="prooph_service_bus.container_plugin" class="%prooph_service_bus.container_plugin.class%">
             <argument type="service" id="prooph_service_bus.container_wrapper" />
         </service>
         <service id="prooph_service_bus.container_wrapper" class="%prooph_service_bus.container_wrapper.class%" public="false">
             <argument type="service" id="service_container" />
+        </service>
+
+        <service id="prooph_service_bus.psr_logger_plugin" class="Prooph\Bundle\ServiceBus\Plugin\PsrLoggerPlugin" abstract="true" public="false"/>
+
+        <service id="prooph_service_bus.stopwatch_plugin" class="Prooph\Bundle\ServiceBus\Plugin\StopwatchPlugin" public="false">
+            <argument id="debug.stopwatch" type="service"/>
+            <tag name="prooph_service_bus.plugin" />
         </service>
         <service id="prooph_service_bus.async_switch_message_router" class="Prooph\ServiceBus\Plugin\Router\AsyncSwitchMessageRouter" />
     </services>
