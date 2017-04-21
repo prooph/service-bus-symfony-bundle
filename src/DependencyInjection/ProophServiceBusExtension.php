@@ -193,7 +193,7 @@ final class ProophServiceBusExtension extends Extension
         }
 
         //Attach container plugin
-        $containerPluginId = 'prooph_service_bus.container_plugin';
+        $containerPluginId = 'prooph_service_bus.plugin.service_locator';
         $containerPluginDefinition = $container->getDefinition($containerPluginId);
         $containerPluginDefinition->addTag(sprintf('prooph_service_bus.%s.plugin', $name));
 
