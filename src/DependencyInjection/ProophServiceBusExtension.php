@@ -197,5 +197,6 @@ final class ProophServiceBusExtension extends Extension
         $containerPluginDefinition = $container->getDefinition($containerPluginId);
         $containerPluginDefinition->addTag(sprintf('prooph_service_bus.%s.plugin', $name));
 
+        $container->setParameter(sprintf('prooph_service_bus.%s.configuration', $name), $options);
     }
 }
