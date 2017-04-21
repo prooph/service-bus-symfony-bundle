@@ -141,7 +141,7 @@ final class ProophServiceBusExtension extends Extension
         $serviceBusLoggerDefinition = $container
             ->setDefinition(
                 sprintf('%s.plugin.psr_logger', $serviceBusId),
-                new ChildDefinition('prooph_service_bus.psr_logger_plugin')
+                new ChildDefinition('prooph_service_bus.plugin.psr_logger')
             )
             ->setArguments(
                 [
