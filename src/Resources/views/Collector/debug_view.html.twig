@@ -97,15 +97,16 @@
     <div class="sf-tabs">
         {% for bus, messages in collector.messages %}
             <div class="tab">
-                <h3 class="tab-title">{{ bus }}<span class="badge">{{ messages|length }}</span><span class="badge">{{ collector.busDuration(bus) }} ms</span></h3>
+                <h2 class="tab-title">{{ bus }}<span class="badge">{{ messages|length }}</span><span class="badge">{{ collector.busDuration(bus) }} ms</span></h2>
 
                 <div class="tab-content">
-                    <a href="#" class="sf-toggle link-inverse sf-toggle-on" data-toggle-selector=".callstack-{{ bus }}" data-toggle-alt-content="Hide message callstack">Show message callstack</a> |
-                    <a href="#" class="sf-toggle link-inverse" data-toggle-selector=".config-{{ bus }}" data-toggle-alt-content="Hide config">Show config</a> |
-                    <a href="#" class="sf-toggle link-inverse" data-toggle-selector=".plugins-{{ bus }}" data-toggle-alt-content="Hide plugins">Show plugins</a>
+                    <a href="#" class="sf-toggle link-inverse" data-toggle-selector=".callstack-{{ bus }}" data-toggle-alt-content="Hide {{ collector.busType|capitalize }} callstack">{{ collector.busType|capitalize }} callstack</a> |
+                    <a href="#" class="sf-toggle link-inverse" data-toggle-selector=".routing-{{ bus }}" data-toggle-alt-content="Hide route map">Route map</a> |
+                    <a href="#" class="sf-toggle link-inverse" data-toggle-selector=".plugins-{{ bus }}" data-toggle-alt-content="Hide plugins">Plugins</a> |
+                    <a href="#" class="sf-toggle link-inverse" data-toggle-selector=".config-{{ bus }}" data-toggle-alt-content="Hide config">Config</a>
 
                     <div class="sf-toggle-content callstack-{{ bus }}">
-                        <h4>Message callstack</h4>
+                        <h4>{{ collector.busType|capitalize }} callstack</h4>
                         <table>
                             <thead>
                             <tr>
@@ -121,6 +122,31 @@
                                 <td><a href="#{{ call.id }}">{{ call.message }}</a></td>
                                 <td>{{ call.handler }}</td>
                             </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="sf-toggle-content routing-{{ bus }}">
+                        <h4>{{ collector.busType|capitalize }} Routing</h4>
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>{{ collector.busType|capitalize }}</th>
+                                <th>Handler</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for message, handler in collector.config(bus)['router']['routes'] %}
+                                <tr>
+                                    <td>{{ message }}</a></td>
+                                    <td>{% if handler is iterable %}
+                                            {{ handler|join('<br />')|raw }}
+                                        {% else %}
+                                            {{ handler }}
+                                        {% endif %}
+                                    </td>
+                                </tr>
                             {% endfor %}
                             </tbody>
                         </table>
