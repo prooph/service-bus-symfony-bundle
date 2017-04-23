@@ -7,16 +7,12 @@ namespace Prooph\Bundle\ServiceBus\Plugin;
 use Prooph\Bundle\ServiceBus\NamedMessageBus;
 use Prooph\Common\Event\ActionEvent;
 use Prooph\ServiceBus\MessageBus;
+use Prooph\ServiceBus\Plugin\AbstractPlugin;
 use Prooph\ServiceBus\Plugin\Plugin;
 use Symfony\Component\Stopwatch\Stopwatch;
 
-class StopwatchPlugin implements Plugin
+class StopwatchPlugin extends AbstractPlugin
 {
-    /**
-     * @var array
-     */
-    private $messageBusListener = [];
-
     /**
      * @var Stopwatch
      */
@@ -46,23 +42,13 @@ class StopwatchPlugin implements Plugin
             }
         };
 
-        $this->messageBusListener[] = $messageBus->attach(MessageBus::EVENT_DISPATCH, function (ActionEvent $event) use ($resolveName) {
+        $this->listenerHandlers[] = $messageBus->attach(MessageBus::EVENT_DISPATCH, function (ActionEvent $event) use ($resolveName) {
             $messageType = $event->getParam(MessageBus::EVENT_PARAM_MESSAGE)->messageType();
             $this->stopwatch->start($resolveName($event), $messageType === 'command' ? 'section' : $messageType);
         }, MessageBus::PRIORITY_INVOKE_HANDLER + 2000);
 
-        $this->messageBusListener[] = $messageBus->attach(MessageBus::EVENT_FINALIZE, function (ActionEvent $event) use ($resolveName) {
+        $this->listenerHandlers[] = $messageBus->attach(MessageBus::EVENT_FINALIZE, function (ActionEvent $event) use ($resolveName) {
             $this->stopwatch->stop($resolveName($event));
         }, -2000);
     }
-
-//    }
-
-    public function detachFromMessageBus(MessageBus $messageBus): void
-    {
-        foreach ($this->messageBusListener as $listener) {
-            $messageBus->detach($listener);
-        }
-    }
-
 }

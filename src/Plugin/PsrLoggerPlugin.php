@@ -7,19 +7,16 @@ namespace Prooph\Bundle\ServiceBus\Plugin;
 use Prooph\Bundle\ServiceBus\NamedMessageBus;
 use Prooph\Common\Event\ActionEvent;
 use Prooph\ServiceBus\MessageBus;
+use Prooph\ServiceBus\Plugin\AbstractPlugin;
 use Psr\Log\LoggerInterface;
 use ReflectionClass;
 
-class PsrLoggerPlugin implements \Prooph\ServiceBus\Plugin\Plugin
+class PsrLoggerPlugin extends AbstractPlugin
 {
     /**
      * @var LoggerInterface
      */
     protected $logger;
-    /**
-     * @var array
-     */
-    private $messageBusListener = [];
 
     public function __construct(LoggerInterface $logger = null)
     {
@@ -28,7 +25,7 @@ class PsrLoggerPlugin implements \Prooph\ServiceBus\Plugin\Plugin
 
     public function attachToMessageBus(MessageBus $messageBus): void
     {
-        $this->messageBusListener[] = $messageBus->attach(MessageBus::EVENT_DISPATCH, function (ActionEvent $event) {
+        $this->listenerHandlers[] = $messageBus->attach(MessageBus::EVENT_DISPATCH, function (ActionEvent $event) {
             $context = $this->createContextFromActionEvent($event);
             $message = 'Dispatched {bus-type}:{message-name}';
             if ($context['message-handler'] !== null) {
@@ -37,7 +34,7 @@ class PsrLoggerPlugin implements \Prooph\ServiceBus\Plugin\Plugin
             $this->logger->info($message, $context);
         }, MessageBus::PRIORITY_INVOKE_HANDLER + 2000);
 
-        $this->messageBusListener[] = $messageBus->attach(MessageBus::EVENT_FINALIZE, function (ActionEvent $event) {
+        $this->listenerHandlers[] = $messageBus->attach(MessageBus::EVENT_FINALIZE, function (ActionEvent $event) {
             $context = $this->createContextFromActionEvent($event);
             $message = 'Finished {bus-type}:{message-name}';
             if ($context['message-handler'] !== null) {
@@ -46,12 +43,12 @@ class PsrLoggerPlugin implements \Prooph\ServiceBus\Plugin\Plugin
             $this->logger->info($message, $context);
         }, -2000);
 
-        $this->messageBusListener[] = $messageBus->attach(MessageBus::EVENT_DISPATCH, function (ActionEvent $event) {
+        $this->listenerHandlers[] = $messageBus->attach(MessageBus::EVENT_DISPATCH, function (ActionEvent $event) {
             $context = $this->createContextFromActionEvent($event);
             $this->logger->debug('Initialized {bus-type} message {message-name}', $context);
         }, MessageBus::PRIORITY_INITIALIZE - 100);
 
-        $this->messageBusListener[] = $messageBus->attach(MessageBus::EVENT_DISPATCH, function (ActionEvent $event) {
+        $this->listenerHandlers[] = $messageBus->attach(MessageBus::EVENT_DISPATCH, function (ActionEvent $event) {
             $context = $this->createContextFromActionEvent($event);
 
             $this->logger->debug('Detect {bus-type} message name for {message-name}', $context);
@@ -59,7 +56,7 @@ class PsrLoggerPlugin implements \Prooph\ServiceBus\Plugin\Plugin
         }, MessageBus::PRIORITY_DETECT_MESSAGE_NAME - 100);
 
         //Should be triggered because we did not provide a message-handler yet
-        $this->messageBusListener[] = $messageBus->attach(MessageBus::EVENT_DISPATCH, function (ActionEvent $event) {
+        $this->listenerHandlers[] = $messageBus->attach(MessageBus::EVENT_DISPATCH, function (ActionEvent $event) {
             $context = $this->createContextFromActionEvent($event);
 
             $this->logger->debug(
@@ -67,7 +64,7 @@ class PsrLoggerPlugin implements \Prooph\ServiceBus\Plugin\Plugin
 
         }, MessageBus::PRIORITY_ROUTE - 100);
 
-        $this->messageBusListener[] = $messageBus->attach(MessageBus::EVENT_DISPATCH, function (ActionEvent $event) {
+        $this->listenerHandlers[] = $messageBus->attach(MessageBus::EVENT_DISPATCH, function (ActionEvent $event) {
             $context = $this->createContextFromActionEvent($event);
 
             $this->logger->debug(
@@ -97,12 +94,5 @@ class PsrLoggerPlugin implements \Prooph\ServiceBus\Plugin\Plugin
                     'message-handler' => \is_object($event->getParam('message-handler')) ? get_class($event->getParam('message-handler')) : $event->getParam('message-handler'),
                 ]
             );
-    }
-
-    public function detachFromMessageBus(MessageBus $messageBus): void
-    {
-        foreach ($this->messageBusListener as $handler) {
-            $messageBus->detach($handler);
-        }
     }
 }
