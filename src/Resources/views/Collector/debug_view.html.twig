@@ -100,8 +100,31 @@
                 <h3 class="tab-title">{{ bus }}<span class="badge">{{ messages|length }}</span><span class="badge">{{ collector.busDuration(bus) }} ms</span></h3>
 
                 <div class="tab-content">
+                    <a href="#" class="sf-toggle link-inverse sf-toggle-on" data-toggle-selector=".callstack-{{ bus }}" data-toggle-alt-content="Hide message callstack">Show message callstack</a> |
                     <a href="#" class="sf-toggle link-inverse" data-toggle-selector=".config-{{ bus }}" data-toggle-alt-content="Hide config">Show config</a> |
                     <a href="#" class="sf-toggle link-inverse" data-toggle-selector=".plugins-{{ bus }}" data-toggle-alt-content="Hide plugins">Show plugins</a>
+
+                    <div class="sf-toggle-content callstack-{{ bus }}">
+                        <h4>Message callstack</h4>
+                        <table>
+                            <thead>
+                            <tr>
+                            <th></th>
+                            <th>Message</th>
+                            <th>Handler</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for i, call in collector.callstack(bus) %}
+                            <tr>
+                                <td>{{ i }}</td>
+                                <td><a href="#{{ call.id }}">{{ call.message }}</a></td>
+                                <td>{{ call.handler }}</td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
 
                     <div class="sf-toggle-content sf-toggle-hidden config-{{ bus }}">
                         <h4>Config:</h4>
@@ -112,12 +135,14 @@
 
                     <div class="sf-toggle-content sf-toggle-hidden plugins-{{ bus }}">
                         <h4>Attached plugins:</h4>
+                        {% for type, plugins in collector.config(bus).plugins %}
+                            <h5>{{ type|capitalize }}</h5>
                         <table>
-                            {% for plugin in collector.plugins(bus) %}
+                            {% for plugin in plugins %}
                                 <thead>
                                 <tr>
                                     <th>Class</th>
-                                    <th colspan="2">{{ plugin.class }}</th>
+                                    <th colspan="2">{{ plugin.class_name }}</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -129,8 +154,9 @@
                                 </tbody>
                             {% endfor %}
                         </table>
+                        {% endfor %}
                     </div>
-
+                    <h2>Messages</h2>
                     {% for i, message in messages %}
                         <a name="{{ message['message-data']['uuid'] }}"></a>
                         <table>
