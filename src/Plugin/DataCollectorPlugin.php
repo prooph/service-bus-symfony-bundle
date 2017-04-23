@@ -20,7 +20,7 @@ class DataCollectorPlugin extends DataCollector implements Plugin
     /**
      * @var array
      */
-    private $messageBusListener = [];
+    protected $listenerHandlers = [];
 
     /**
      * @var Stopwatch
@@ -107,7 +107,7 @@ class DataCollectorPlugin extends DataCollector implements Plugin
             throw new RuntimeException(sprinf('To use the Symfony Datacollector, the Bus "%s" needs to implement "%s"', $messageBus, NamedMessageBus::class));
         }
 
-        $this->messageBusListener = $messageBus->attach(MessageBus::EVENT_DISPATCH, function (ActionEvent $actionEvent) {
+        $this->listenerHandlers[] = $messageBus->attach(MessageBus::EVENT_DISPATCH, function (ActionEvent $actionEvent) {
             $busName = $actionEvent->getTarget()->busName();
             $uuid = (string)$actionEvent->getParam(MessageBus::EVENT_PARAM_MESSAGE)->uuid();
 
@@ -119,7 +119,7 @@ class DataCollectorPlugin extends DataCollector implements Plugin
 
         });
 
-        $this->messageBusListener = $messageBus->attach(MessageBus::EVENT_FINALIZE, function (ActionEvent $actionEvent) {
+        $this->listenerHandlers[] = $messageBus->attach(MessageBus::EVENT_FINALIZE, function (ActionEvent $actionEvent) {
             $busName = $actionEvent->getTarget()->busName();
             $uuid = (string)$actionEvent->getParam(MessageBus::EVENT_PARAM_MESSAGE)->uuid();
 
@@ -128,7 +128,7 @@ class DataCollectorPlugin extends DataCollector implements Plugin
             $this->data['messages'][$busName][$uuid]['duration'] = $this->stopwatch->stop($uuid)->getDuration();
         });
 
-        $this->messageBusListener = $messageBus->attach(MessageBus::EVENT_DISPATCH, function(ActionEvent $actionEvent) {
+        $this->listenerHandlers[] = $messageBus->attach(MessageBus::EVENT_DISPATCH, function(ActionEvent $actionEvent) {
             foreach($actionEvent->getParam('event-listeners',[]) as $handler) {
                 $this->data['message_callstack'][$actionEvent->getTarget()->busName()][] = [
                     'id' => $actionEvent->getParam('message')->uuid(),
@@ -150,9 +150,11 @@ class DataCollectorPlugin extends DataCollector implements Plugin
 
     public function detachFromMessageBus(MessageBus $messageBus): void
     {
-        foreach ($this->messageBusListener as $listener) {
-            $messageBus->detach($listener);
+        foreach ($this->listenerHandlers as $listenerHandler) {
+            $messageBus->detach($listenerHandler);
         }
+
+        $this->listenerHandlers = [];
     }
 
     protected function createContextFromActionEvent(ActionEvent $event): array
