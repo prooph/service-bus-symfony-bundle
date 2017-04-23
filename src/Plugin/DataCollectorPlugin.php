@@ -49,14 +49,9 @@ class DataCollectorPlugin extends DataCollector implements Plugin
             $reflClass = new \ReflectionClass($bus);
             $reflProperty = $reflClass->getProperty('events');
             $reflProperty->setAccessible(true);
-            $this->data['config'][$busName]['action_event_emitter'] = get_class($reflProperty->getValue($bus));
-
-            $this->data['plugins'][$busName] = array_map(function ($v) {
-                $class = get_class($v['plugin']);
-                unset($v['plugin']);
-
-                return array_merge($v, ['class' => $class]);
-            }, $bus->plugins());
+            // todo maybe put as default value in config tree builder to also make it configurable?
+//            $this->data['config'][$busName]['action_event_emitter'] = get_class($reflProperty->getValue($bus));
+            $this->data['config'][$busName] = $this->container->getParameter(sprintf('prooph_service_bus.%s.configuration',$busName));
         }
     }
 
@@ -90,9 +85,9 @@ class DataCollectorPlugin extends DataCollector implements Plugin
         return $this->data['duration'][$busName];
     }
 
-    public function plugins(string $busName) : array
+    public function callstack(string $busName) : array
     {
-        return $this->data['plugins'][$busName];
+        return $this->data['message_callstack'][$busName] ?? [];
     }
 
     public function config(string $busName) : array
@@ -121,7 +116,7 @@ class DataCollectorPlugin extends DataCollector implements Plugin
             }
 
             $this->stopwatch->start($uuid);
-            $this->data['messages'][$busName][$uuid] = $this->createContextFromActionEvent($actionEvent);
+
         });
 
         $this->messageBusListener = $messageBus->attach(MessageBus::EVENT_FINALIZE, function (ActionEvent $actionEvent) {
@@ -129,8 +124,28 @@ class DataCollectorPlugin extends DataCollector implements Plugin
             $uuid = (string)$actionEvent->getParam(MessageBus::EVENT_PARAM_MESSAGE)->uuid();
 
             $this->data['duration'][$busName] = $this->stopwatch->stop($busName)->getDuration();
+            $this->data['messages'][$busName][$uuid] = $this->createContextFromActionEvent($actionEvent);
             $this->data['messages'][$busName][$uuid]['duration'] = $this->stopwatch->stop($uuid)->getDuration();
         });
+
+        $this->messageBusListener = $messageBus->attach(MessageBus::EVENT_DISPATCH, function(ActionEvent $actionEvent) {
+            foreach($actionEvent->getParam('event-listeners',[]) as $handler) {
+                $this->data['message_callstack'][$actionEvent->getTarget()->busName()][] = [
+                    'id' => $actionEvent->getParam('message')->uuid(),
+                    'message' => $actionEvent->getParam('message-name'),
+                    'handler' => $handler
+                ] ;
+            }
+            if($actionEvent->getParam('message-handler') !== null) {
+                $this->data['message_callstack'][$actionEvent->getTarget()->busName()][] = [
+                    'id' => $actionEvent->getParam('message')->uuid(),
+                    'message' => $actionEvent->getParam('message-name'),
+                    'handler' => $actionEvent->getParam('message-handler')
+                ];
+            }
+
+            $context = $this->createContextFromActionEvent($actionEvent);
+        }, MessageBus::PRIORITY_ROUTE - 50000);
     }
 
     public function detachFromMessageBus(MessageBus $messageBus): void
