@@ -78,6 +78,7 @@ class RoutePass implements CompilerPassInterface
             function (ReflectionMethod $method) {
                 return $method->getNumberOfRequiredParameters() === 1
                 && $method->getParameters()[0]->getClass()
+                && $method->getParameters()[0]->getClass()->getName() !== Message::class
                 && $method->getParameters()[0]->getClass()->implementsInterface(Message::class);
             }
         );
