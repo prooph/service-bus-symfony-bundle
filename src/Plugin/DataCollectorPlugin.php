@@ -133,14 +133,14 @@ class DataCollectorPlugin extends DataCollector implements Plugin
                 $this->data['message_callstack'][$actionEvent->getTarget()->busName()][] = [
                     'id' => $actionEvent->getParam('message')->uuid(),
                     'message' => $actionEvent->getParam('message-name'),
-                    'handler' => $handler
+                    'handler' => \is_object($handler) ? get_class($handler) : $handler,
                 ] ;
             }
             if($actionEvent->getParam('message-handler') !== null) {
                 $this->data['message_callstack'][$actionEvent->getTarget()->busName()][] = [
                     'id' => $actionEvent->getParam('message')->uuid(),
                     'message' => $actionEvent->getParam('message-name'),
-                    'handler' => $actionEvent->getParam('message-handler')
+                    'handler' => \is_object($actionEvent->getParam('message-handler')) ? get_class($actionEvent->getParam('message-handler')) : (string) $actionEvent->getParam('message-handler'),
                 ];
             }
 
