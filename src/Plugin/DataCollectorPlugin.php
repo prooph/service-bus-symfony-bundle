@@ -117,7 +117,7 @@ class DataCollectorPlugin extends DataCollector implements Plugin
 
             $this->stopwatch->start($uuid);
 
-        });
+        }, MessageBus::PRIORITY_INVOKE_HANDLER + 100);
 
         $this->listenerHandlers[] = $messageBus->attach(MessageBus::EVENT_FINALIZE, function (ActionEvent $actionEvent) {
             $busName = $actionEvent->getTarget()->busName();
@@ -126,7 +126,7 @@ class DataCollectorPlugin extends DataCollector implements Plugin
             $this->data['duration'][$busName] = $this->stopwatch->stop($busName)->getDuration();
             $this->data['messages'][$busName][$uuid] = $this->createContextFromActionEvent($actionEvent);
             $this->data['messages'][$busName][$uuid]['duration'] = $this->stopwatch->stop($uuid)->getDuration();
-        }, MessageBus::PRIORITY_INVOKE_HANDLER + 2000);
+        }, MessageBus::PRIORITY_INVOKE_HANDLER - 100);
 
         $this->listenerHandlers[] = $messageBus->attach(MessageBus::EVENT_DISPATCH, function(ActionEvent $actionEvent) {
             foreach($actionEvent->getParam('event-listeners',[]) as $handler) {
