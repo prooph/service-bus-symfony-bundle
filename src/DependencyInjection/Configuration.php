@@ -153,6 +153,16 @@ final class Configuration implements ConfigurationInterface
                                 ->end()
                                 ->defaultValue('prooph_service_bus.' . $type . '_bus_router')
                             ->end()
+                            ->scalarNode('async_switch')
+                                ->beforeNormalization()
+                                    ->ifTrue(function ($v) {
+                                        return strpos($v, '@') === 0;
+                                    })
+                                    ->then(function ($v) {
+                                        return substr($v, 1);
+                                    })
+                                ->end()
+                            ->end()
                             ->append($routesNode)
                         ->end()
                     ->end()

@@ -86,7 +86,8 @@
     "prooph/php-cs-fixer-config": "^0.1.1",
     "prooph/bookdown-template": "^0.2.3",
     "satooshi/php-coveralls": "^1.0",
-    "phpspec/prophecy": "^1.7"
+    "phpspec/prophecy": "^1.7",
+    "react/promise": "^2.5"
   },
   "minimum-stability": "dev",
   "prefer-stable": true,
