@@ -19,6 +19,7 @@ use Prooph\ServiceBus\CommandBus;
 use Prooph\ServiceBus\EventBus;
 use Prooph\ServiceBus\Exception\CommandDispatchException;
 use Prooph\ServiceBus\Exception\MessageDispatchException;
+use Prooph\ServiceBus\Plugin\Router\AsyncSwitchMessageRouter;
 use Prooph\ServiceBus\Plugin\Router\CommandRouter;
 use Prooph\ServiceBus\Plugin\Router\EventRouter;
 use Prooph\ServiceBus\Plugin\Router\QueryRouter;
@@ -382,6 +383,27 @@ abstract class AbstractServiceBusExtensionTestCase extends TestCase
         $mockListener = $container->get('Acme\UserListener');
 
         self::assertSame($event, $mockListener->lastEvent());
+    }
+
+    /**
+     * @test
+     */
+    public function it_creates_a_command_bus_with_async_switch_message_router()
+    {
+        $container = $this->loadContainer('command_bus_async');
+
+        $config = $container->getDefinition('prooph_service_bus.command_bus_async');
+
+        self::assertEquals(CommandBus::class, $config->getClass());
+
+        /* @var $commandBus CommandBus */
+        $commandBus = $container->get('prooph_service_bus.command_bus_async');
+
+        self::assertInstanceOf(CommandBus::class, $commandBus);
+
+        $router = $container->get('prooph_service_bus.command_bus_async.router');
+
+        self::assertInstanceOf(AsyncSwitchMessageRouter::class, $router);
     }
 
     private function loadContainer($fixture, CompilerPassInterface $compilerPass = null)
