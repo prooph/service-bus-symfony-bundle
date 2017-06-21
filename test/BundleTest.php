@@ -12,7 +12,10 @@ declare(strict_types=1);
 namespace ProophTest\Bundle\ServiceBus;
 
 use PHPUnit\Framework\TestCase;
+use Prooph\Bundle\ServiceBus\DependencyInjection\Compiler\PluginsPass;
+use Prooph\Bundle\ServiceBus\DependencyInjection\Compiler\RoutePass;
 use Prooph\Bundle\ServiceBus\ProophServiceBusBundle;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class BundleTest extends TestCase
@@ -29,6 +32,23 @@ class BundleTest extends TestCase
         $config = $container->getCompilerPassConfig();
         $passes = $config->getBeforeOptimizationPasses();
 
-        // TODO assert something
+        $this->assertInstanceOf(PassConfig::class, $config);
+
+        $hasPluginPass = false;
+        $hasRoutePass = false;
+
+        foreach ($passes as $pass) {
+            if ($pass instanceof PluginsPass) {
+                $hasPluginPass = true;
+                continue;
+            }
+            if ($pass instanceof RoutePass) {
+                $hasRoutePass = true;
+                continue;
+            }
+        }
+
+        $this->assertTrue($hasPluginPass, 'No plugin pass configured');
+        $this->assertTrue($hasRoutePass, 'No route pass configured');
     }
 }
