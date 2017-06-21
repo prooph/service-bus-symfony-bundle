@@ -227,7 +227,7 @@
                                 <td>Payload</td>
                                 <td>{{ dump(message['message-data']['payload']) }}</td>
                             </tr>
-                            {% if message['message-data']['metadata']['_causation_id'] is defined %}
+                            {% if message['message-data']['metadata'] is defined %}
                                 <tr>
                                     <td>Metadata</td>
                                     <td>
