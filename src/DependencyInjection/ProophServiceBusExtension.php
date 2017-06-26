@@ -153,11 +153,34 @@ final class ProophServiceBusExtension extends Extension
         if (!empty($options['router'])) {
             $routerId = sprintf('prooph_service_bus.%s.router', $name);
 
-            $routerDefinition = $container->setDefinition(
-                $routerId,
-                new DefinitionDecorator($options['router']['type'])
-            );
-            $routerDefinition->setArguments([$options['router']['routes'] ?? []]);
+            if (isset($options['router']['async_switch'])) {
+                $decoratedRouterId = sprintf('prooph_service_bus.%s.decorated_router', $name);
+
+                $routerDefinition = $container->setDefinition(
+                    $decoratedRouterId,
+                    new DefinitionDecorator($options['router']['type'])
+                );
+                $routerDefinition->setArguments([$options['router']['routes'] ?? []]);
+
+                $container->setDefinition($decoratedRouterId, $routerDefinition);
+
+
+                // replace router definition with async switch message router
+                $routerDefinition = new DefinitionDecorator('prooph_service_bus.async_switch_message_router');
+                $routerDefinition->setArguments([
+                    new Reference($decoratedRouterId),
+                    new Reference($options['router']['async_switch']),
+                ]);
+                $routerDefinition->setPublic(true);
+                $container->setDefinition($routerId, $routerDefinition);
+            } else {
+                $routerDefinition = $container->setDefinition(
+                    $routerId,
+                    new DefinitionDecorator($options['router']['type'])
+                );
+                $routerDefinition->setArguments([$options['router']['routes'] ?? []]);
+            }
+
 
             $serviceBusDefinition->addMethodCall('utilize', [new Reference($routerId)]);
         }

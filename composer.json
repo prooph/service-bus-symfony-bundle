@@ -61,8 +61,9 @@
     "phpunit/phpunit": "^5.3",
     "phpunit/php-invoker": "^1.1.4",
     "fabpot/php-cs-fixer": "^1.11",
-    "bookdown/bookdown": "1.x-dev as 1.0.0",
-    "tobiju/bookdown-bootswatch-templates": "1.0.x-dev"
+    "bookdown/bookdown": "^1.0",
+    "tobiju/bookdown-bootswatch-templates": "1.1.1",
+    "react/promise": "^2.5"
   },
   "suggest": {
   },
