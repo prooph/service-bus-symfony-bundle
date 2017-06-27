@@ -123,7 +123,7 @@ class DataCollectorPlugin extends DataCollector implements Plugin
             $busName = $actionEvent->getTarget()->busName();
             $uuid = (string)$actionEvent->getParam(MessageBus::EVENT_PARAM_MESSAGE)->uuid();
 
-            $this->data['duration'][$busName] = $this->stopwatch->stop($busName)->getDuration();
+            $this->data['duration'][$busName] = $this->stopwatch->lap($busName)->getDuration();
             $this->data['messages'][$busName][$uuid] = $this->createContextFromActionEvent($actionEvent);
             $this->data['messages'][$busName][$uuid]['duration'] = $this->stopwatch->stop($uuid)->getDuration();
         }, MessageBus::PRIORITY_INVOKE_HANDLER - 100);
