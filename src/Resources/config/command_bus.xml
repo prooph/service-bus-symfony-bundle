@@ -8,12 +8,12 @@
         <service id="prooph_service_bus.command_bus" class="Prooph\Bundle\ServiceBus\CommandBus" abstract="true" />
         <service id="prooph_service_bus.command_bus_router" class="Prooph\ServiceBus\Plugin\Router\CommandRouter" public="false" abstract="true" />
 
-        <service id="prooph_service_bus.command_bus.plugin.datacollector_plugin" class="Prooph\Bundle\ServiceBus\Plugin\DataCollectorPlugin">
-            <argument id="service_container" type="service"/>
-            <argument>command</argument>
-            <tag name="prooph_service_bus.command_bus.plugin" />
-            <tag name="data_collector" id="prooph.command_bus" template="ProophServiceBusBundle:Collector:debug_view.html.twig"/>
-        </service>
+        <!--<service id="prooph_service_bus.command_bus.plugin.datacollector_plugin" class="Prooph\Bundle\ServiceBus\Plugin\DataCollectorPlugin">-->
+            <!--<argument id="service_container" type="service"/>-->
+            <!--<argument>command</argument>-->
+            <!--<tag name="prooph_service_bus.command_bus.plugin" />-->
+            <!--<tag name="data_collector" id="prooph.command_bus" template="ProophServiceBusBundle:Collector:debug_view.html.twig"/>-->
+        <!--</service>-->
 
     </services>
 </container>
