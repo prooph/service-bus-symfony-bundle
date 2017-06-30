@@ -9,6 +9,7 @@ use Prooph\Common\Event\ActionEvent;
 use Prooph\ServiceBus\Exception\RuntimeException;
 use Prooph\ServiceBus\MessageBus;
 use Prooph\ServiceBus\Plugin\Plugin;
+use Prooph\ServiceBus\QueryBus;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -102,6 +103,9 @@ class DataCollectorPlugin extends DataCollector implements Plugin
 
     public function attachToMessageBus(MessageBus $messageBus): void
     {
+        if ($messageBus instanceof QueryBus) {
+            return;
+        }
         $this->buses[] = $messageBus;
         if (!$messageBus instanceof NamedMessageBus) {
             throw new RuntimeException(sprinf('To use the Symfony Datacollector, the Bus "%s" needs to implement "%s"', $messageBus, NamedMessageBus::class));
