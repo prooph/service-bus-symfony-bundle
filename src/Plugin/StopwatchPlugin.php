@@ -9,6 +9,7 @@ use Prooph\Common\Event\ActionEvent;
 use Prooph\ServiceBus\MessageBus;
 use Prooph\ServiceBus\Plugin\AbstractPlugin;
 use Prooph\ServiceBus\Plugin\Plugin;
+use Prooph\ServiceBus\QueryBus;
 use Symfony\Component\Stopwatch\Stopwatch;
 
 class StopwatchPlugin extends AbstractPlugin
@@ -25,6 +26,10 @@ class StopwatchPlugin extends AbstractPlugin
 
     public function attachToMessageBus(MessageBus $messageBus): void
     {
+        if($messageBus instanceof QueryBus) {
+            return;
+        }
+
         $resolveName = function (ActionEvent $event) {
             if ($event->getTarget() instanceof NamedMessageBus) {
                 return sprintf(
