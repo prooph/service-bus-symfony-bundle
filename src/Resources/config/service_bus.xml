@@ -24,5 +24,6 @@
         <service id="prooph_service_bus.container_wrapper" class="%prooph_service_bus.container_wrapper.class%" public="false">
             <argument type="service" id="service_container" />
         </service>
+        <service id="prooph_service_bus.async_switch_message_router" class="Prooph\ServiceBus\Plugin\Router\AsyncSwitchMessageRouter" />
     </services>
 </container>

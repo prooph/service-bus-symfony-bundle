@@ -11,6 +11,8 @@ prooph_service_bus:
             # Service ID of the message factory
             message_factory: 'prooph_service_bus.message_factory'
             router:
+                # Service ID of the async message producer e.g. for Amazon AWS SQS
+                async_switch: 'my_async_message_producer'
                 # Service ID of the router
                 type: 'prooph_service_bus.command_bus_router'
                 # Routing definition constructed as
@@ -28,6 +30,8 @@ prooph_service_bus:
             # Service ID of the message factory
             message_factory: 'prooph_service_bus.message_factory'
             router:
+                # Service ID of the async message producer e.g. for Amazon AWS SQS
+                async_switch: 'my_async_message_producer'
                 # Service ID of the router
                 type: 'prooph_service_bus.event_bus_router'
                 # Routing definition constructed as
@@ -46,6 +50,8 @@ prooph_service_bus:
             # Service ID of the message factory
             message_factory: 'prooph_service_bus.message_factory'
             router:
+                # Service ID of the async message producer e.g. for Amazon AWS SQS
+                async_switch: 'my_async_message_producer'
                 # Service ID of the router
                 type: 'prooph_service_bus.query_bus_router'
                 # Routing definition constructed as

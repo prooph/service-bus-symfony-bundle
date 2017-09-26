@@ -148,6 +148,21 @@ final class ProophServiceBusExtension extends Extension
             $routerDefinition = new DefinitionDecorator($options['router']['type']);
             $routerDefinition->setArguments([$options['router']['routes'] ?? []]);
             $routerDefinition->setPublic(true);
+
+            if (isset($options['router']['async_switch'])) {
+                $decoratedRouterId = 'prooph_service_bus.' . $name . '.decorated_router';
+
+                $container->setDefinition($decoratedRouterId, $routerDefinition);
+
+                // replace router definition with async switch message router
+                $routerDefinition = new DefinitionDecorator('prooph_service_bus.async_switch_message_router');
+                $routerDefinition->setArguments([
+                    new Reference($decoratedRouterId),
+                    new Reference($options['router']['async_switch']),
+                ]);
+                $routerDefinition->setPublic(true);
+            }
+
             $container->setDefinition($routerId, $routerDefinition);
         }
 

@@ -1,0 +1,13 @@
+prooph_service_bus:
+  command_buses:
+    command_bus_async:
+      router:
+        async_switch: 'async_message_producer'
+        routes:
+          'Acme\RegisterUser': 'Acme\RegisterUserHandler'
+
+services:
+  'Acme\RegisterUserHandler':
+    class: ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AcmeRegisterUserHandler
+  'async_message_producer':
+    class: ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AsyncMessageProducer
