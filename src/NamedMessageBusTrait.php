@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Prooph\Bundle\ServiceBus;
@@ -25,7 +26,7 @@ trait NamedMessageBusTrait
         $this->busName = $busName;
     }
 
-    public function busName() : string
+    public function busName(): string
     {
         return $this->busName;
     }
@@ -40,12 +41,12 @@ trait NamedMessageBusTrait
         return $this->busType;
     }
 
-    public function plugins() : array
+    public function plugins(): array
     {
         return $this->plugins;
     }
 
-    public function addPlugin(\Prooph\ServiceBus\Plugin\Plugin $plugin, string $serviceId = null) : void
+    public function addPlugin(\Prooph\ServiceBus\Plugin\Plugin $plugin, string $serviceId = null): void
     {
         $plugin->attachToMessageBus($this);
         $this->plugins[] = ['plugin' => $plugin, 'service_id' => $serviceId];

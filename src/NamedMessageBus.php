@@ -14,5 +14,5 @@ interface NamedMessageBus
 
     public function addPlugin(Plugin $plugin, string $serviceId): void;
 
-    public function plugins() : array;
+    public function plugins(): array;
 }

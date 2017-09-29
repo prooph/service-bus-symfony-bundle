@@ -51,12 +51,11 @@ class RoutePass implements CompilerPassInterface
                         throw CompilerPassException::tagCountExceeded($id, $id, $bus);
                     }
                     foreach ($args as $eachArgs) {
-
-                        if ((!isset($eachArgs['message_detection']) || $eachArgs['message_detection'] !== true) && !isset($eachArgs['message'])) {
+                        if ((! isset($eachArgs['message_detection']) || $eachArgs['message_detection'] !== true) && ! isset($eachArgs['message'])) {
                             throw CompilerPassException::messageTagMissing($id);
                         }
 
-                        $messageNames = isset($eachArgs['message']) ? [$eachArgs['message']] : $this->recognizeMessageNames($container->getDefinition($id), $eachArgs);
+                        $messageNames = isset($eachArgs['message']) ? [$eachArgs['message']] : $this->recognizeMessageNames($container, $container->getDefinition($id));
 
                         if ($type === 'event') {
                             $routerArguments[0] = array_merge_recursive(
@@ -77,16 +76,16 @@ class RoutePass implements CompilerPassInterface
                 // Update route configuration parameter
                 $configId = sprintf('prooph_service_bus.%s.configuration', $name);
 
-                $config = array_replace($container->getParameter($configId), ['router' => ['routes' => $routerArguments[0]]]) ;
+                $config = array_replace($container->getParameter($configId), ['router' => ['routes' => $routerArguments[0]]]);
 
                 $config = $container->setParameter($configId, $config);
             }
         }
     }
 
-    private function recognizeMessageNames(Definition $routeDefinition, array $args): array
+    private function recognizeMessageNames(ContainerBuilder $container, Definition $routeDefinition): array
     {
-        $handlerReflection = new ReflectionClass($routeDefinition->getClass());
+        $handlerReflection = $container->getReflectionClass($routeDefinition->getClass());
 
         $methodsWithMessageParameter = array_filter(
             $handlerReflection->getMethods(ReflectionMethod::IS_PUBLIC),

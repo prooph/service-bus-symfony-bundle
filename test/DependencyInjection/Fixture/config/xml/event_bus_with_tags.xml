@@ -14,7 +14,7 @@
 
     <srv:services>
         <srv:service id="Acme\UserListener" class="ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AcmeUserEventListener">
-            <srv:tag name="prooph_service_bus.main_event_bus.route_target" />
+            <srv:tag name="prooph_service_bus.main_event_bus.route_target" message_detection="true" />
         </srv:service>
     </srv:services>
 </srv:container>

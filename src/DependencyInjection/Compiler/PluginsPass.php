@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace Prooph\Bundle\ServiceBus\DependencyInjection\Compiler;
 
 use Prooph\Bundle\ServiceBus\DependencyInjection\ProophServiceBusExtension;
-use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -40,31 +39,6 @@ class PluginsPass implements CompilerPassInterface
                 foreach ($plugins as $plugin) {
                     $busDefinition->addMethodCall('addPlugin', [new Reference($plugin), $plugin]);
                 }
-
-
-                $resolveClass = function ($id) use ($container): string {
-                    $definition = $container->getDefinition($id);
-                    while ($definition instanceof ChildDefinition) {
-                        $id = $definition->getParent();
-                        $definition = $container->getDefinition($id);
-                    }
-
-                    return $definition->getClass();
-                };
-
-                $mapIdToClass = function ($id) use ($resolveClass): array {
-                    return ['service_id' => $id, 'class_name' => $resolveClass($id)];
-                };
-
-                $configId = sprintf('prooph_service_bus.%s.configuration', $name);
-                $config = $container->getParameter($configId);
-
-                $config['plugins'] = [
-                    'global' => array_map($mapIdToClass, array_keys($globalPlugins) ?? []),
-                    'bus_type' => array_map($mapIdToClass, array_keys($typePlugins) ?? []),
-                    'bus_specific' => array_map($mapIdToClass, array_merge(array_keys($localPlugins), array_values($config['plugins'])))  ?? [],
-                ];
-                $container->setParameter($configId, $config);
             }
         }
     }

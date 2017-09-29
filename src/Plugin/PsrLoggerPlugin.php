@@ -9,6 +9,7 @@ use Prooph\Common\Event\ActionEvent;
 use Prooph\ServiceBus\MessageBus;
 use Prooph\ServiceBus\Plugin\AbstractPlugin;
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use ReflectionClass;
 
 class PsrLoggerPlugin extends AbstractPlugin
@@ -52,7 +53,6 @@ class PsrLoggerPlugin extends AbstractPlugin
             $context = $this->createContextFromActionEvent($event);
 
             $this->logger->debug('Detect {bus-type} message name for {message-name}', $context);
-
         }, MessageBus::PRIORITY_DETECT_MESSAGE_NAME - 100);
 
         //Should be triggered because we did not provide a message-handler yet
@@ -61,7 +61,6 @@ class PsrLoggerPlugin extends AbstractPlugin
 
             $this->logger->debug(
                 'Detect {bus-type} message route for {message-name}', $context);
-
         }, MessageBus::PRIORITY_ROUTE - 100);
 
         $this->listenerHandlers[] = $messageBus->attach(MessageBus::EVENT_DISPATCH, function (ActionEvent $event) {
@@ -69,7 +68,6 @@ class PsrLoggerPlugin extends AbstractPlugin
 
             $this->logger->debug(
                 'Locate {bus-type} handler for {message-name}', $context);
-
         }, MessageBus::PRIORITY_LOCATE_HANDLER - 100);
     }
 

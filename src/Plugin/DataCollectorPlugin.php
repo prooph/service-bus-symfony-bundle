@@ -39,11 +39,10 @@ class DataCollectorPlugin extends DataCollector implements Plugin
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
-
         foreach ($this->buses as $bus) {
             $busName = $bus->busName();
 
@@ -52,16 +51,16 @@ class DataCollectorPlugin extends DataCollector implements Plugin
             $reflProperty->setAccessible(true);
             // todo maybe put as default value in config tree builder to also make it configurable?
 //            $this->data['config'][$busName]['action_event_emitter'] = get_class($reflProperty->getValue($bus));
-            $this->data['config'][$busName] = $this->container->getParameter(sprintf('prooph_service_bus.%s.configuration',$busName));
+            $this->data['config'][$busName] = $this->container->getParameter(sprintf('prooph_service_bus.%s.configuration', $busName));
         }
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function getName(): string
     {
-        return sprintf("prooph.%s_bus", $this->data['bus_type']);
+        return sprintf('prooph.%s_bus', $this->data['bus_type']);
     }
 
     public function totalMessageCount(): int
@@ -86,12 +85,12 @@ class DataCollectorPlugin extends DataCollector implements Plugin
         return $this->data['duration'][$busName];
     }
 
-    public function callstack(string $busName) : array
+    public function callstack(string $busName): array
     {
         return $this->data['message_callstack'][$busName] ?? [];
     }
 
-    public function config(string $busName) : array
+    public function config(string $busName): array
     {
         return $this->data['config'][$busName];
     }
@@ -107,40 +106,39 @@ class DataCollectorPlugin extends DataCollector implements Plugin
             return;
         }
         $this->buses[] = $messageBus;
-        if (!$messageBus instanceof NamedMessageBus) {
+        if (! $messageBus instanceof NamedMessageBus) {
             throw new RuntimeException(sprinf('To use the Symfony Datacollector, the Bus "%s" needs to implement "%s"', $messageBus, NamedMessageBus::class));
         }
 
         $this->listenerHandlers[] = $messageBus->attach(MessageBus::EVENT_DISPATCH, function (ActionEvent $actionEvent) {
             $busName = $actionEvent->getTarget()->busName();
-            $uuid = (string)$actionEvent->getParam(MessageBus::EVENT_PARAM_MESSAGE)->uuid();
+            $uuid = (string) $actionEvent->getParam(MessageBus::EVENT_PARAM_MESSAGE)->uuid();
 
-            if (!$this->stopwatch->isStarted($busName)) {
+            if (! $this->stopwatch->isStarted($busName)) {
                 $this->stopwatch->start($busName);
             }
 
             $this->stopwatch->start($uuid);
-
         }, MessageBus::PRIORITY_INVOKE_HANDLER + 100);
 
         $this->listenerHandlers[] = $messageBus->attach(MessageBus::EVENT_FINALIZE, function (ActionEvent $actionEvent) {
             $busName = $actionEvent->getTarget()->busName();
-            $uuid = (string)$actionEvent->getParam(MessageBus::EVENT_PARAM_MESSAGE)->uuid();
+            $uuid = (string) $actionEvent->getParam(MessageBus::EVENT_PARAM_MESSAGE)->uuid();
 
             $this->data['duration'][$busName] = $this->stopwatch->lap($busName)->getDuration();
             $this->data['messages'][$busName][$uuid] = $this->createContextFromActionEvent($actionEvent);
             $this->data['messages'][$busName][$uuid]['duration'] = $this->stopwatch->stop($uuid)->getDuration();
         }, MessageBus::PRIORITY_INVOKE_HANDLER - 100);
 
-        $this->listenerHandlers[] = $messageBus->attach(MessageBus::EVENT_DISPATCH, function(ActionEvent $actionEvent) {
-            foreach($actionEvent->getParam('event-listeners',[]) as $handler) {
+        $this->listenerHandlers[] = $messageBus->attach(MessageBus::EVENT_DISPATCH, function (ActionEvent $actionEvent) {
+            foreach ($actionEvent->getParam('event-listeners', []) as $handler) {
                 $this->data['message_callstack'][$actionEvent->getTarget()->busName()][] = [
                     'id' => $actionEvent->getParam('message')->uuid(),
                     'message' => $actionEvent->getParam('message-name'),
                     'handler' => \is_object($handler) ? get_class($handler) : $handler,
-                ] ;
+                ];
             }
-            if($actionEvent->getParam('message-handler') !== null) {
+            if ($actionEvent->getParam('message-handler') !== null) {
                 $this->data['message_callstack'][$actionEvent->getTarget()->busName()][] = [
                     'id' => $actionEvent->getParam('message')->uuid(),
                     'message' => $actionEvent->getParam('message-name'),

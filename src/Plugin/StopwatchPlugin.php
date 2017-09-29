@@ -8,7 +8,6 @@ use Prooph\Bundle\ServiceBus\NamedMessageBus;
 use Prooph\Common\Event\ActionEvent;
 use Prooph\ServiceBus\MessageBus;
 use Prooph\ServiceBus\Plugin\AbstractPlugin;
-use Prooph\ServiceBus\Plugin\Plugin;
 use Prooph\ServiceBus\QueryBus;
 use Symfony\Component\Stopwatch\Stopwatch;
 
@@ -26,25 +25,25 @@ class StopwatchPlugin extends AbstractPlugin
 
     public function attachToMessageBus(MessageBus $messageBus): void
     {
-        if($messageBus instanceof QueryBus) {
+        if ($messageBus instanceof QueryBus) {
             return;
         }
 
         $resolveName = function (ActionEvent $event) {
             if ($event->getTarget() instanceof NamedMessageBus) {
                 return sprintf(
-                    "%s:%s:%s",
+                    '%s:%s:%s',
                     $event->getParam(MessageBus::EVENT_PARAM_MESSAGE)->messageType(),
                     $event->getTarget()->busName(),
                     $event->getParam(MessageBus::EVENT_PARAM_MESSAGE_NAME)
                 );
-            } else {
-                return sprintf(
-                    "%s:%s",
+            }
+
+            return sprintf(
+                    '%s:%s',
                     $event->getParam(MessageBus::EVENT_PARAM_MESSAGE)->messageType(),
                     $event->getParam(MessageBus::EVENT_PARAM_MESSAGE_NAME)
                 );
-            }
         };
 
         $this->listenerHandlers[] = $messageBus->attach(MessageBus::EVENT_DISPATCH, function (ActionEvent $event) use ($resolveName) {
