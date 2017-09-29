@@ -11,15 +11,11 @@ declare(strict_types=1);
 
 namespace Prooph\Bundle\ServiceBus\DependencyInjection;
 
-use Prooph\ServiceBus\CommandBus;
-use Prooph\ServiceBus\EventBus;
-use Prooph\ServiceBus\Plugin\Router\CommandRouter;
-use Prooph\ServiceBus\Plugin\Router\EventRouter;
-use Prooph\ServiceBus\Plugin\Router\QueryRouter;
-use Prooph\ServiceBus\QueryBus;
+use Prooph\Bundle\ServiceBus\NamedMessageBus;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
@@ -30,9 +26,9 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 final class ProophServiceBusExtension extends Extension
 {
     const AVAILABLE_BUSES = [
-        'command' => CommandBus::class,
-        'event' => EventBus::class,
-        'query' => QueryBus::class,
+        'command',
+        'event',
+        'query',
     ];
 
     public function getNamespace()
@@ -53,20 +49,11 @@ final class ProophServiceBusExtension extends Extension
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('service_bus.xml');
 
-        foreach (self::AVAILABLE_BUSES as $type => $bus) {
+        foreach (self::AVAILABLE_BUSES as $type) {
             if (! empty($config[$type . '_buses'])) {
-                $this->busLoad($type, $bus, $config[$type . '_buses'], $container, $loader);
+                $this->busLoad($type, $config[$type . '_buses'], $container, $loader);
             }
         }
-
-        $this->addClassesToCompile([
-            CommandBus::class,
-            QueryBus::class,
-            EventBus::class,
-            CommandRouter::class,
-            EventRouter::class,
-            QueryRouter::class,
-        ]);
     }
 
     /**
@@ -81,7 +68,6 @@ final class ProophServiceBusExtension extends Extension
      */
     private function busLoad(
         string $type,
-        string $class,
         array $config,
         ContainerBuilder $container,
         XmlFileLoader $loader
@@ -94,9 +80,6 @@ final class ProophServiceBusExtension extends Extension
             $serviceBuses[$name] = 'prooph_service_bus.' . $name;
         }
         $container->setParameter('prooph_service_bus.' . $type . '_buses', $serviceBuses);
-
-        $def = $container->getDefinition('prooph_service_bus.' . $type . '_bus');
-        $def->setClass($class);
 
         foreach ($config as $name => $options) {
             $this->loadBus($type, $name, $options, $container);
@@ -120,21 +103,46 @@ final class ProophServiceBusExtension extends Extension
         $serviceBusId = 'prooph_service_bus.' . $name;
         $serviceBusDefinition = $container->setDefinition(
             $serviceBusId,
-            new DefinitionDecorator('prooph_service_bus.' . $type . '_bus')
+            new ChildDefinition('prooph_service_bus.' . $type . '_bus')
         );
+        if (in_array(NamedMessageBus::class, class_implements($container->getDefinition('prooph_service_bus.'.$type.'_bus')->getClass()))) {
+            $serviceBusDefinition->addMethodCall('setBusName', [$name]);
+            $serviceBusDefinition->addMethodCall('setBusType', [$type]);
+        }
+
+        // Add plugin tag for plugins configured in the bus config
+        foreach ($options['plugins'] as $pluginServiceId) {
+            $container
+                ->getDefinition($pluginServiceId)
+                ->addTag(sprintf('prooph_service_bus.%s.plugin', $name));
+        }
+
+        // Logging for each configured service bus
+        $serviceBusLoggerDefinition = $container
+            ->setDefinition(
+                sprintf('%s.plugin.psr_logger', $serviceBusId),
+                new ChildDefinition('prooph_service_bus.plugin.psr_logger')
+            )
+            ->setArguments(
+                [
+                    new Reference('logger', ContainerInterface::NULL_ON_INVALID_REFERENCE),
+                ]
+            )
+            ->addTag('monolog.logger', ['channel' => sprintf('%s_bus.%s', $type, $name)])
+            ->addTag(sprintf('prooph_service_bus.%s.plugin', $name));
 
         // define message factory
         $messageFactoryId = 'prooph_service_bus.message_factory.'.$name;
         $container->setDefinition(
                 $messageFactoryId,
-                new DefinitionDecorator($options['message_factory'])
+                new ChildDefinition($options['message_factory'])
             );
 
         // define message factory plugin
         $messageFactoryPluginId = 'prooph_service_bus.message_factory_plugin.'.$name;
-        $messageFactoryPluginDefinition = new DefinitionDecorator('prooph_service_bus.message_factory_plugin');
+        $messageFactoryPluginDefinition = new ChildDefinition('prooph_service_bus.message_factory_plugin');
         $messageFactoryPluginDefinition->setArguments([new Reference($messageFactoryId)]);
-        $messageFactoryPluginDefinition->setPublic(true);
+        $messageFactoryPluginDefinition->addTag(sprintf('prooph_service_bus.%s.plugin', $name));
 
         $container->setDefinition(
                 $messageFactoryPluginId,
@@ -145,40 +153,30 @@ final class ProophServiceBusExtension extends Extension
         $routerId = null;
         if (! empty($options['router'])) {
             $routerId = 'prooph_service_bus.' . $name . '.router';
-            $routerDefinition = new DefinitionDecorator($options['router']['type']);
+            $routerDefinition = new ChildDefinition($options['router']['type']);
             $routerDefinition->setArguments([$options['router']['routes'] ?? []]);
-            $routerDefinition->setPublic(true);
-
             if (isset($options['router']['async_switch'])) {
                 $decoratedRouterId = 'prooph_service_bus.' . $name . '.decorated_router';
 
                 $container->setDefinition($decoratedRouterId, $routerDefinition);
 
                 // replace router definition with async switch message router
-                $routerDefinition = new DefinitionDecorator('prooph_service_bus.async_switch_message_router');
+                $routerDefinition = new ChildDefinition('prooph_service_bus.async_switch_message_router');
                 $routerDefinition->setArguments([
                     new Reference($decoratedRouterId),
                     new Reference($options['router']['async_switch']),
                 ]);
-                $routerDefinition->setPublic(true);
             }
+            $routerDefinition->addTag(sprintf('prooph_service_bus.%s.plugin', $name));
 
             $container->setDefinition($routerId, $routerDefinition);
         }
 
         //Attach container plugin
-        $containerPluginId = 'prooph_service_bus.container_plugin';
-        $pluginIds = array_filter(array_merge($options['plugins'], [$containerPluginId, $messageFactoryPluginId, $routerId]));
+        $containerPluginId = 'prooph_service_bus.plugin.service_locator';
+        $containerPluginDefinition = $container->getDefinition($containerPluginId);
+        $containerPluginDefinition->addTag(sprintf('prooph_service_bus.%s.plugin', $name));
 
-        // Wrap the message bus creation into factory to call attachToMessageBus on the plugins
-        $serviceBusDefinition
-            ->setFactory([new Reference('prooph_service_bus.'.$type.'_bus_factory'), 'create'])
-            ->setArguments(
-                [
-                    $container->getDefinition('prooph_service_bus.'.$type.'_bus')->getClass(),
-                    new Reference('service_container'),
-                    $pluginIds,
-                ]
-            );
+        $container->setParameter(sprintf('prooph_service_bus.%s.configuration', $name), $options);
     }
 }

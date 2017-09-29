@@ -13,4 +13,4 @@ services:
   'Acme\RegisterUserHandler':
     class: ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AcmeRegisterUserHandler
     tags:
-      - { name: 'prooph_service_bus.main_command_bus.route_target' }
+      - { name: 'prooph_service_bus.main_command_bus.route_target', message_detection: true }

@@ -4,19 +4,21 @@ declare(strict_types=1);
 namespace Prooph\Bundle\ServiceBus\DependencyInjection\Compiler;
 
 use Prooph\Bundle\ServiceBus\DependencyInjection\ProophServiceBusExtension;
+use Prooph\Bundle\ServiceBus\Exception\CompilerPassException;
 use Prooph\Common\Messaging\HasMessageName;
 use Prooph\Common\Messaging\Message;
 use ReflectionClass;
 use ReflectionMethod;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 
 class RoutePass implements CompilerPassInterface
 {
-    private static function tryToDetectMessageName(ReflectionClass $messageReflection)
+    private static function tryToDetectMessageName(ReflectionClass $messageReflection): ?string
     {
         if (! $messageReflection->implementsInterface(HasMessageName::class)) {
-            return;
+            return null;
         }
         $instance = $messageReflection->newInstanceWithoutConstructor(); /* @var $instance HasMessageName */
         if ($messageReflection->hasMethod('init')) {
@@ -30,7 +32,7 @@ class RoutePass implements CompilerPassInterface
 
     public function process(ContainerBuilder $container)
     {
-        foreach (ProophServiceBusExtension::AVAILABLE_BUSES as $type => $busClass) {
+        foreach (ProophServiceBusExtension::AVAILABLE_BUSES as $type) {
             if (! $container->hasParameter('prooph_service_bus.' . $type . '_buses')) {
                 continue;
             }
@@ -44,8 +46,16 @@ class RoutePass implements CompilerPassInterface
                 $handlers = $container->findTaggedServiceIds(sprintf('prooph_service_bus.%s.route_target', $name));
 
                 foreach ($handlers as $id => $args) {
+                    // Safeguard to have only one tag per command / query
+                    if ($type !== 'event' && count($args) > 1) {
+                        throw CompilerPassException::tagCountExceeded($id, $id, $bus);
+                    }
                     foreach ($args as $eachArgs) {
-                        $messageNames = $this->recognizeMessageNames($container, $id, $eachArgs);
+                        if ((! isset($eachArgs['message_detection']) || $eachArgs['message_detection'] !== true) && ! isset($eachArgs['message'])) {
+                            throw CompilerPassException::messageTagMissing($id);
+                        }
+
+                        $messageNames = isset($eachArgs['message']) ? [$eachArgs['message']] : $this->recognizeMessageNames($container, $container->getDefinition($id));
 
                         if ($type === 'event') {
                             $routerArguments[0] = array_merge_recursive(
@@ -62,22 +72,27 @@ class RoutePass implements CompilerPassInterface
                     }
                 }
                 $router->setArguments($routerArguments);
+
+                // Update route configuration parameter
+                $configId = sprintf('prooph_service_bus.%s.configuration', $name);
+
+                $config = array_replace($container->getParameter($configId), ['router' => ['routes' => $routerArguments[0]]]);
+
+                $config = $container->setParameter($configId, $config);
             }
         }
     }
 
-    private function recognizeMessageNames(ContainerBuilder $container, $id, array $args)
+    private function recognizeMessageNames(ContainerBuilder $container, Definition $routeDefinition): array
     {
-        if (isset($args['message'])) {
-            return [$args['message']];
-        }
-        $handlerReflection = new ReflectionClass($container->getDefinition($id)->getClass());
+        $handlerReflection = $container->getReflectionClass($routeDefinition->getClass());
 
         $methodsWithMessageParameter = array_filter(
             $handlerReflection->getMethods(ReflectionMethod::IS_PUBLIC),
             function (ReflectionMethod $method) {
                 return $method->getNumberOfRequiredParameters() === 1
                 && $method->getParameters()[0]->getClass()
+                && $method->getParameters()[0]->getClass()->getName() !== Message::class
                 && $method->getParameters()[0]->getClass()->implementsInterface(Message::class);
             }
         );

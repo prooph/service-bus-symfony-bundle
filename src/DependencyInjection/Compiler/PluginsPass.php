@@ -14,12 +14,13 @@ namespace Prooph\Bundle\ServiceBus\DependencyInjection\Compiler;
 use Prooph\Bundle\ServiceBus\DependencyInjection\ProophServiceBusExtension;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 class PluginsPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        foreach (ProophServiceBusExtension::AVAILABLE_BUSES as $type => $busClass) {
+        foreach (ProophServiceBusExtension::AVAILABLE_BUSES as $type) {
             if (! $container->hasParameter('prooph_service_bus.' . $type . '_buses')) {
                 continue;
             }
@@ -29,15 +30,15 @@ class PluginsPass implements CompilerPassInterface
             foreach ($buses as $name => $bus) {
                 $globalPlugins = $container->findTaggedServiceIds('prooph_service_bus.plugin');
                 $typePlugins = $container->findTaggedServiceIds(sprintf('prooph_service_bus.%s.plugin', $type . '_bus'));
-                $plugins = $container->findTaggedServiceIds(sprintf('prooph_service_bus.%s.plugin', $name));
+                $localPlugins = $container->findTaggedServiceIds(sprintf('prooph_service_bus.%s.plugin', $name));
 
-                $plugins = array_merge(array_keys($globalPlugins), array_keys($typePlugins), array_keys($plugins));
+                $plugins = array_merge(array_keys($globalPlugins), array_keys($typePlugins), array_keys($localPlugins));
 
                 $busDefinition = $container->getDefinition($bus);
-                $busPlugins = $busDefinition->getArgument(2);
 
-                $finalPlugins = array_merge($busPlugins, $plugins);
-                $busDefinition->replaceArgument(2, $finalPlugins);
+                foreach ($plugins as $plugin) {
+                    $busDefinition->addMethodCall('addPlugin', [new Reference($plugin), $plugin]);
+                }
             }
         }
     }

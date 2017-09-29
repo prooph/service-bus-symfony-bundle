@@ -12,18 +12,18 @@ declare(strict_types=1);
 namespace ProophTest\Bundle\ServiceBus\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Prooph\Bundle\ServiceBus\CommandBus;
 use Prooph\Bundle\ServiceBus\DependencyInjection\Compiler\PluginsPass;
 use Prooph\Bundle\ServiceBus\DependencyInjection\Compiler\RoutePass;
 use Prooph\Bundle\ServiceBus\DependencyInjection\ProophServiceBusExtension;
-use Prooph\ServiceBus\CommandBus;
-use Prooph\ServiceBus\EventBus;
+use Prooph\Bundle\ServiceBus\EventBus;
+use Prooph\Bundle\ServiceBus\QueryBus;
 use Prooph\ServiceBus\Exception\CommandDispatchException;
 use Prooph\ServiceBus\Exception\MessageDispatchException;
 use Prooph\ServiceBus\Plugin\Router\AsyncSwitchMessageRouter;
 use Prooph\ServiceBus\Plugin\Router\CommandRouter;
 use Prooph\ServiceBus\Plugin\Router\EventRouter;
 use Prooph\ServiceBus\Plugin\Router\QueryRouter;
-use Prooph\ServiceBus\QueryBus;
 use ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AcmeRegisterUserCommand;
 use ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AcmeRegisterUserHandler;
 use ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AcmeUserWasRegisteredEvent;
@@ -107,7 +107,7 @@ abstract class AbstractServiceBusExtensionTestCase extends TestCase
      */
     public function it_adds_default_container_plugin()
     {
-        $container = $this->loadContainer('command_bus');
+        $container = $this->loadContainer('command_bus', new PluginsPass(), new RoutePass());
 
         /* @var $commandBus CommandBus */
         $commandBus = $container->get('prooph_service_bus.main_command_bus');
@@ -127,7 +127,7 @@ abstract class AbstractServiceBusExtensionTestCase extends TestCase
      */
     public function it_adds_plugins_based_on_tags()
     {
-        $container = $this->loadContainer('plugins', new PluginsPass());
+        $container = $this->loadContainer('plugins', new PluginsPass(), new RoutePass());
 
         /** @var MockPlugin $globalPlugin */
         $globalPlugin = $container->get('global_plugin');
@@ -297,7 +297,7 @@ abstract class AbstractServiceBusExtensionTestCase extends TestCase
      */
     public function it_allows_command_handlers_prefixed_with_at()
     {
-        $container = $this->loadContainer('command_bus_routes_with_@');
+        $container = $this->loadContainer('command_bus_routes_with_@', new PluginsPass(), new RoutePass());
 
         /* @var $commandBus CommandBus */
         $commandBus = $container->get('prooph_service_bus.main_command_bus');
@@ -317,7 +317,7 @@ abstract class AbstractServiceBusExtensionTestCase extends TestCase
      */
     public function it_allows_event_listeners_prefixed_with_at()
     {
-        $container = $this->loadContainer('event_bus_routes_with_@');
+        $container = $this->loadContainer('event_bus_routes_with_@', new PluginsPass(), new RoutePass());
 
         $event = new AcmeUserWasRegisteredEvent([]);
         $eventBus = $container->get('prooph_service_bus.main_event_bus');
@@ -333,7 +333,7 @@ abstract class AbstractServiceBusExtensionTestCase extends TestCase
      */
     public function it_adds_command_bus_routes_based_on_tags_with_automatic_message_detection()
     {
-        $container = $this->loadContainer('command_bus_with_tags', new RoutePass());
+        $container = $this->loadContainer('command_bus_with_tags', new PluginsPass(), new RoutePass());
 
         /* @var $commandBus CommandBus */
         $commandBus = $container->get('prooph_service_bus.main_command_bus');
@@ -353,7 +353,7 @@ abstract class AbstractServiceBusExtensionTestCase extends TestCase
      */
     public function it_adds_command_bus_routes_based_on_tags_with_message_configuration()
     {
-        $container = $this->loadContainer('command_bus_with_tags_and_explicit_message', new RoutePass());
+        $container = $this->loadContainer('command_bus_with_tags_and_explicit_message', new PluginsPass(), new RoutePass());
 
         /* @var $commandBus CommandBus */
         $commandBus = $container->get('prooph_service_bus.main_command_bus');
@@ -373,7 +373,7 @@ abstract class AbstractServiceBusExtensionTestCase extends TestCase
      */
     public function it_adds_event_bus_routes_based_on_tags()
     {
-        $container = $this->loadContainer('event_bus_with_tags', new RoutePass());
+        $container = $this->loadContainer('event_bus_with_tags', new PluginsPass(), new RoutePass());
 
         $event = new AcmeUserWasRegisteredEvent([]);
         $eventBus = $container->get('prooph_service_bus.main_event_bus');
@@ -389,7 +389,7 @@ abstract class AbstractServiceBusExtensionTestCase extends TestCase
      */
     public function it_creates_a_command_bus_with_async_switch_message_router()
     {
-        $container = $this->loadContainer('command_bus_async');
+        $container = $this->loadContainer('command_bus_async', new PluginsPass(), new RoutePass());
 
         $config = $container->getDefinition('prooph_service_bus.command_bus_async');
 
@@ -405,14 +405,14 @@ abstract class AbstractServiceBusExtensionTestCase extends TestCase
         self::assertInstanceOf(AsyncSwitchMessageRouter::class, $router);
     }
 
-    private function loadContainer($fixture, CompilerPassInterface $compilerPass = null)
+    private function loadContainer($fixture, CompilerPassInterface ...$compilerPasses)
     {
         $container = $this->getContainer();
         $container->registerExtension(new ProophServiceBusExtension());
 
         $this->loadFromFile($container, $fixture);
 
-        if (null !== $compilerPass) {
+        foreach ($compilerPasses as $compilerPass) {
             $container->addCompilerPass($compilerPass);
         }
 
