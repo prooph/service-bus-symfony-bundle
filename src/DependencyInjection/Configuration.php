@@ -61,7 +61,6 @@ final class Configuration implements ConfigurationInterface
 
         /** @var $routesNode ArrayNodeDefinition */
         $handlerNode = $routesNode
-            ->requiresAtLeastOneElement()
             ->useAttributeAsKey($type)
             ->prototype('event' === $type ? 'array' : 'scalar');
 
