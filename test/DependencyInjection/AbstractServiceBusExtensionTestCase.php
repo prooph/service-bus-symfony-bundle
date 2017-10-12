@@ -32,6 +32,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ResolveDefinitionTemplatesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\Dumper;
+use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\Dumper\XmlDumper;
 use Symfony\Component\DependencyInjection\Dumper\YamlDumper;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -405,6 +406,14 @@ abstract class AbstractServiceBusExtensionTestCase extends TestCase
         self::assertInstanceOf(AsyncSwitchMessageRouter::class, $router);
     }
 
+    /**
+     * @test
+     */
+    public function it_dumps_async_switch_command_bus()
+    {
+        $this->dump('command_bus_async');
+    }
+
     private function loadContainer($fixture, CompilerPassInterface ...$compilerPasses)
     {
         $container = $this->getContainer();
@@ -449,7 +458,7 @@ abstract class AbstractServiceBusExtensionTestCase extends TestCase
 
     private function dump(string $configFile)
     {
-        $container = $this->loadContainer($configFile);
+        $container = $this->loadContainer($configFile, new PluginsPass(), new RoutePass());
         $dumper = null;
 
         if ($this instanceof XmlServiceBusExtensionTest) {
@@ -459,5 +468,7 @@ abstract class AbstractServiceBusExtensionTestCase extends TestCase
         }
         self::assertInstanceOf(Dumper::class, $dumper, sprintf('Test type "%s" not supported', get_class($this)));
         self::assertNotEmpty($dumper->dump());
+
+        self::assertNotEmpty((new PhpDumper($container))->dump(), 'PHP cache cannot be warmuped correctly.');
     }
 }
