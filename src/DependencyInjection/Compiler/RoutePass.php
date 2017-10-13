@@ -76,13 +76,10 @@ class RoutePass implements CompilerPassInterface
                 // Update route configuration parameter
                 $configId = sprintf('prooph_service_bus.%s.configuration', $name);
 
-                $config = $container->getParameter($configId);
+                $routes = is_array($routerArguments[0]) ? $routerArguments[0] : [];
+                $config = array_replace($container->getParameter($configId), ['router' => ['routes' => $routes]]);
 
-                if ($router instanceof ChildDefinition && is_a($container->getDefinition($router->getParent())->getClass(), SingleHandlerRouter::class, true)) {
-                    $config = array_replace($config, ['router' => ['routes' => $routerArguments[0]]]);
-                }
-
-                $config = $container->setParameter($configId, $config);
+                $container->setParameter($configId, $config);
             }
         }
     }
