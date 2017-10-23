@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+        <service id="prooph_service_bus.plugin.stopwatch" class="Prooph\Bundle\ServiceBus\Plugin\StopwatchPlugin" public="false">
+            <argument id="debug.stopwatch" type="service"/>
+            <tag name="prooph_service_bus.plugin"/>
+        </service>
+    </services>
+</container>

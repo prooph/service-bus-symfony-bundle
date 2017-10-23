@@ -49,6 +49,10 @@ final class ProophServiceBusExtension extends Extension
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('service_bus.xml');
 
+        if ($container->getParameter('kernel.debug')) {
+            $loader->load('debug.xml');
+        }
+
         foreach (self::AVAILABLE_BUSES as $type) {
             if (! empty($config[$type . '_buses'])) {
                 $this->busLoad($type, $config[$type . '_buses'], $container, $loader);
@@ -131,23 +135,18 @@ final class ProophServiceBusExtension extends Extension
             ->addTag('monolog.logger', ['channel' => sprintf('%s_bus.%s', $type, $name)])
             ->addTag(sprintf('prooph_service_bus.%s.plugin', $name));
 
+
         // define message factory
-        $messageFactoryId = 'prooph_service_bus.message_factory.'.$name;
-        $container->setDefinition(
-                $messageFactoryId,
-                new ChildDefinition($options['message_factory'])
-            );
+        $messageFactoryId = 'prooph_service_bus.message_factory.' . $name;
+        $container->setDefinition($messageFactoryId, new ChildDefinition($options['message_factory']));
 
         // define message factory plugin
-        $messageFactoryPluginId = 'prooph_service_bus.message_factory_plugin.'.$name;
+        $messageFactoryPluginId = 'prooph_service_bus.message_factory_plugin.' . $name;
         $messageFactoryPluginDefinition = new ChildDefinition('prooph_service_bus.message_factory_plugin');
         $messageFactoryPluginDefinition->setArguments([new Reference($messageFactoryId)]);
         $messageFactoryPluginDefinition->addTag(sprintf('prooph_service_bus.%s.plugin', $name));
 
-        $container->setDefinition(
-                $messageFactoryPluginId,
-                $messageFactoryPluginDefinition
-            );
+        $container->setDefinition($messageFactoryPluginId, $messageFactoryPluginDefinition);
 
         // define router
         $routerId = null;

@@ -12,14 +12,15 @@ declare(strict_types=1);
 namespace ProophTest\Bundle\ServiceBus\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerBuilder as SymfonyContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
 class YamlServiceBusExtensionTest extends AbstractServiceBusExtensionTestCase
 {
-    protected function loadFromFile(ContainerBuilder $container, $file)
+    protected function buildContainer(): ContainerBuilder
     {
-        $loadYaml = new YamlFileLoader($container, new FileLocator(__DIR__.'/Fixture/config/yml'));
-        $loadYaml->load($file.'.yml');
+        return ContainerBuilder::buildContainer(function (SymfonyContainerBuilder $container) {
+            return new YamlFileLoader($container, new FileLocator(__DIR__.'/Fixture/config/yml'));
+        }, 'yml');
     }
 }
