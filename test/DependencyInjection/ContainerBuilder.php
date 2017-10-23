@@ -17,9 +17,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder as SymfonyContainerBu
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\FileLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
-use function array_merge;
-use function array_walk;
-use function call_user_func;
 
 class ContainerBuilder
 {
@@ -62,24 +59,28 @@ class ContainerBuilder
     public function withParameters(array $parameters): self
     {
         $this->parameters = array_merge($this->parameters, $parameters);
+
         return $this;
     }
 
     public function withExtensions(ExtensionInterface ...$extensions): self
     {
         $this->extensions = array_merge($this->extensions, $extensions);
+
         return $this;
     }
 
     public function withCompilerPasses(CompilerPassInterface ...$compilerPasses): self
     {
         $this->compilerPasses = array_merge($this->compilerPasses, $compilerPasses);
+
         return $this;
     }
 
     public function withConfigFiles(string ...$fileNames): self
     {
         $this->configFiles = array_merge($this->configFiles, $fileNames);
+
         return $this;
     }
 
@@ -99,6 +100,7 @@ class ContainerBuilder
         $container->getCompilerPassConfig()->setOptimizationPasses([new ResolveDefinitionTemplatesPass()]);
         $container->getCompilerPassConfig()->setRemovingPasses([]);
         $container->compile();
+
         return $container;
     }
 }

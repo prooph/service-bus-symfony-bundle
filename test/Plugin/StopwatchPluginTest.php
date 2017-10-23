@@ -63,6 +63,7 @@ class StopwatchPluginTest extends TestCase
 
         $commandBus = new CommandBus($eventEmitter);
         $commandBus->setBusName('we must set a name');
+
         return $commandBus;
     }
 }

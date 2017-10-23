@@ -135,7 +135,6 @@ final class ProophServiceBusExtension extends Extension
             ->addTag('monolog.logger', ['channel' => sprintf('%s_bus.%s', $type, $name)])
             ->addTag(sprintf('prooph_service_bus.%s.plugin', $name));
 
-
         // define message factory
         $messageFactoryId = 'prooph_service_bus.message_factory.' . $name;
         $container->setDefinition($messageFactoryId, new ChildDefinition($options['message_factory']));
