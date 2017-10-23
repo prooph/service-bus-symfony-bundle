@@ -12,9 +12,6 @@
         <service id="prooph_service_bus.message_factory" class="Prooph\Common\Messaging\FQCNMessageFactory" />
 
         <service id="prooph_service_bus.plugin.service_locator" class="Prooph\ServiceBus\Plugin\ServiceLocatorPlugin">
-            <argument type="service" id="prooph_service_bus.container_wrapper" />
-        </service>
-        <service id="prooph_service_bus.container_wrapper" class="Prooph\Bundle\ServiceBus\Container\SymfonyContainerWrapper" public="false">
             <argument type="service" id="service_container" />
         </service>
 
