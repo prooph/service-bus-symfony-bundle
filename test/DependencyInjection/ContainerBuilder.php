@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\FileLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
+/** @internal */
 class ContainerBuilder
 {
     /** @var FileLoader */
