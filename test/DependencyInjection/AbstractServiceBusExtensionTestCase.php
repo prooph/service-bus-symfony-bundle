@@ -15,31 +15,34 @@ use PHPUnit\Framework\TestCase;
 use Prooph\Bundle\ServiceBus\CommandBus;
 use Prooph\Bundle\ServiceBus\DependencyInjection\Compiler\PluginsPass;
 use Prooph\Bundle\ServiceBus\DependencyInjection\Compiler\RoutePass;
+use Prooph\Bundle\ServiceBus\DependencyInjection\Compiler\StopwatchPass;
 use Prooph\Bundle\ServiceBus\DependencyInjection\ProophServiceBusExtension;
 use Prooph\Bundle\ServiceBus\EventBus;
+use Prooph\Bundle\ServiceBus\Plugin\StopwatchPlugin;
 use Prooph\Bundle\ServiceBus\QueryBus;
 use Prooph\ServiceBus\Exception\CommandDispatchException;
 use Prooph\ServiceBus\Exception\MessageDispatchException;
+use Prooph\ServiceBus\Plugin\Plugin;
 use Prooph\ServiceBus\Plugin\Router\AsyncSwitchMessageRouter;
 use Prooph\ServiceBus\Plugin\Router\CommandRouter;
 use Prooph\ServiceBus\Plugin\Router\EventRouter;
 use Prooph\ServiceBus\Plugin\Router\QueryRouter;
+use ProophTest\Bundle\ServiceBus\DependencyInjection\ContainerBuilder as ProophContainerBuilder;
 use ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AcmeRegisterUserCommand;
 use ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AcmeRegisterUserHandler;
 use ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AcmeUserWasRegisteredEvent;
 use ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\MockPlugin;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\Compiler\ResolveDefinitionTemplatesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\Dumper;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\Dumper\XmlDumper;
 use Symfony\Component\DependencyInjection\Dumper\YamlDumper;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 abstract class AbstractServiceBusExtensionTestCase extends TestCase
 {
-    abstract protected function loadFromFile(ContainerBuilder $container, $file);
+    abstract protected function buildContainer(): ProophContainerBuilder;
 
     /**
      * @test
@@ -89,7 +92,7 @@ abstract class AbstractServiceBusExtensionTestCase extends TestCase
 
             self::assertInstanceOf(CommandBus::class, $commandBus);
 
-            $router = $container->get('prooph_service_bus.'.$name.'.router');
+            $router = $container->get('prooph_service_bus.' . $name . '.router');
 
             self::assertInstanceOf(CommandRouter::class, $router);
         }
@@ -227,7 +230,7 @@ abstract class AbstractServiceBusExtensionTestCase extends TestCase
 
             self::assertInstanceOf(QueryBus::class, $queryBus);
 
-            $router = $container->get('prooph_service_bus.'.$name.'.router');
+            $router = $container->get('prooph_service_bus.' . $name . '.router');
 
             self::assertInstanceOf(QueryRouter::class, $router);
         }
@@ -279,7 +282,7 @@ abstract class AbstractServiceBusExtensionTestCase extends TestCase
 
             self::assertInstanceOf(EventBus::class, $eventBus);
 
-            $router = $container->get('prooph_service_bus.'.$name.'.router');
+            $router = $container->get('prooph_service_bus.' . $name . '.router');
 
             self::assertInstanceOf(EventRouter::class, $router);
         }
@@ -354,7 +357,8 @@ abstract class AbstractServiceBusExtensionTestCase extends TestCase
      */
     public function it_adds_command_bus_routes_based_on_tags_with_message_configuration()
     {
-        $container = $this->loadContainer('command_bus_with_tags_and_explicit_message', new PluginsPass(), new RoutePass());
+        $container = $this->loadContainer('command_bus_with_tags_and_explicit_message', new PluginsPass(),
+            new RoutePass());
 
         /* @var $commandBus CommandBus */
         $commandBus = $container->get('prooph_service_bus.main_command_bus');
@@ -414,46 +418,55 @@ abstract class AbstractServiceBusExtensionTestCase extends TestCase
         $this->dump('command_bus_async');
     }
 
-    private function loadContainer($fixture, CompilerPassInterface ...$compilerPasses)
+    /** @test */
+    public function it_registers_the_stopwatch_plugin_if_the_framework_bundle_is_loaded_and_kernel_debug_enabled()
     {
-        $container = $this->getContainer();
-        $container->registerExtension(new ProophServiceBusExtension());
+        $container = $this->buildContainer()
+            ->withConfigFiles('stopwatch', 'framework_bundle')
+            ->withExtensions(new ProophServiceBusExtension(), new FrameworkExtension())
+            ->withParameters(['kernel.debug' => true, 'kernel.container_class' => 'srcDevDebugProjectContainer'])
+            ->withCompilerPasses(new StopwatchPass(), new PluginsPass())
+            ->compile();
 
-        $this->loadFromFile($container, $fixture);
-
-        foreach ($compilerPasses as $compilerPass) {
-            $container->addCompilerPass($compilerPass);
-        }
-
-        $this->compileContainer($container);
-
-        return $container;
+        self::assertTrue($container->hasDefinition('prooph_service_bus.plugin.stopwatch'));
+        self::assertHasPlugin(StopwatchPlugin::class, $container->get('prooph_service_bus.main_command_bus'));
     }
 
-    private function getContainer(array $bundles = [])
+    /** @test */
+    public function it_does_not_register_the_stopwatch_plugin_if_the_framework_bundle_is_not_loaded()
     {
-        $map = [];
+        $container = $this->buildContainer()
+            ->withConfigFiles('stopwatch')
+            ->withExtensions(new ProophServiceBusExtension())
+            ->withParameters(['kernel.debug' => true, 'kernel.container_class' => 'srcDevDebugProjectContainer'])
+            ->withCompilerPasses(new StopwatchPass(), new PluginsPass())
+            ->compile();
 
-        foreach ($bundles as $bundle) {
-            require_once __DIR__ . '/Fixture/Bundles/' . $bundle . '/' . $bundle . '.php';
-
-            $map[$bundle] = 'Fixture\\Bundles\\' . $bundle . '\\' . $bundle;
-        }
-
-        return new ContainerBuilder(new ParameterBag([
-            'kernel.debug' => false,
-            'kernel.bundles' => $map,
-            'kernel.cache_dir' => sys_get_temp_dir(),
-            'kernel.environment' => 'test',
-            'kernel.root_dir' => __DIR__ . '/../../src',
-        ]));
+        self::assertFalse($container->hasDefinition('prooph_service_bus.plugin.stopwatch'));
+        self::assertNotHasPlugin(StopwatchPlugin::class, $container->get('prooph_service_bus.main_command_bus'));
     }
 
-    private function compileContainer(ContainerBuilder $container)
+    /** @test */
+    public function it_does_not_register_the_stopwatch_plugin_if_the_framework_bundle_is_loaded_and_kernel_debug_disabled()
     {
-        $container->getCompilerPassConfig()->setOptimizationPasses([new ResolveDefinitionTemplatesPass()]);
-        $container->getCompilerPassConfig()->setRemovingPasses([]);
-        $container->compile();
+        $container = $this->buildContainer()
+            ->withConfigFiles('stopwatch', 'framework_bundle')
+            ->withExtensions(new ProophServiceBusExtension(), new FrameworkExtension())
+            ->withParameters(['kernel.debug' => false, 'kernel.container_class' => 'srcDevDebugProjectContainer'])
+            ->withCompilerPasses(new StopwatchPass(), new PluginsPass())
+            ->compile();
+
+        self::assertFalse($container->hasDefinition('prooph_service_bus.plugin.stopwatch'));
+        self::assertNotHasPlugin(StopwatchPlugin::class, $container->get('prooph_service_bus.main_command_bus'));
+    }
+
+    private function loadContainer($fixture, CompilerPassInterface ...$compilerPasses): ContainerBuilder
+    {
+        return $this->buildContainer()
+            ->withExtensions(new ProophServiceBusExtension())
+            ->withConfigFiles($fixture)
+            ->withCompilerPasses(...$compilerPasses)
+            ->compile();
     }
 
     private function dump(string $configFile)
@@ -470,5 +483,21 @@ abstract class AbstractServiceBusExtensionTestCase extends TestCase
         self::assertNotEmpty($dumper->dump());
 
         self::assertNotEmpty((new PhpDumper($container))->dump(), 'PHP cache cannot be warmuped correctly.');
+    }
+
+    private static function assertHasPlugin(string $className, CommandBus $bus)
+    {
+        $plugins = array_filter(array_column($bus->plugins(), 'plugin'), function (Plugin $plugin) use ($className) {
+            return $plugin instanceof $className;
+        });
+        self::assertCount(1, $plugins, "No plugin of class $className has been attached");
+    }
+
+    private static function assertNotHasPlugin(string $className, CommandBus $bus)
+    {
+        $plugins = array_filter(array_column($bus->plugins(), 'plugin'), function (Plugin $plugin) use ($className) {
+            return $plugin instanceof $className;
+        });
+        self::assertCount(0, $plugins, "A plugin of class $className has been attached");
     }
 }
