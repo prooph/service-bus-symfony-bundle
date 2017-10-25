@@ -2,7 +2,7 @@
 
 This documentation covers just the configuration of the Prooph Service Bus in Symfony.
 To inform yourself about the ProophServiceBus please have a look at the
-[official documentation](http://getprooph.org/service-bus/intro.html).
+[official documentation](http://docs.getprooph.org/service-bus/).
 
 ## Download the Bundle
 
