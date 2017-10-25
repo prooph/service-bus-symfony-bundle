@@ -100,7 +100,7 @@ final class ProophServiceBusExtension extends Extension
                 ->addTag("prooph_service_bus.{$type}_bus.plugin")
                 ->addTag('data_collector', [
                     'id' => "prooph.{$type}_bus",
-                    'template' => '@ProophServiceBus/Collector/debug_view.html.twig'
+                    'template' => '@ProophServiceBus/Collector/debug_view.html.twig',
                 ]);
         }
     }
