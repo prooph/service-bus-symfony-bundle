@@ -91,7 +91,7 @@ class RoutePass implements CompilerPassInterface
         $methodsWithMessageParameter = array_filter(
             $handlerReflection->getMethods(ReflectionMethod::IS_PUBLIC),
             function (ReflectionMethod $method) {
-                return $method->getNumberOfRequiredParameters() === 1
+                return ($method->getNumberOfRequiredParameters() === 1 || $method->getNumberOfRequiredParameters() === 2)
                 && $method->getParameters()[0]->getClass()
                 && $method->getParameters()[0]->getClass()->getName() !== Message::class
                 && $method->getParameters()[0]->getClass()->implementsInterface(Message::class);
