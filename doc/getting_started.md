@@ -16,6 +16,7 @@ at the root of your Symfony project.
 
 To start using this bundle, register the bundle in your application's kernel class:
 ```php
+<?php
 // app/AppKernel.php
 // …
 class AppKernel extends Kernel
@@ -34,6 +35,17 @@ class AppKernel extends Kernel
 }
 ```
 
+or, if you are using [the new flex structure](https://symfony.com/doc/current/setup/flex.html):
+```php
+<?php
+// config/bundles.php
+
+return [
+    // …
+    Prooph\Bundle\ServiceBus\ProophServiceBusBundle::class => ['all' => true],
+];
+```
+
 ## Configure your first command bus
 
 There are three different types of message bus supported by the ProophServiceBus.
@@ -43,7 +55,7 @@ For query bus and event bus, please have a look at the [configuration reference]
 
 The command bus is configured in `app/config/config.yml`:
 ```yaml
-# app/config/config.yml
+# app/config/config.yml or (flex) config/packages/prooph_service_bus.yml
 prooph_service_bus:
     command_buses:
         acme_command_bus: ~
@@ -57,7 +69,7 @@ There are two ways to route a command to a command handler.
 You can simply add it to the ProophServiceBus configuration:
 
 ```yaml
-# app/config/config.yml
+# app/config/config.yml or (flex) config/packages/prooph_service_bus.yml
 prooph_service_bus:
     command_buses:
         acme_command_bus:
