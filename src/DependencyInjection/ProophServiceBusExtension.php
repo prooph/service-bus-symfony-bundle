@@ -83,10 +83,25 @@ final class ProophServiceBusExtension extends Extension
         foreach (array_keys($config) as $name) {
             $serviceBuses[$name] = 'prooph_service_bus.' . $name;
         }
-        $container->setParameter('prooph_service_bus.' . $type . '_buses', $serviceBuses);
+        $container->setParameter("prooph_service_bus.{$type}_buses", $serviceBuses);
 
         foreach ($config as $name => $options) {
             $this->loadBus($type, $name, $options, $container);
+        }
+
+        // Add DataCollector
+        if ($type !== 'query' && $container->getParameter('kernel.debug')) {
+            $container
+                ->setDefinition(
+                    "prooph_service_bus.plugin.data_collector.${type}_bus",
+                    new ChildDefinition('prooph_service_bus.plugin.data_collector')
+                )
+                ->addArgument($type)
+                ->addTag("prooph_service_bus.{$type}_bus.plugin")
+                ->addTag('data_collector', [
+                    'id' => "prooph.{$type}_bus",
+                    'template' => '@ProophServiceBus/Collector/debug_view.html.twig'
+                ]);
         }
     }
 
