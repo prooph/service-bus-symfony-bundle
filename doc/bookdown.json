@@ -3,7 +3,8 @@
   "content": [
     {"intro": "../README.md"},
     {"getting_started": "getting_started.md"},
-    {"configuration_reference": "configuration_reference.md"}
+    {"configuration_reference": "configuration_reference.md"},
+    {"profiler": "profiler.md"}
   ],
   "target": "./html",
   "tocDepth": 2,
