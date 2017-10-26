@@ -52,11 +52,6 @@ class DataCollectorPlugin extends DataCollector implements Plugin
         foreach ($this->buses as $bus) {
             $busName = $bus->busName();
 
-            /*$reflClass = new ReflectionClass($bus);
-            $reflProperty = $reflClass->getProperty('events');
-            $reflProperty->setAccessible(true);
-            todo maybe put as default value in config tree builder to also make it configurable?
-            $this->data['config'][$busName]['action_event_emitter'] = get_class($reflProperty->getValue($bus)); */
             $this->data['config'][$busName] = $this->container->getParameter(
                 sprintf('prooph_service_bus.%s.configuration', $busName)
             );
