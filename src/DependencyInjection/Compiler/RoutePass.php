@@ -48,7 +48,7 @@ class RoutePass implements CompilerPassInterface
                 foreach ($handlers as $id => $args) {
                     // Safeguard to have only one tag per command / query
                     if ($type !== 'event' && count($args) > 1) {
-                        throw CompilerPassException::tagCountExceeded($id, $id, $bus);
+                        throw CompilerPassException::tagCountExceeded($type, $id, $bus);
                     }
                     foreach ($args as $eachArgs) {
                         if ((! isset($eachArgs['message_detection']) || $eachArgs['message_detection'] !== true) && ! isset($eachArgs['message'])) {
