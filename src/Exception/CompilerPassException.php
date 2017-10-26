@@ -24,4 +24,14 @@ class CompilerPassException extends RuntimeException
             )
         );
     }
+
+    public static function unknownHandlerClass(string $className, string $serviceId, string $busName): self
+    {
+        return new self(sprintf(
+            'Service %s has been tagged as %s handler, but its class %s does not exist',
+            $serviceId,
+            $busName,
+            $className
+        ));
+    }
 }

@@ -55,7 +55,9 @@ class RoutePass implements CompilerPassInterface
                             throw CompilerPassException::messageTagMissing($id);
                         }
 
-                        $messageNames = isset($eachArgs['message']) ? [$eachArgs['message']] : $this->recognizeMessageNames($container, $container->getDefinition($id));
+                        $messageNames = isset($eachArgs['message'])
+                            ? [$eachArgs['message']]
+                            : $this->recognizeMessageNames($container, $container->getDefinition($id), $id, $type);
 
                         if ($type === 'event') {
                             $routerArguments[0] = array_merge_recursive(
@@ -84,9 +86,16 @@ class RoutePass implements CompilerPassInterface
         }
     }
 
-    private function recognizeMessageNames(ContainerBuilder $container, Definition $routeDefinition): array
-    {
+    private function recognizeMessageNames(
+        ContainerBuilder $container,
+        Definition $routeDefinition,
+        string $routeId,
+        string $busType
+    ): array {
         $handlerReflection = $container->getReflectionClass($routeDefinition->getClass());
+        if (! $handlerReflection) {
+            throw CompilerPassException::unknownHandlerClass($routeDefinition->getClass(), $routeId, $busType);
+        }
 
         $methodsWithMessageParameter = array_filter(
             $handlerReflection->getMethods(ReflectionMethod::IS_PUBLIC),
