@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Prooph\Bundle\ServiceBus\Exception;
 
-class CompilerPassException extends \RuntimeException
+class CompilerPassException extends RuntimeException
 {
     public static function messageTagMissing(string $serviceId): self
     {
