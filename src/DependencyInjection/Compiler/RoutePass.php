@@ -48,14 +48,16 @@ class RoutePass implements CompilerPassInterface
                 foreach ($handlers as $id => $args) {
                     // Safeguard to have only one tag per command / query
                     if ($type !== 'event' && count($args) > 1) {
-                        throw CompilerPassException::tagCountExceeded($id, $id, $bus);
+                        throw CompilerPassException::tagCountExceeded($type, $id, $bus);
                     }
                     foreach ($args as $eachArgs) {
                         if ((! isset($eachArgs['message_detection']) || $eachArgs['message_detection'] !== true) && ! isset($eachArgs['message'])) {
                             throw CompilerPassException::messageTagMissing($id);
                         }
 
-                        $messageNames = isset($eachArgs['message']) ? [$eachArgs['message']] : $this->recognizeMessageNames($container, $container->getDefinition($id));
+                        $messageNames = isset($eachArgs['message'])
+                            ? [$eachArgs['message']]
+                            : $this->recognizeMessageNames($container, $container->getDefinition($id), $id, $type);
 
                         if ($type === 'event') {
                             $routerArguments[0] = array_merge_recursive(
@@ -84,9 +86,16 @@ class RoutePass implements CompilerPassInterface
         }
     }
 
-    private function recognizeMessageNames(ContainerBuilder $container, Definition $routeDefinition): array
-    {
+    private function recognizeMessageNames(
+        ContainerBuilder $container,
+        Definition $routeDefinition,
+        string $routeId,
+        string $busType
+    ): array {
         $handlerReflection = $container->getReflectionClass($routeDefinition->getClass());
+        if (! $handlerReflection) {
+            throw CompilerPassException::unknownHandlerClass($routeDefinition->getClass(), $routeId, $busType);
+        }
 
         $methodsWithMessageParameter = array_filter(
             $handlerReflection->getMethods(ReflectionMethod::IS_PUBLIC),
