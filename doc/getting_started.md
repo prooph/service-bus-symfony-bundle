@@ -2,7 +2,7 @@
 
 This documentation covers just the configuration of the Prooph Service Bus in Symfony.
 To inform yourself about the ProophServiceBus please have a look at the
-[official documentation](http://getprooph.org/service-bus/intro.html).
+[official documentation](http://docs.getprooph.org/service-bus/).
 
 ## Download the Bundle
 
@@ -16,6 +16,7 @@ at the root of your Symfony project.
 
 To start using this bundle, register the bundle in your application's kernel class:
 ```php
+<?php
 // app/AppKernel.php
 // …
 class AppKernel extends Kernel
@@ -34,6 +35,17 @@ class AppKernel extends Kernel
 }
 ```
 
+or, if you are using [the new flex structure](https://symfony.com/doc/current/setup/flex.html):
+```php
+<?php
+// config/bundles.php
+
+return [
+    // …
+    Prooph\Bundle\ServiceBus\ProophServiceBusBundle::class => ['all' => true],
+];
+```
+
 ## Configure your first command bus
 
 There are three different types of message bus supported by the ProophServiceBus.
@@ -41,9 +53,9 @@ While they have totally different purposes, their configuration is nearly the sa
 As an example, we will configure a command bus.
 For query bus and event bus, please have a look at the [configuration reference](./configuration_reference.html). 
 
-The command bus is configured in `app/config/config.yml`:
+The command bus is configured in `app/config/config.yml`
+(or `config/packages/prooph_service_bus.yaml` if you are using flex):
 ```yaml
-# app/config/config.yml
 prooph_service_bus:
     command_buses:
         acme_command_bus: ~
@@ -51,110 +63,41 @@ prooph_service_bus:
 
 That's all you need to define a (useless) command bus. Let's make it useful.
 
-### Route to a command handler
+### Route your first command handler
 
-There are two ways to route a command to a command handler.
-You can simply add it to the ProophServiceBus configuration:
-
+We assume that you already have a command `Acme\Command\RegisterUser`
+and a command handler `Acme\Command\RegisterUserHandler`.
+We will define the command handler as a regular service in Symfony:
 ```yaml
-# app/config/config.yml
-prooph_service_bus:
-    command_buses:
-        acme_command_bus:
-            router:
-                routes:
-                    'Acme\Command\RegisterUser': '@acme.command.register_user_handler'
+# app/config/services.yml or (flex) config/packages/prooph_service_bus.yaml
+services:
+    acme.command.register_user_handler:
+        class: Acme\Command\RegisterUserHandler
 ```
 
-In this case `Acme\Command\RegisterUser` would be the name of your command (which usually corresponds to its class name)
-and `acme.command.register_user_handler` the service-id of the handler (that you have to normally configure in Symfony).
-The `@` before the service-id can be omitted, but it provides auto completion in some IDEs.
-
-> **Note**: When configuring the event bus you can pass an array of service IDs for each event instead of a single service ID.
-> This is necessary because events can be routed to multiple event handlers. 
-
-The main benefit of this way is that you have all command handlers registered in one place.
-But it has also some drawbacks:
-You have to configure every command handler for itself and add it to the routes of the command bus,
-which implies changes at two different places for adding one command handler.
-Also, because the name of the command usually corresponds to the class of the command, it is vulnerable for refactoring.
-
-Therefore, you can also route a command to a command handler using tags. This will look like this:
+To route the command `Acme\Command\RegisterUser` to this service, we just need to add a tag to this definition:
 ```yaml
-# app/config/services.yml
 services:
     acme.command.register_user_handler:
         class: Acme\Command\RegisterUserHandler
         tags:
             - { name: 'prooph_service_bus.acme_command_bus.route_target' }
 ```
-The bundle will try to detect the name of the command by itself.
 
-If this feels like too much magic or if the detection fails, you can still pass the name of the command as attribute:
-```yaml
-# app/config/services.yml
-services:
-    acme.command.register_user_handler:
-        class: Acme\Command\RegisterUserHandler
-        tags:
-            - { name: 'prooph_service_bus.acme_command_bus.route_target', message: 'Acme\Command\RegisterUser' }
-```
+Now we are ready to dispatch our command.
 
-> **Hint:** If you rely on automatic message detection and your handler handles multiple messages of the same message bus,
-> you need to tag the handler just once. 
-
-Both options have its advantages and disadvantages.
-The result is the same, so it's up to your personal preference which option you choose.
-
-### Add a plugin
-
-[Plugins](http://getprooph.org/service-bus/plugins.html) are a great way to expand a message bus. 
-Let's assume that we want to use the `HandleCommandStrategy` for our command bus.
-Again, there are two options to do this.
-Both require to define a service for the plugin:
-```yaml
-# app/config/services.yml
-services:
-    acme.prooph.plugin.handle_command_strategy:
-        class: Prooph\ServiceBus\Plugin\InvokeStrategy\HandleCommandStrategy
-```
-
-Let's start with the first option, modifying our `app/config/config.yml`:
-```yaml
-# app/config/config.yml
-prooph_service_bus:
-    command_buses:
-        acme_command_bus:
-            plugins:
-                - "acme.prooph.plugin.handle_command_strategy"
-```
-That is all you need to do to register the plugin.
-
-Now we will have a look at the other option, using tags.
-Therefore, we just need to add a tag to the service configuration:
-```yaml
-# app/config/services.yml
-services:
-    acme.prooph.plugin.handle_command_strategy:
-        class: Prooph\ServiceBus\Plugin\InvokeStrategy\HandleCommandStrategy
-        tags:
-            - { name: 'prooph_service_bus.acme_command_bus.plugin' }
-```
-
-> **Hint:** If you want to register the plugin for more than one message bus, you can use
->  - `prooph_service_bus.command_bus.plugin` to register it for every command bus (resp. `prooph_service_bus.query_bus.plugin` and `prooph_service_bus.event_bus.plugin`) or
->  - `prooph_service_bus.plugin` to register it for every message bus.
-
-## Access the command bus
+## Dispatching the command
 
 Given our configuration
 ```yaml
-# app/config/config.yml
+# app/config/config.yml or (flex) config/packages/prooph_service_bus.yaml
 prooph_service_bus:
     command_buses:
         acme_command_bus: ~
 ```
+
 we can access the command bus from the container using the ID `prooph_service_bus.acme_command_bus`:
+
 ```php
 <?php
 // …
@@ -163,9 +106,15 @@ class RegisterUserController extends Controller
     public function indexAction()
     {
         // …
-        $this->get('prooph_service_bus.acme_command_bus')
+        $this
+            ->get('prooph_service_bus.acme_command_bus')
             ->dispatch(new RegisterUser(/* … */));
         // …
     }
 }
 ```
+
+That was everything we need to configure and dispatch our first command.
+Perhaps you want to know more about [routing](./routing.html),
+about how to customize message buses with [plugins](./plugins.html)
+or about what information will be included in the [profiler](./profiler.html)?

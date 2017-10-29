@@ -3,6 +3,9 @@
   "content": [
     {"intro": "../README.md"},
     {"getting_started": "getting_started.md"},
+    {"routing": "routing.md"},
+    {"plugins": "plugins.md"},
+    {"profiler": "profiler.md"},
     {"configuration_reference": "configuration_reference.md"}
   ],
   "target": "./html",
