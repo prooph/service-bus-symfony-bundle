@@ -54,7 +54,7 @@ As an example, we will configure a command bus.
 For query bus and event bus, please have a look at the [configuration reference](./configuration_reference.html). 
 
 The command bus is configured in `app/config/config.yml`
-(or `config/packages/prooph_service_bus.yml` if you are using flex):
+(or `config/packages/prooph_service_bus.yaml` if you are using flex):
 ```yaml
 prooph_service_bus:
     command_buses:
@@ -69,7 +69,7 @@ We assume that you already have a command `Acme\Command\RegisterUser`
 and a command handler `Acme\Command\RegisterUserHandler`.
 We will define the command handler as a regular service in Symfony:
 ```yaml
-# app/config/services.yml or (flex) config/packages/prooph_service_bus.yml
+# app/config/services.yml or (flex) config/packages/prooph_service_bus.yaml
 services:
     acme.command.register_user_handler:
         class: Acme\Command\RegisterUserHandler
@@ -90,7 +90,7 @@ Now we are ready to dispatch our command.
 
 Given our configuration
 ```yaml
-# app/config/config.yml or (flex) config/packages/prooph_service_bus.yml
+# app/config/config.yml or (flex) config/packages/prooph_service_bus.yaml
 prooph_service_bus:
     command_buses:
         acme_command_bus: ~

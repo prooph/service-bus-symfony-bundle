@@ -16,7 +16,7 @@ services:
 
 and a configured message bus:
 ```yaml
-# app/config/config.yml or (flex) config/packages/prooph_service_bus.yml
+# app/config/config.yml or (flex) config/packages/prooph_service_bus.yaml
 prooph_service_bus:
     command_buses:
         acme_command_bus: ~
@@ -82,7 +82,7 @@ But don't worry about performance because this will happen on compiling.
 
 If you are no fan of service tags, you can route the messages directly at the bus configuration:
 ```yaml
-# app/config/config.yml or (flex) config/packages/prooph_service_bus.yml
+# app/config/config.yml or (flex) config/packages/prooph_service_bus.yaml
 prooph_service_bus:
     command_buses:
         acme_command_bus:
