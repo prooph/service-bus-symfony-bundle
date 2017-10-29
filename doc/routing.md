@@ -39,7 +39,7 @@ services:
 ```
 
 The name of the tag is simple `prooph_service_bus.<name-of-the-bus>.route_target`.
-The additional `message` attribute defines the class of the message object that is routed to the handler.
+The additional `message` attribute defines the message name (message class by default) that is routed to the handler.
 
 If your handler handles multiple messages, you need to add a tag for each one.
 
