@@ -38,7 +38,7 @@ final class ProophServiceBusExtension extends Extension
 
     public function getConfiguration(array $config, ContainerBuilder $container)
     {
-        return new Configuration($container->getParameter('kernel.debug'));
+        return new Configuration();
     }
 
     public function load(array $configs, ContainerBuilder $container)

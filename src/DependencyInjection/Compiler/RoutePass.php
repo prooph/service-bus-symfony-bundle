@@ -92,18 +92,20 @@ class RoutePass implements CompilerPassInterface
         string $routeId,
         string $busType
     ): array {
-        $handlerReflection = $container->getReflectionClass($routeDefinition->getClass());
+        /* @var $routeClass string Help phpstan */
+        $routeClass = $routeDefinition->getClass();
+        $handlerReflection = $container->getReflectionClass($routeClass);
         if (! $handlerReflection) {
-            throw CompilerPassException::unknownHandlerClass($routeDefinition->getClass(), $routeId, $busType);
+            throw CompilerPassException::unknownHandlerClass($routeClass, $routeId, $busType);
         }
 
         $methodsWithMessageParameter = array_filter(
             $handlerReflection->getMethods(ReflectionMethod::IS_PUBLIC),
             function (ReflectionMethod $method) {
                 return ($method->getNumberOfRequiredParameters() === 1 || $method->getNumberOfRequiredParameters() === 2)
-                && $method->getParameters()[0]->getClass()
-                && $method->getParameters()[0]->getClass()->getName() !== Message::class
-                && $method->getParameters()[0]->getClass()->implementsInterface(Message::class);
+                    && $method->getParameters()[0]->getClass()
+                    && $method->getParameters()[0]->getClass()->getName() !== Message::class
+                    && $method->getParameters()[0]->getClass()->implementsInterface(Message::class);
             }
         );
 

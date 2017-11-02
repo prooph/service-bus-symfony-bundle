@@ -17,18 +17,6 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 final class Configuration implements ConfigurationInterface
 {
-    private $debug;
-
-    /**
-     * Constructor
-     *
-     * @param Boolean $debug Whether to use the debug mode
-     */
-    public function __construct($debug)
-    {
-        $this->debug = (bool) $debug;
-    }
-
     /**
      * Normalizes XML config and defines config tree
      *
@@ -37,6 +25,7 @@ final class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
+        /** @var $rootNode ArrayNodeDefinition Help phpstan */
         $rootNode = $treeBuilder->root('prooph_service_bus');
 
         foreach (ProophServiceBusExtension::AVAILABLE_BUSES as $type) {
@@ -66,25 +55,24 @@ final class Configuration implements ConfigurationInterface
 
         if ('event' === $type) {
             $handlerNode
+                ->beforeNormalization()
+                    ->ifTrue(function ($v) {
+                        // XML uses listener nodes
+                        return isset($v['listener']);
+                    })
+                    ->then(function ($v) {
+                        // fix single node in XML
+                        return (array) $v['listener'];
+                    })
+                ->end()
+                ->prototype('scalar')
                     ->beforeNormalization()
                         ->ifTrue(function ($v) {
-                            // XML uses listener nodes
-                            return isset($v['listener']);
+                            return strpos($v, '@') === 0;
                         })
                         ->then(function ($v) {
-                            // fix single node in XML
-                            return (array) $v['listener'];
+                            return substr($v, 1);
                         })
-                    ->end()
-                    ->prototype('scalar')
-                        ->beforeNormalization()
-                            ->ifTrue(function ($v) {
-                                return strpos($v, '@') === 0;
-                            })
-                            ->then(function ($v) {
-                                return substr($v, 1);
-                            })
-                        ->end()
                     ->end()
                 ->end();
         } else {
@@ -98,6 +86,7 @@ final class Configuration implements ConfigurationInterface
                     })
                 ->end();
         }
+        $handlerNode->end();
 
         $node
             ->fixXmlConfig($type . '_bus', $type . '_buses')

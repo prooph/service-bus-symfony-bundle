@@ -43,6 +43,8 @@ The additional `message` attribute defines the message name (message class by de
 
 If your handler handles multiple messages, you need to add a tag for each one.
 
+> **Important**: Your handlers must be `public`.
+
 ### Automatic message detection
 
 If you are not afraid of a little bit magic
