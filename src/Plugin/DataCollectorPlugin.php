@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace Prooph\Bundle\ServiceBus\Plugin;
 
+use Exception;
 use Prooph\Bundle\ServiceBus\NamedMessageBus;
 use Prooph\Common\Event\ActionEvent;
+use Prooph\Common\Messaging\DomainMessage;
+use Prooph\Common\Messaging\Message;
 use Prooph\ServiceBus\Exception\RuntimeException;
 use Prooph\ServiceBus\MessageBus;
 use Prooph\ServiceBus\Plugin\Plugin;
@@ -47,7 +50,7 @@ class DataCollectorPlugin extends DataCollector implements Plugin
         $this->data['duration'] = [];
     }
 
-    public function collect(Request $request, Response $response, \Exception $exception = null)
+    public function collect(Request $request, Response $response, Exception $exception = null)
     {
         foreach ($this->buses as $bus) {
             $busName = $bus->busName();
@@ -65,9 +68,7 @@ class DataCollectorPlugin extends DataCollector implements Plugin
 
     public function totalMessageCount(): int
     {
-        return array_sum(array_map(function ($v) {
-            return count($v);
-        }, $this->data['messages']));
+        return array_sum(array_map('count', $this->data['messages']));
     }
 
     public function totalBusCount(): int
@@ -108,16 +109,21 @@ class DataCollectorPlugin extends DataCollector implements Plugin
 
         $this->buses[] = $messageBus;
         if (! $messageBus instanceof NamedMessageBus) {
-            throw new RuntimeException(sprinf(
-                'To use the Symfony Datacollector, the Bus "%s" needs to implement "%s"',
+            throw new RuntimeException(sprintf(
+                'To use the Symfony DataCollector, the Bus "%s" needs to implement "%s"',
                 $messageBus,
                 NamedMessageBus::class
             ));
         }
-
         $this->listenerHandlers[] = $messageBus->attach(MessageBus::EVENT_DISPATCH, function (ActionEvent $actionEvent) {
-            $busName = $actionEvent->getTarget()->busName();
-            $uuid = (string) $actionEvent->getParam(MessageBus::EVENT_PARAM_MESSAGE)->uuid();
+            /* @var $target NamedMessageBus Is ensured above */
+            $target = $actionEvent->getTarget();
+            $busName = $target->busName();
+            $message = $actionEvent->getParam(MessageBus::EVENT_PARAM_MESSAGE);
+            if (! $message instanceof Message) {
+                return;
+            }
+            $uuid = (string) $message->uuid();
 
             if (! $this->stopwatch->isStarted($busName)) {
                 $this->stopwatch->start($busName);
@@ -127,8 +133,14 @@ class DataCollectorPlugin extends DataCollector implements Plugin
         }, MessageBus::PRIORITY_INVOKE_HANDLER + 100);
 
         $this->listenerHandlers[] = $messageBus->attach(MessageBus::EVENT_FINALIZE, function (ActionEvent $actionEvent) {
-            $busName = $actionEvent->getTarget()->busName();
-            $uuid = (string) $actionEvent->getParam(MessageBus::EVENT_PARAM_MESSAGE)->uuid();
+            /* @var $messageBus NamedMessageBus Is ensured above */
+            $messageBus = $actionEvent->getTarget();
+            $busName = $messageBus->busName();
+            $message = $actionEvent->getParam(MessageBus::EVENT_PARAM_MESSAGE);
+            if (! $message instanceof Message) {
+                return;
+            }
+            $uuid = (string) $message->uuid();
 
             $this->data['duration'][$busName] = $this->stopwatch->lap($busName)->getDuration();
             $this->data['messages'][$busName][$uuid] = $this->createContextFromActionEvent($actionEvent);
@@ -136,21 +148,24 @@ class DataCollectorPlugin extends DataCollector implements Plugin
         }, MessageBus::PRIORITY_INVOKE_HANDLER - 100);
 
         $this->listenerHandlers[] = $messageBus->attach(MessageBus::EVENT_DISPATCH, function (ActionEvent $actionEvent) {
-            foreach ($actionEvent->getParam('event-listeners', []) as $handler) {
-                $this->data['message_callstack'][$actionEvent->getTarget()->busName()][] = [
-                    'id' => $actionEvent->getParam('message')->uuid(),
-                    'message' => $actionEvent->getParam('message-name'),
-                    'handler' => \is_object($handler) ? get_class($handler) : $handler,
-                ];
+            /* @var $messageBus NamedMessageBus Is ensured above */
+            $messageBus = $actionEvent->getTarget();
+            $message = $actionEvent->getParam(MessageBus::EVENT_PARAM_MESSAGE);
+            $messageName = $actionEvent->getParam(MessageBus::EVENT_PARAM_MESSAGE_NAME);
+            $handler = $actionEvent->getParam(MessageBus::EVENT_PARAM_MESSAGE_HANDLER);
+            if (! $message instanceof Message) {
+                return;
             }
-            if ($actionEvent->getParam('message-handler') !== null) {
-                $this->data['message_callstack'][$actionEvent->getTarget()->busName()][] = [
-                    'id' => $actionEvent->getParam('message')->uuid(),
-                    'message' => $actionEvent->getParam('message-name'),
-                    'handler' => is_object($actionEvent->getParam('message-handler'))
-                        ? get_class($actionEvent->getParam('message-handler'))
-                        : (string) $actionEvent->getParam('message-handler'),
-                ];
+            $log = [
+                'id' => (string) $message->uuid(),
+                'message' => $messageName,
+                'handler' => is_object($handler) ? get_class($handler) : (string) $handler,
+            ];
+            foreach ($actionEvent->getParam('event-listeners', []) as $handler) {
+                $this->data['message_callstack'][$messageBus->busName()][] = $log;
+            }
+            if ($handler !== null) {
+                $this->data['message_callstack'][$messageBus->busName()][] = $log;
             }
         }, MessageBus::PRIORITY_ROUTE - 50000);
     }
@@ -166,14 +181,17 @@ class DataCollectorPlugin extends DataCollector implements Plugin
 
     protected function createContextFromActionEvent(ActionEvent $event): array
     {
+        /* @var $messageBus NamedMessageBus Is ensured above */
+        $messageBus = $event->getTarget();
+        $message = $event->getParam(MessageBus::EVENT_PARAM_MESSAGE);
+        $handler = $event->getParam(MessageBus::EVENT_PARAM_MESSAGE_HANDLER);
+
         return [
-            'bus-name' => $event->getTarget()->busName(),
-            'message-data' => $event->getParam('message')->toArray(),
-            'message-name' => $event->getParam('message-name'),
-            'message-handled' => $event->getParam('message-handled'),
-            'message-handler' => is_object($event->getParam('message-handler'))
-                ? get_class($event->getParam('message-handler'))
-                : $event->getParam('message-handler'),
+            'bus-name' => $messageBus->busName(),
+            'message-data' => $message instanceof DomainMessage ? $message->toArray() : [],
+            'message-name' => $event->getParam(MessageBus::EVENT_PARAM_MESSAGE_NAME),
+            'message-handled' => $event->getParam(MessageBus::EVENT_PARAM_MESSAGE_HANDLED),
+            'message-handler' => is_object($handler) ? get_class($handler) : (string) $handler,
         ];
     }
 

@@ -6,6 +6,7 @@ namespace Prooph\Bundle\ServiceBus\Plugin;
 
 use Prooph\Bundle\ServiceBus\NamedMessageBus;
 use Prooph\Common\Event\ActionEvent;
+use Prooph\Common\Messaging\DomainMessage;
 use Prooph\ServiceBus\MessageBus;
 use Prooph\ServiceBus\Plugin\AbstractPlugin;
 use Psr\Log\LoggerInterface;
@@ -51,46 +52,42 @@ class PsrLoggerPlugin extends AbstractPlugin
 
         $this->listenerHandlers[] = $messageBus->attach(MessageBus::EVENT_DISPATCH, function (ActionEvent $event) {
             $context = $this->createContextFromActionEvent($event);
-
             $this->logger->debug('Detect {bus-type} message name for {message-name}', $context);
         }, MessageBus::PRIORITY_DETECT_MESSAGE_NAME - 100);
 
         //Should be triggered because we did not provide a message-handler yet
         $this->listenerHandlers[] = $messageBus->attach(MessageBus::EVENT_DISPATCH, function (ActionEvent $event) {
             $context = $this->createContextFromActionEvent($event);
-
-            $this->logger->debug(
-                'Detect {bus-type} message route for {message-name}', $context);
+            $this->logger->debug('Detect {bus-type} message route for {message-name}', $context);
         }, MessageBus::PRIORITY_ROUTE - 100);
 
         $this->listenerHandlers[] = $messageBus->attach(MessageBus::EVENT_DISPATCH, function (ActionEvent $event) {
             $context = $this->createContextFromActionEvent($event);
-
-            $this->logger->debug(
-                'Locate {bus-type} handler for {message-name}', $context);
+            $this->logger->debug('Locate {bus-type} handler for {message-name}', $context);
         }, MessageBus::PRIORITY_LOCATE_HANDLER - 100);
     }
 
     protected function createContextFromActionEvent(ActionEvent $event): array
     {
         $context = [];
-        if ($event->getTarget() instanceof NamedMessageBus) {
-            $context['bus-type'] = $event->getTarget()->busType();
-            $context['bus-name'] = $event->getTarget()->busName();
+        $messageBus = $event->getTarget();
+        if ($messageBus instanceof NamedMessageBus) {
+            $context['bus-type'] = $messageBus->busType();
+            $context['bus-name'] = $messageBus->busName();
         } else {
-            $reflect = new ReflectionClass($event->getTarget());
+            $reflect = new ReflectionClass($messageBus);
             $context['bus-type'] = $reflect->getShortName();
             $context['bus-name'] = 'anonymous';
         }
 
-        return
-            array_merge($context,
-                [
-                    'message-data' => $event->getParam('message')->toArray(),
-                    'message-name' => $event->getParam('message-name'),
-                    'message-handled' => $event->getParam('message-handled'),
-                    'message-handler' => \is_object($event->getParam('message-handler')) ? get_class($event->getParam('message-handler')) : $event->getParam('message-handler'),
-                ]
-            );
+        $message = $event->getParam(MessageBus::EVENT_PARAM_MESSAGE);
+        $messageHandler = $event->getParam(MessageBus::EVENT_PARAM_MESSAGE_HANDLER);
+
+        return array_merge($context, [
+            'message-data' => $message instanceof DomainMessage ? $message->toArray() : [],
+            'message-name' => $event->getParam(MessageBus::EVENT_PARAM_MESSAGE_NAME),
+            'message-handled' => $event->getParam(MessageBus::EVENT_PARAM_MESSAGE_HANDLED),
+            'message-handler' => is_object($messageHandler) ? get_class($messageHandler) : (string) $messageHandler,
+        ]);
     }
 }

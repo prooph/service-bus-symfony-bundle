@@ -184,10 +184,12 @@
                     </div>
                     <h2>Messages</h2>
                     {% for i, message in messages %}
-                        <a name="{{ message['message-data']['uuid'] }}"></a>
+                        {% if message['message-data']['uuid'] is defined %}
+                            <a name="{{ message['message-data']['uuid'] }}"></a>
+                        {% endif %}
                         <table>
                             <thead>
-                            <th colspan="2">{{ message['message-name'] }}</th>
+                                <th colspan="2">{{ message['message-name'] }}</th>
                             </thead>
                             <tbody>
                             <tr>
@@ -196,11 +198,19 @@
                             </tr>
                             <tr>
                                 <td>Message created</td>
-                                <td>{{ message['message-data']['created_at']|date('Y-m-d H:i:s.u (P)') }}</td>
+                                {% if message['message-data']['created_at'] is defined %}
+                                    <td>{{ message['message-data']['created_at']|date('Y-m-d H:i:s.u (P)') }}</td>
+                                {% else %}
+                                    <td>This message is not supported by the default message converter. Please use another message converter.</td>
+                                {% endif %}
                             </tr>
                             <tr>
                                 <td>Uuid</td>
-                                <td>{{ message['message-data']['uuid'] }}</td>
+                                {% if message['message-data']['uuid'] is defined %}
+                                    <td>{{ message['message-data']['uuid'] }}</td>
+                                {% else %}
+                                    <td>This message is not supported by the default message converter. Please use another message converter.</td>
+                                {% endif %}
                             </tr>
                             {% if message['message-handler'] %}
                                 <tr>
@@ -225,7 +235,11 @@
                             {% endif %}
                             <tr>
                                 <td>Payload</td>
-                                <td>{{ dump(message['message-data']['payload']) }}</td>
+                                {% if message['message-data']['payload'] is defined %}
+                                    <td>{{ dump(message['message-data']['payload']) }}</td>
+                                {% else %}
+                                    <td>This message is not supported by the default message converter. Please use another message converter.</td>
+                                {% endif %}
                             </tr>
                             {% if message['message-data']['metadata'] is defined %}
                                 <tr>

@@ -33,6 +33,7 @@ install:
 script:
   - if [[ $TEST_COVERAGE == 'true' ]]; then php -dzend_extension=xdebug.so ./vendor/bin/phpunit --coverage-text --coverage-clover ./build/logs/clover.xml; else ./vendor/bin/phpunit; fi
   - if [[ $EXECUTE_CS_CHECK == 'true' ]]; then ./vendor/bin/php-cs-fixer fix -v --diff --dry-run; fi
+  - ./vendor/bin/phpstan analyse -c phpstan.neon -l 7 src
 
 after_script:
   - if [[ $TEST_COVERAGE == 'true' ]]; then php vendor/bin/coveralls -v; fi
