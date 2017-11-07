@@ -131,9 +131,7 @@ final class ProophServiceBusExtension extends Extension
 
         // Add plugin tag for plugins configured in the bus config
         foreach ($options['plugins'] as $pluginServiceId) {
-            $container
-                ->getDefinition($pluginServiceId)
-                ->addTag(sprintf('prooph_service_bus.%s.plugin', $name));
+            $serviceBusDefinition->addMethodCall('addPlugin', [new Reference($pluginServiceId), $pluginServiceId]);
         }
 
         // Logging for each configured service bus
