@@ -106,6 +106,28 @@ final class Configuration implements ConfigurationInterface
                         ->end()
                         ->defaultValue('prooph_service_bus.message_factory')
                     ->end()
+                    ->scalarNode('message_data_converter')
+                        ->beforeNormalization()
+                            ->ifTrue(function ($v) {
+                                return strpos($v, '@') === 0;
+                            })
+                            ->then(function ($v) {
+                                return substr($v, 1);
+                            })
+                        ->end()
+                        ->defaultValue('prooph_service_bus.message_data_converter.' . $type)
+                    ->end()
+                    ->scalarNode('message_converter')
+                        ->beforeNormalization()
+                            ->ifTrue(function ($v) {
+                                return strpos($v, '@') === 0;
+                            })
+                            ->then(function ($v) {
+                                return substr($v, 1);
+                            })
+                        ->end()
+                        ->defaultValue('prooph_service_bus.message_converter')
+                    ->end()
                     ->arrayNode('plugins')
                         ->beforeNormalization()
                             // fix single node in XML

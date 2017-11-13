@@ -63,11 +63,6 @@ final class ProophServiceBusExtension extends Extension
     /**
      * Loads bus configuration depending on type. For configuration examples, please take look at
      * test/DependencyInjection/Fixture/config files
-     *
-     * @param string $type
-     * @param array $config
-     * @param ContainerBuilder $container
-     * @param XmlFileLoader $loader
      */
     private function busLoad(
         string $type,
@@ -84,23 +79,22 @@ final class ProophServiceBusExtension extends Extension
         }
         $container->setParameter("prooph_service_bus.{$type}_buses", $serviceBuses);
 
-        foreach ($config as $name => $options) {
-            $this->loadBus($type, $name, $options, $container);
-        }
-
         // Add DataCollector
         if ($type !== 'query' && $container->getParameter('kernel.debug')) {
             $container
                 ->setDefinition(
-                    "prooph_service_bus.plugin.data_collector.${type}_bus",
-                    new ChildDefinition('prooph_service_bus.plugin.data_collector')
+                    sprintf('prooph_service_bus.plugin.symfony_data_collector.%s_bus', $type),
+                    new ChildDefinition('prooph_service_bus.plugin.symfony_data_collector')
                 )
                 ->addArgument($type)
-                ->addTag("prooph_service_bus.{$type}_bus.plugin")
                 ->addTag('data_collector', [
-                    'id' => "prooph.{$type}_bus",
+                    'id' => sprintf('prooph.%s_bus', $type),
                     'template' => '@ProophServiceBus/Collector/debug_view.html.twig',
                 ]);
+        }
+
+        foreach ($config as $name => $options) {
+            $this->loadBus($type, $name, $options, $container);
         }
     }
 
@@ -116,7 +110,7 @@ final class ProophServiceBusExtension extends Extension
      * @throws \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
      * @throws \Prooph\Bundle\ServiceBus\Exception\RuntimeException
      */
-    private function loadBus(string $type, string $name, array $options, ContainerBuilder $container)
+    private function loadBus(string $type, string $name, array $options, ContainerBuilder $container): void
     {
         $serviceBusId = 'prooph_service_bus.' . $name;
         $serviceBusDefinition = $container->setDefinition(
@@ -134,17 +128,41 @@ final class ProophServiceBusExtension extends Extension
             $serviceBusDefinition->addMethodCall('addPlugin', [new Reference($pluginServiceId), $pluginServiceId]);
         }
 
+        // Configure context factory
+        $container
+            ->setDefinition(
+                'prooph_service_bus.message_data_converter.' . $type,
+                new ChildDefinition('prooph_service_bus.message_data_converter')
+            )
+            ->addArgument(new Reference($options['message_converter']));
+
+        $contextFactoryId = sprintf('prooph_service_bus.message_context_factory.%s', $serviceBusId);
+        $container
+            ->setDefinition($contextFactoryId, new ChildDefinition('prooph_service_bus.message_context_factory'))
+            ->addArgument(new Reference($options['message_data_converter']));
+
+        // Collecting data for each configured service bus
+        if ($type !== 'query' && $container->getParameter('kernel.debug')) {
+            $container
+                ->setDefinition(
+                    sprintf('%s.plugin.data_collector', $serviceBusId),
+                    new ChildDefinition('prooph_service_bus.plugin.data_collector')
+                )
+                ->addArgument(new Reference($contextFactoryId))
+                ->addArgument(new Reference(sprintf('prooph_service_bus.plugin.symfony_data_collector.%s_bus', $type)))
+                ->addTag("prooph_service_bus.{$type}_bus.plugin");
+        }
+
         // Logging for each configured service bus
-        $serviceBusLoggerDefinition = $container
+        $container
             ->setDefinition(
                 sprintf('%s.plugin.psr_logger', $serviceBusId),
                 new ChildDefinition('prooph_service_bus.plugin.psr_logger')
             )
-            ->setArguments(
-                [
-                    new Reference('logger', ContainerInterface::NULL_ON_INVALID_REFERENCE),
-                ]
-            )
+            ->setArguments([
+                new Reference($contextFactoryId),
+                new Reference('logger', ContainerInterface::NULL_ON_INVALID_REFERENCE),
+            ])
             ->addTag('monolog.logger', ['channel' => sprintf('%s_bus.%s', $type, $name)])
             ->addTag(sprintf('prooph_service_bus.%s.plugin', $name));
 

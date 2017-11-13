@@ -16,10 +16,15 @@
         </service>
 
         <service id="prooph_service_bus.plugin.psr_logger" class="Prooph\Bundle\ServiceBus\Plugin\PsrLoggerPlugin" abstract="true" public="false"/>
-        <service id="prooph_service_bus.plugin.data_collector" class="Prooph\Bundle\ServiceBus\Plugin\DataCollectorPlugin" abstract="true" public="false">
-            <argument type="service" id="service_container"/>
+        <service id="prooph_service_bus.plugin.data_collector" class="Prooph\Bundle\ServiceBus\Plugin\DataCollectorPlugin" abstract="true" public="false"/>
+        <service id="prooph_service_bus.plugin.symfony_data_collector" class="Prooph\Bundle\ServiceBus\Plugin\DataCollector" abstract="true" public="false">
+            <argument type="service" id="service_container" />
         </service>
 
         <service id="prooph_service_bus.async_switch_message_router" class="Prooph\ServiceBus\Plugin\Router\AsyncSwitchMessageRouter" />
+
+        <service id="prooph_service_bus.message_context_factory" class="Prooph\Bundle\ServiceBus\MessageContext\ContextFactory" abstract="true" public="false" />
+        <service id="prooph_service_bus.message_data_converter" class="Prooph\Bundle\ServiceBus\MessageContext\DefaultMessageDataConverter" abstract="true" public="false" />
+        <service id="prooph_service_bus.message_converter" class="Prooph\Common\Messaging\NoOpMessageConverter" public="false" />
     </services>
 </container>
