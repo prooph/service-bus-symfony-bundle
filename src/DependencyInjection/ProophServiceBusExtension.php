@@ -90,7 +90,7 @@ final class ProophServiceBusExtension extends Extension
         }
 
         // Add DataCollector
-        if ($type !== 'query' && $container->getParameter('kernel.debug')) {
+        if ($type !== 'query' && $container->getParameter('kernel.debug') && class_exists('Symfony\Component\Stopwatch\Stopwatch')) {
             $container
                 ->setDefinition(
                     "prooph_service_bus.plugin.data_collector.${type}_bus",
