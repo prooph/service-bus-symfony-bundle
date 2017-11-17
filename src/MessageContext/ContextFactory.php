@@ -36,12 +36,14 @@ class ContextFactory
         if ($messageBus instanceof NamedMessageBus) {
             $context['bus-type'] = $messageBus->busType();
             $context['bus-name'] = $messageBus->busName();
+
             return $context;
         }
 
         $reflection = new ReflectionClass($messageBus);
         $context['bus-type'] = $reflection->getShortName();
         $context['bus-name'] = 'anonymous';
+
         return $context;
     }
 }
