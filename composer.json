@@ -70,7 +70,7 @@
     "phpspec/prophecy": "^1.7",
     "react/promise": "^2.5",
     "friendsofphp/php-cs-fixer": " ~2.0",
-    "prooph/php-cs-fixer-config": "^0.1.1",
+    "prooph/php-cs-fixer-config": "^0.2",
     "symfony/framework-bundle": "~3.3",
     "phpstan/phpstan": "^0.8.5",
     "symfony/expression-language": "^3.0"
