@@ -14,7 +14,7 @@ use Prooph\Common\Messaging\MessageConverter;
 class DefaultMessageDataConverterTest extends TestCase
 {
     /** @test */
-    public function it_uses_as_MessageConverter_to_convert_Messages()
+    public function it_uses_as_MessageConverter_to_convert_Messages(): void
     {
         $message = $this->createMock(Message::class);
         $messageConverter = $this->createMock(MessageConverter::class);
@@ -28,7 +28,7 @@ class DefaultMessageDataConverterTest extends TestCase
     }
 
     /** @test */
-    public function it_converts_the_message_to_an_empty_array_if_the_MessageConverter_throws_an_exception()
+    public function it_converts_the_message_to_an_empty_array_if_the_MessageConverter_throws_an_exception(): void
     {
         $message = $this->createMock(Message::class);
         $messageConverter = $this->createMock(MessageConverter::class);
@@ -39,7 +39,8 @@ class DefaultMessageDataConverterTest extends TestCase
         $this->assertSame([], $result);
     }
 
-    public function it_simply_returns_the_message_if_the_message_is_an_array()
+    /** @test */
+    public function it_simply_returns_the_message_if_the_message_is_an_array(): void
     {
         $message = ['name' => 'create-todo', 'text' => 'buy milk'];
         $messageConverter = $this->createMock(MessageConverter::class);
@@ -51,7 +52,7 @@ class DefaultMessageDataConverterTest extends TestCase
     }
 
     /** @test */
-    public function it_converts_scalars_to_an_empty_array()
+    public function it_converts_scalars_to_an_empty_array(): void
     {
         $messageConverter = $this->createMock(MessageConverter::class);
         $messageConverter->expects($this->never())->method('convertToArray');

@@ -47,7 +47,7 @@ class ContextFactoryTest extends TestCase
     }
 
     /** @test */
-    public function it_uses_anonymous_as_name_for_not_NamedMessageBuses()
+    public function it_uses_anonymous_as_name_for_not_NamedMessageBuses(): void
     {
         $messageData = ['message_name' => 'my-acme-message'];
 
