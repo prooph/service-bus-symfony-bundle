@@ -35,6 +35,13 @@ class DataCollector extends BaseDataCollector
         }
     }
 
+    public function reset(): void
+    {
+        $this->data['messages'] = [];
+        $this->data['duration'] = [];
+        $this->busNames = [];
+    }
+
     public function totalMessageCount(): int
     {
         return array_sum(array_map('count', $this->data['messages']));
