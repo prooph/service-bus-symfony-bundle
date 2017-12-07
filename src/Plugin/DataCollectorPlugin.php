@@ -8,7 +8,7 @@ use Prooph\Bundle\ServiceBus\MessageContext\ContextFactory;
 use Prooph\Bundle\ServiceBus\NamedMessageBus;
 use Prooph\Common\Event\ActionEvent;
 use Prooph\Common\Messaging\Message;
-use Prooph\ServiceBus\Exception\RuntimeException;
+use Prooph\Bundle\ServiceBus\Exception\RuntimeException;
 use Prooph\ServiceBus\MessageBus;
 use Prooph\ServiceBus\Plugin\AbstractPlugin;
 use Prooph\ServiceBus\QueryBus;
@@ -47,11 +47,13 @@ class DataCollectorPlugin extends AbstractPlugin
         if (! $messageBus instanceof NamedMessageBus) {
             throw new RuntimeException(sprintf(
                 'To use the Symfony DataCollector, the Bus "%s" needs to implement "%s"',
-                $messageBus,
+                get_class($messageBus),
                 NamedMessageBus::class
             ));
         }
+
         $this->data->addMessageBus($messageBus->busName());
+
         $this->listenerHandlers[] = $messageBus->attach(MessageBus::EVENT_DISPATCH, function (ActionEvent $actionEvent) {
             /** @var NamedMessageBus $target Is ensured above */
             $target = $actionEvent->getTarget();
