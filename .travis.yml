@@ -20,7 +20,7 @@ matrix:
       env: DEPENDENCIES="" EXECUTE_CS_CHECK=true TEST_COVERAGE=true
 
 before_install:
-  - if [[ $TEST_COVERAGE != 'true' ]]; then phpenv config-rm xdebug.ini || return 0 ; fi
+  - phpenv config-rm xdebug.ini || return 0
   - composer self-update
   - if [[ $TEST_COVERAGE == 'true' ]]; then composer require --no-update satooshi/php-coveralls:dev-master ; fi
 
