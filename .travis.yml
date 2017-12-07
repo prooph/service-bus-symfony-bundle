@@ -30,7 +30,7 @@ matrix:
       env: DEPENDENCIES="" EXECUTE_CS_CHECK=true TEST_COVERAGE=true
   exclude:
     - php: 7.2
-      env: DEPENDENCIES="" EXECUTE_CS_CHECK=false TEST_COVERAGE=false
+      env: DEPENDENCIES=""
 
 before_install:
   - phpenv config-rm xdebug.ini || return 0
