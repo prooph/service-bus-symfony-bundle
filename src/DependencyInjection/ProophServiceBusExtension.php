@@ -65,7 +65,6 @@ final class ProophServiceBusExtension extends Extension
      * test/DependencyInjection/Fixture/config files
      *
      * @param string $type
-     * @param string $class
      * @param array $config
      * @param ContainerBuilder $container
      * @param XmlFileLoader $loader

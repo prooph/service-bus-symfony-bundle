@@ -2,5 +2,4 @@ parameters:
     ignoreErrors:
         # Only available in ArrayNodeDefinition which is given
         - '#Call to an undefined method Symfony\\Component\\Config\\Definition\\Builder\\NodeDefinition::fixXmlConfig\(\)\.#'
-        # NamedMessageBuses are always MessageBuses
-        - '#Call to an undefined method Prooph\\Bundle\\ServiceBus\\NamedMessageBus::attach\(\)\.#'
+        - '#Call to an undefined method Symfony\\Component\\Config\\Definition\\Builder\\NodeDefinition::prototype\(\)\.#'
