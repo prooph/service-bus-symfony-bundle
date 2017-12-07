@@ -11,13 +11,26 @@ cache:
     - $HOME/.composer/cache
     - $HOME/.php-cs-fixer
 
+php:
+ - 7.1
+ - 7.2
+
+env:
+  global:
+    - EXECUTE_CS_CHECK=false
+    - TEST_COVERAGE=false
+  matrix:
+    - DEPENDENCIES="--prefer-lowest --prefer-stable"
+    - DEPENDENCIES=""
+
 matrix:
   fast_finish: true
   include:
-    - php: 7.1
-      env: DEPENDENCIES="--prefer-lowest --prefer-stable" EXECUTE_CS_CHECK=false TEST_COVERAGE=false
     - php: 7.2
       env: DEPENDENCIES="" EXECUTE_CS_CHECK=true TEST_COVERAGE=true
+  exclude:
+    - php: 7.2
+      env: DEPENDENCIES="" EXECUTE_CS_CHECK=false TEST_COVERAGE=false
 
 before_install:
   - phpenv config-rm xdebug.ini || return 0
