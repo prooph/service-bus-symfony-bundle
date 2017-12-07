@@ -72,7 +72,7 @@
     "friendsofphp/php-cs-fixer": "~2.0",
     "prooph/php-cs-fixer-config": "^0.2",
     "symfony/framework-bundle": "~3.3|^4.0",
-    "phpstan/phpstan": "^0.8.5"
+    "phpstan/phpstan": "^0.9"
   },
   "minimum-stability": "dev",
   "prefer-stable": true,
