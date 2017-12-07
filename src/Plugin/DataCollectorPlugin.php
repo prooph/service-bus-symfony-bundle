@@ -50,6 +50,12 @@ class DataCollectorPlugin extends DataCollector implements Plugin
         $this->data['duration'] = [];
     }
 
+    public function reset(): void
+    {
+        $this->data['messages'] = [];
+        $this->data['duration'] = [];
+    }
+
     public function collect(Request $request, Response $response, Exception $exception = null)
     {
         foreach ($this->buses as $bus) {

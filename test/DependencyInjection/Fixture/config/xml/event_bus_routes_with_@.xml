@@ -17,6 +17,6 @@
     </config>
 
     <srv:services>
-        <srv:service id="Acme\UserListener" class="ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AcmeUserEventListener" />
+        <srv:service id="Acme\UserListener" class="ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AcmeUserEventListener" public="true"/>
     </srv:services>
 </srv:container>

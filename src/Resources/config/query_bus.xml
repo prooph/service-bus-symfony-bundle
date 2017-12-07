@@ -6,7 +6,7 @@
 
     <services>
         <service id="prooph_service_bus.query_bus" class="Prooph\Bundle\ServiceBus\QueryBus" abstract="true" />
-        <service id="prooph_service_bus.query_bus_router" class="Prooph\ServiceBus\Plugin\Router\QueryRouter" public="false" abstract="true" />
+        <service id="prooph_service_bus.query_bus_router" class="Prooph\ServiceBus\Plugin\Router\QueryRouter" public="true" abstract="true" />
 
         <!--<service id="prooph_service_bus.query_bus.plugin.datacollector_plugin" class="Prooph\Bundle\ServiceBus\Plugin\DataCollectorPlugin">-->
             <!--<argument id="service_container" type="service"/>-->

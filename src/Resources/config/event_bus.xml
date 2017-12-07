@@ -6,7 +6,7 @@
 
     <services>
         <service id="prooph_service_bus.event_bus" class="Prooph\Bundle\ServiceBus\EventBus" abstract="true" />
-        <service id="prooph_service_bus.event_bus_router" class="Prooph\ServiceBus\Plugin\Router\EventRouter" public="false" abstract="true" />
+        <service id="prooph_service_bus.event_bus_router" class="Prooph\ServiceBus\Plugin\Router\EventRouter" public="true" abstract="true" />
 
         <!--<service id="prooph_service_bus.event_bus.plugin.datacollector_plugin" class="Prooph\Bundle\ServiceBus\Plugin\DataCollectorPlugin">-->
             <!--<argument id="service_container" type="service"/>-->

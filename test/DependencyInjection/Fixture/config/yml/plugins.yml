@@ -30,15 +30,18 @@ prooph_service_bus:
 services:
   'global_plugin':
     class: 'ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\GlobalPlugin'
+    public: true
     tags:
       - { name: prooph_service_bus.plugin }
 
   'command_type_plugin':
       class: 'ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\CommandTypePlugin'
+      public: true
       tags:
         - { name: prooph_service_bus.command_bus.plugin }
 
   'main_command_bus_plugin':
       class: 'ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\MainCommandBusPlugin'
+      public: true
       tags:
         - { name: prooph_service_bus.main_command_bus.plugin }

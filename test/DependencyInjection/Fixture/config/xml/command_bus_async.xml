@@ -16,7 +16,7 @@
     </config>
 
     <srv:services>
-        <srv:service id="Acme\RegisterUserHandler" class="ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AcmeRegisterUserHandler" />
-        <srv:service id="async_message_producer" class="ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AsyncMessageProducer" />
+        <srv:service id="Acme\RegisterUserHandler" class="ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AcmeRegisterUserHandler" public="true" />
+        <srv:service id="async_message_producer" class="ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AsyncMessageProducer" public="true" />
     </srv:services>
 </srv:container>

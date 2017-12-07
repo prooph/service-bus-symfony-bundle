@@ -36,13 +36,13 @@
     </config>
 
     <srv:services>
-        <srv:service id="global_plugin" class="ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\GlobalPlugin">
+        <srv:service id="global_plugin" class="ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\GlobalPlugin" public="true">
             <srv:tag name="prooph_service_bus.plugin" />
         </srv:service>
-        <srv:service id="command_type_plugin" class="ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\CommandTypePlugin">
+        <srv:service id="command_type_plugin" class="ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\CommandTypePlugin" public="true">
             <srv:tag name="prooph_service_bus.command_bus.plugin" />
         </srv:service>
-        <srv:service id="main_command_bus_plugin" class="ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\MainCommandBusPlugin">
+        <srv:service id="main_command_bus_plugin" class="ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\MainCommandBusPlugin" public="true">
             <srv:tag name="prooph_service_bus.main_command_bus.plugin" />
         </srv:service>
     </srv:services>
