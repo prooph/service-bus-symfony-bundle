@@ -29,7 +29,7 @@ install:
   - composer info -i
 
 before_script:
-  - if [[ $EXECUTE_CS_CHECK == 'true ]]; then mkdir -p "$HOME/.php-cs-fixer" ; fi
+  - if [[ $EXECUTE_CS_CHECK == 'true' ]]; then mkdir -p "$HOME/.php-cs-fixer" ; fi
 
 script:
   - if [[ $TEST_COVERAGE == 'true' ]]; then php -dzend_extension=xdebug.so ./vendor/bin/phpunit --coverage-text --coverage-clover ./build/logs/clover.xml; else ./vendor/bin/phpunit; fi
