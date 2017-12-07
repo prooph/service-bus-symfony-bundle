@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Prooph\Bundle\ServiceBus\Plugin;
 
+use Prooph\Bundle\ServiceBus\Exception\RuntimeException;
 use Prooph\Bundle\ServiceBus\MessageContext\ContextFactory;
 use Prooph\Bundle\ServiceBus\NamedMessageBus;
 use Prooph\Common\Event\ActionEvent;
 use Prooph\Common\Messaging\Message;
-use Prooph\Bundle\ServiceBus\Exception\RuntimeException;
 use Prooph\ServiceBus\MessageBus;
 use Prooph\ServiceBus\Plugin\AbstractPlugin;
 use Prooph\ServiceBus\QueryBus;

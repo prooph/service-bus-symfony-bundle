@@ -16,7 +16,6 @@ use Prooph\ServiceBus\Exception\MessageDispatchException;
 use Prooph\ServiceBus\MessageBus;
 use Prooph\ServiceBus\QueryBus;
 use ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AcmeRegisterUserCommand;
-use Throwable;
 
 /**
  * @covers \Prooph\Bundle\ServiceBus\Plugin\DataCollectorPlugin
@@ -124,6 +123,7 @@ class DataCollectorPluginTest extends TestCase
     {
         $commandBus = new CommandBus();
         $commandBus->setBusName($name);
+
         return $commandBus;
     }
 
@@ -134,6 +134,7 @@ class DataCollectorPluginTest extends TestCase
             $event->setParam(MessageBus::EVENT_PARAM_MESSAGE_HANDLER, function () {
             });
         }, MessageBus::PRIORITY_ROUTE);
+
         return $commandBus;
     }
 }
