@@ -70,7 +70,7 @@ class DataCollectorPluginTest extends TestCase
         $messageBus = $this->createNamedCommandBusWithDummyHandler();
         $plugin->attachToMessageBus($messageBus);
 
-        $dataCollector->expects($this->never())->method('addDuration');
+        $dataCollector->expects($this->never())->method('addMessage');
         $dataCollector->expects($this->never())->method('addCallstack');
 
         $messageBus->dispatch('message as string');
@@ -84,7 +84,7 @@ class DataCollectorPluginTest extends TestCase
         $messageBus = $this->createNamedCommandBusWithDummyHandler();
         $plugin->attachToMessageBus($messageBus);
 
-        $dataCollector->expects($this->once())->method('addDuration');
+        $dataCollector->expects($this->once())->method('addMessage');
 
         $messageBus->dispatch(new AcmeRegisterUserCommand([]));
     }

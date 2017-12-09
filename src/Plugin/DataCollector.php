@@ -24,6 +24,7 @@ class DataCollector extends BaseDataCollector
         $this->data['bus_type'] = $busType;
         $this->data['messages'] = [];
         $this->data['duration'] = [];
+        $this->data['message_callstack'] = [];
     }
 
     public function collect(Request $request, Response $response, Exception $exception = null): void
@@ -39,6 +40,7 @@ class DataCollector extends BaseDataCollector
     {
         $this->data['messages'] = [];
         $this->data['duration'] = [];
+        $this->data['message_callstack'] = [];
         $this->busNames = [];
     }
 
@@ -92,9 +94,9 @@ class DataCollector extends BaseDataCollector
         $this->busNames[] = $busName;
     }
 
-    public function addDuration(string $busName, int $duration, string $messageId, array $data): void
+    public function addMessage(string $busName, int $totalBusDuration, string $messageId, array $data): void
     {
-        $this->data['duration'][$busName] = $duration;
+        $this->data['duration'][$busName] = $totalBusDuration;
         $this->data['messages'][$busName][$messageId] = $data;
     }
 

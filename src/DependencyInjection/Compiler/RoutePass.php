@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Prooph\Bundle\ServiceBus\DependencyInjection\Compiler;
 
 use Prooph\Bundle\ServiceBus\DependencyInjection\ProophServiceBusExtension;
