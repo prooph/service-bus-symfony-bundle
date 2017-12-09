@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace ProophTest\Bundle\ServiceBus\Plugin;
 
-use Prooph\Bundle\ServiceBus\Plugin\DataCollector;
 use PHPUnit\Framework\TestCase;
+use Prooph\Bundle\ServiceBus\Plugin\DataCollector;
 use ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AcmeRegisterUserCommand;
 use ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AcmeRegisterUserHandler;
 use Symfony\Component\DependencyInjection\Container;
@@ -118,7 +118,7 @@ class DataCollectorTest extends TestCase
         $log = [
             'id' => 'message-5',
             'message' => AcmeRegisterUserCommand::class,
-            'handler' => AcmeRegisterUserHandler::class
+            'handler' => AcmeRegisterUserHandler::class,
         ];
 
         $collector = new DataCollector(new Container(), 'command');
@@ -142,7 +142,7 @@ class DataCollectorTest extends TestCase
         $log = [
             'id' => 'message-5',
             'message' => AcmeRegisterUserCommand::class,
-            'handler' => AcmeRegisterUserHandler::class
+            'handler' => AcmeRegisterUserHandler::class,
         ];
         $collector = new DataCollector(new Container(), 'command');
         $collector->addCallstack('default_command_bus', $log);

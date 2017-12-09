@@ -11,7 +11,6 @@ declare(strict_types=1);
 
 namespace Prooph\Bundle\ServiceBus\DependencyInjection;
 
-use function class_exists;
 use Prooph\Bundle\ServiceBus\NamedMessageBus;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ChildDefinition;
