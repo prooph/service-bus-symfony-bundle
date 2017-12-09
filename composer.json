@@ -74,6 +74,10 @@
     "symfony/framework-bundle": "~3.3|^4.0",
     "phpstan/phpstan": "^0.9"
   },
+  "suggest": {
+      "symfony/stopwatch": "~3.3|^4.0",
+      "symfony/framework-bundle": "~3.3|^4.0"
+  },
   "minimum-stability": "dev",
   "prefer-stable": true,
   "extra": {

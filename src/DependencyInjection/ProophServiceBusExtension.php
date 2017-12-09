@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Prooph\Bundle\ServiceBus\DependencyInjection;
 
+use function class_exists;
 use Prooph\Bundle\ServiceBus\NamedMessageBus;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ChildDefinition;
@@ -19,6 +20,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
  * Defines and load message bus instances.
@@ -80,7 +82,7 @@ final class ProophServiceBusExtension extends Extension
         $container->setParameter("prooph_service_bus.{$type}_buses", $serviceBuses);
 
         // Add DataCollector
-        if ($type !== 'query' && $container->getParameter('kernel.debug')) {
+        if ($type !== 'query' && $container->getParameter('kernel.debug') && class_exists(Stopwatch::class)) {
             $container
                 ->setDefinition(
                     sprintf('prooph_service_bus.plugin.symfony_data_collector.%s_bus', $type),
@@ -142,7 +144,7 @@ final class ProophServiceBusExtension extends Extension
             ->addArgument(new Reference($options['message_data_converter']));
 
         // Collecting data for each configured service bus
-        if ($type !== 'query' && $container->getParameter('kernel.debug')) {
+        if ($type !== 'query' && $container->getParameter('kernel.debug') && class_exists(Stopwatch::class)) {
             $container
                 ->setDefinition(
                     sprintf('%s.plugin.data_collector', $serviceBusId),

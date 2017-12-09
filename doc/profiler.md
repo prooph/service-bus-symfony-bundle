@@ -11,7 +11,7 @@ For most of them you will need access to the Symfony Profiler, so please ensure 
 The DataCollectorPlugin gathers data about the dispatched messages and shows them in an extra section within
 the Symfony Profiler.
 There is one profiler for the command- and one for the event-buses
-and both are automatically enabled if `kernel.debug` is `true`.
+and both are automatically enabled if `kernel.debug` is `true` and `symfony/stopwach` is installed.
 
 ![Example of a timeline with a command and an event](profiler_data_collector_sections.png)
 
@@ -28,7 +28,7 @@ You can find the logged messages either in the *Logs* section of the Symfony Pro
 ### StopwatchPlugin
 
 The StopwatchPlugin is automatically enabled if `kernel.debug` is `true`
-(which is the case e.g. in the `dev` environment).
+(which is the case e.g. in the `dev` environment) and `symfony/framework-bundle` is installed.
 It times the execution time of your command- and event-handlers.
 The collected data are shown within the *Performance* section of the Symfony Profiler.
 
