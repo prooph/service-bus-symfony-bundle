@@ -27,7 +27,7 @@ class DataCollectorPlugin extends DataCollector implements Plugin
     protected $listenerHandlers = [];
 
     /**
-     * @var array
+     * @var MessageBus[]&NamedMessageBus[]
      */
     private $buses = [];
 
@@ -46,6 +46,12 @@ class DataCollectorPlugin extends DataCollector implements Plugin
         $this->stopwatch = new Stopwatch();
         $this->container = $container;
         $this->data['bus_type'] = $busType;
+        $this->data['messages'] = [];
+        $this->data['duration'] = [];
+    }
+
+    public function reset(): void
+    {
         $this->data['messages'] = [];
         $this->data['duration'] = [];
     }
@@ -116,7 +122,7 @@ class DataCollectorPlugin extends DataCollector implements Plugin
             ));
         }
         $this->listenerHandlers[] = $messageBus->attach(MessageBus::EVENT_DISPATCH, function (ActionEvent $actionEvent) {
-            /* @var $target NamedMessageBus Is ensured above */
+            /** @var NamedMessageBus $target Is ensured above */
             $target = $actionEvent->getTarget();
             $busName = $target->busName();
             $message = $actionEvent->getParam(MessageBus::EVENT_PARAM_MESSAGE);
@@ -133,7 +139,7 @@ class DataCollectorPlugin extends DataCollector implements Plugin
         }, MessageBus::PRIORITY_INVOKE_HANDLER + 100);
 
         $this->listenerHandlers[] = $messageBus->attach(MessageBus::EVENT_FINALIZE, function (ActionEvent $actionEvent) {
-            /* @var $messageBus NamedMessageBus Is ensured above */
+            /** @var NamedMessageBus $messageBus Is ensured above */
             $messageBus = $actionEvent->getTarget();
             $busName = $messageBus->busName();
             $message = $actionEvent->getParam(MessageBus::EVENT_PARAM_MESSAGE);
@@ -148,7 +154,7 @@ class DataCollectorPlugin extends DataCollector implements Plugin
         }, MessageBus::PRIORITY_INVOKE_HANDLER - 100);
 
         $this->listenerHandlers[] = $messageBus->attach(MessageBus::EVENT_DISPATCH, function (ActionEvent $actionEvent) {
-            /* @var $messageBus NamedMessageBus Is ensured above */
+            /** @var NamedMessageBus $messageBus Is ensured above */
             $messageBus = $actionEvent->getTarget();
             $message = $actionEvent->getParam(MessageBus::EVENT_PARAM_MESSAGE);
             $messageName = $actionEvent->getParam(MessageBus::EVENT_PARAM_MESSAGE_NAME);
@@ -181,7 +187,7 @@ class DataCollectorPlugin extends DataCollector implements Plugin
 
     protected function createContextFromActionEvent(ActionEvent $event): array
     {
-        /* @var $messageBus NamedMessageBus Is ensured above */
+        /** @var NamedMessageBus $messageBus Is ensured above */
         $messageBus = $event->getTarget();
         $message = $event->getParam(MessageBus::EVENT_PARAM_MESSAGE);
         $handler = $event->getParam(MessageBus::EVENT_PARAM_MESSAGE_HANDLER);

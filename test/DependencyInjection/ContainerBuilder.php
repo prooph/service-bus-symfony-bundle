@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace ProophTest\Bundle\ServiceBus\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveDefinitionTemplatesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder as SymfonyContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
@@ -98,7 +99,11 @@ class ContainerBuilder
         // array_walk is impossible here because the key will be passed as second parameter
         array_map([$container, 'addCompilerPass'], $this->compilerPasses);
 
-        $container->getCompilerPassConfig()->setOptimizationPasses([new ResolveDefinitionTemplatesPass()]);
+        if (class_exists(ResolveChildDefinitionsPass::class)) {
+            $container->getCompilerPassConfig()->setOptimizationPasses([new ResolveChildDefinitionsPass()]);
+        } else {
+            $container->getCompilerPassConfig()->setOptimizationPasses([new ResolveDefinitionTemplatesPass()]);
+        }
         $container->getCompilerPassConfig()->setRemovingPasses([]);
         $container->compile();
 

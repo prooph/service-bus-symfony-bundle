@@ -65,7 +65,6 @@ final class ProophServiceBusExtension extends Extension
      * test/DependencyInjection/Fixture/config files
      *
      * @param string $type
-     * @param string $class
      * @param array $config
      * @param ContainerBuilder $container
      * @param XmlFileLoader $loader
@@ -124,6 +123,7 @@ final class ProophServiceBusExtension extends Extension
             $serviceBusId,
             new ChildDefinition('prooph_service_bus.' . $type . '_bus')
         );
+        $serviceBusDefinition->setPublic(true);
         if (in_array(NamedMessageBus::class, class_implements($container->getDefinition('prooph_service_bus.'.$type.'_bus')->getClass()))) {
             $serviceBusDefinition->addMethodCall('setBusName', [$name]);
             $serviceBusDefinition->addMethodCall('setBusType', [$type]);

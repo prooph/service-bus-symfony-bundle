@@ -13,3 +13,4 @@ prooph_service_bus:
 services:
   Acme\UserListener:
     class: ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AcmeUserEventListener
+    public: true

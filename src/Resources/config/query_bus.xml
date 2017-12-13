@@ -6,14 +6,6 @@
 
     <services>
         <service id="prooph_service_bus.query_bus" class="Prooph\Bundle\ServiceBus\QueryBus" abstract="true" />
-        <service id="prooph_service_bus.query_bus_router" class="Prooph\ServiceBus\Plugin\Router\QueryRouter" public="false" abstract="true" />
-
-        <!--<service id="prooph_service_bus.query_bus.plugin.datacollector_plugin" class="Prooph\Bundle\ServiceBus\Plugin\DataCollectorPlugin">-->
-            <!--<argument id="service_container" type="service"/>-->
-            <!--<argument>query</argument>-->
-            <!--<tag name="prooph_service_bus.query_bus.plugin" />-->
-            <!--<tag name="data_collector" id="prooph.query_bus" template="ProophServiceBusBundle:Collector:debug_view.html.twig"/>-->
-        <!--</service>-->
-
+        <service id="prooph_service_bus.query_bus_router" class="Prooph\ServiceBus\Plugin\Router\QueryRouter" public="true" abstract="true" />
     </services>
 </container>

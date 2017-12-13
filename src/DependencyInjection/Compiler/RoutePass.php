@@ -92,7 +92,7 @@ class RoutePass implements CompilerPassInterface
         string $routeId,
         string $busType
     ): array {
-        /* @var $routeClass string Help phpstan */
+        /** @var string $routeClass Help phpstan */
         $routeClass = $routeDefinition->getClass();
         $handlerReflection = $container->getReflectionClass($routeClass);
         if (! $handlerReflection) {
