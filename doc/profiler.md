@@ -11,7 +11,7 @@ For most of them you will need access to the Symfony Profiler, so please ensure 
 The DataCollectorPlugin gathers data about the dispatched messages and shows them in an extra section within
 the Symfony Profiler.
 There is one profiler for the command- and one for the event-buses
-and both are automatically enabled if `kernel.debug` is `true` and `symfony/stopwach` is installed.
+and both are automatically enabled if `kernel.debug` is `true` and `symfony/stopwatch` is installed.
 
 ![Example of a timeline with a command and an event](profiler_data_collector_sections.png)
 
