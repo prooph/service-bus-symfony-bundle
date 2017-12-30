@@ -10,6 +10,10 @@ prooph_service_bus:
         acme_command_bus:
             # Service ID of the message factory
             message_factory: 'prooph_service_bus.message_factory'
+            # Service ID of the message data converter
+            message_data_converter: 'prooph_service_bus.message_data_converter'
+            # Service ID of the message converter
+            message_converter: 'prooph_service_bus.message_converter'
             router:
                 # Service ID of the async message producer e.g. for Amazon AWS SQS
                 async_switch: 'my_async_message_producer'
@@ -29,6 +33,10 @@ prooph_service_bus:
         acme_event_bus:
             # Service ID of the message factory
             message_factory: 'prooph_service_bus.message_factory'
+            # Service ID of the message data converter
+            message_data_converter: 'prooph_service_bus.message_data_converter'
+            # Service ID of the message converter
+            message_converter: 'prooph_service_bus.message_converter'
             router:
                 # Service ID of the async message producer e.g. for Amazon AWS SQS
                 async_switch: 'my_async_message_producer'
