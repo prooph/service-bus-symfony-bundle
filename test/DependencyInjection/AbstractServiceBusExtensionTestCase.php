@@ -460,6 +460,16 @@ abstract class AbstractServiceBusExtensionTestCase extends TestCase
         self::assertNotHasPlugin(StopwatchPlugin::class, $container->get('prooph_service_bus.main_command_bus'));
     }
 
+    /** @test */
+    public function it_forces_handlers_to_be_public(): void
+    {
+        $container = $this->loadContainer('command_bus_private_handler', new RoutePass());
+        $this->assertTrue(
+            $container->getDefinition('Acme\\RegisterUserHandler')->isPublic(),
+            'Handler is not public but should'
+        );
+    }
+
     private function loadContainer($fixture, CompilerPassInterface ...$compilerPasses): ContainerBuilder
     {
         return $this->buildContainer()
