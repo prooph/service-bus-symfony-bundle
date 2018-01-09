@@ -47,6 +47,7 @@ class RoutePass implements CompilerPassInterface
                 $handlers = $container->findTaggedServiceIds(sprintf('prooph_service_bus.%s.route_target', $name));
 
                 foreach ($handlers as $id => $args) {
+                    $container->getDefinition($id)->setPublic(true);
                     // Safeguard to have only one tag per command / query
                     if ($type !== 'event' && count($args) > 1) {
                         throw CompilerPassException::tagCountExceeded($type, $id, $bus);
