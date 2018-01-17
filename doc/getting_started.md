@@ -81,7 +81,7 @@ services:
     Acme\Command\RegisterUserHandler:
         public: true
         tags:
-            - { name: 'prooph_service_bus.acme_command_bus.route_target' }
+            - { name: 'prooph_service_bus.acme_command_bus.route_target', message_detection: true }
 ```
 
 Now we are ready to dispatch our command.
