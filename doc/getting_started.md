@@ -71,15 +71,15 @@ We will define the command handler as a regular service in Symfony:
 ```yaml
 # app/config/services.yml or (flex) config/packages/prooph_service_bus.yaml
 services:
-    acme.command.register_user_handler:
-        class: Acme\Command\RegisterUserHandler
+    Acme\Command\RegisterUserHandler:
+        public: true
 ```
 
 To route the command `Acme\Command\RegisterUser` to this service, we just need to add a tag to this definition:
 ```yaml
 services:
-    acme.command.register_user_handler:
-        class: Acme\Command\RegisterUserHandler
+    Acme\Command\RegisterUserHandler:
+        public: true
         tags:
             - { name: 'prooph_service_bus.acme_command_bus.route_target' }
 ```
