@@ -10,8 +10,8 @@ The basis for both ways is the service definition of the handler
 ```yaml
 # app/config/services.yml
 services:
-    acme.command.register_user_handler:
-        class: Acme\Command\RegisterUserHandler
+    Acme\Command\RegisterUserHandler:
+        public: true
 ```
 
 and a configured message bus:
@@ -32,8 +32,8 @@ To route a message to a specific handler, we just need to add a tag to its servi
 ```yaml
 # app/config/services.yml
 services:
-    acme.command.register_user_handler:
-        class: Acme\Command\RegisterUserHandler
+    Acme\Command\RegisterUserHandler:
+        public: true
         tags:
             - { name: 'prooph_service_bus.acme_command_bus.route_target', message: Acme\Command\RegisterUser }
 ```
@@ -54,8 +54,8 @@ Instead of defining the `message` attribute add a `message_detection` attribute:
 ```yaml
 # app/config/services.yml
 services:
-    acme.command.register_user_handler:
-        class: Acme\Command\RegisterUserHandler
+    Acme\Command\RegisterUserHandler:
+        public: true
         tags:
             - { name: 'prooph_service_bus.acme_command_bus.route_target', message_detection: true }
 ```
