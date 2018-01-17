@@ -17,6 +17,6 @@
     </config>
 
     <srv:services>
-        <srv:service id="Acme\RegisterUserHandler" class="ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AcmeRegisterUserHandler" public="true" />
+        <srv:service id="Acme\RegisterUserHandler" class="ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AcmeRegisterUserHandler" />
     </srv:services>
 </srv:container>
