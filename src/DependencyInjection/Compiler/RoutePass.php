@@ -13,6 +13,7 @@ use ReflectionMethod;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 
 class RoutePass implements CompilerPassInterface
 {
@@ -43,11 +44,13 @@ class RoutePass implements CompilerPassInterface
             foreach ($buses as $name => $bus) {
                 $router = $container->findDefinition(sprintf('prooph_service_bus.%s.router', $name));
                 $routerArguments = $router->getArguments();
+                $serviceLocator = $container->findDefinition(sprintf('%s.plugin.service_locator.locator', $name));
+                $serviceLocatorServices = $serviceLocator->getArgument(0);
 
                 $handlers = $container->findTaggedServiceIds(sprintf('prooph_service_bus.%s.route_target', $name));
 
                 foreach ($handlers as $id => $args) {
-                    $container->getDefinition($id)->setPublic(true);
+                    $serviceLocatorServices[$id] = new Reference($id);
                     // Safeguard to have only one tag per command / query
                     if ($type !== 'event' && count($args) > 1) {
                         throw CompilerPassException::tagCountExceeded($type, $id, $bus);
@@ -76,6 +79,7 @@ class RoutePass implements CompilerPassInterface
                     }
                 }
                 $router->setArguments($routerArguments);
+                $serviceLocator->setArgument(0, $serviceLocatorServices);
 
                 // Update route configuration parameter
                 $configId = sprintf('prooph_service_bus.%s.configuration', $name);

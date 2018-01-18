@@ -34,6 +34,7 @@ use ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AcmeUserWasRe
 use ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\MockPlugin;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\Dumper;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
@@ -453,7 +454,7 @@ abstract class AbstractServiceBusExtensionTestCase extends TestCase
             ->withConfigFiles('stopwatch', 'framework_bundle')
             ->withExtensions(new ProophServiceBusExtension(), new FrameworkExtension())
             ->withParameters(['kernel.debug' => false, 'kernel.container_class' => 'srcDevDebugProjectContainer'])
-            ->withCompilerPasses(new StopwatchPass(), new PluginsPass())
+            ->withCompilerPasses(new StopwatchPass(), new PluginsPass(), new ServiceLocatorTagPass())
             ->compile();
 
         self::assertFalse($container->hasDefinition('prooph_service_bus.plugin.stopwatch'));
@@ -463,10 +464,10 @@ abstract class AbstractServiceBusExtensionTestCase extends TestCase
     /** @test */
     public function it_allows_private_handlers(): void
     {
-        $container = $this->loadContainer('command_bus_private_handler', new RoutePass());
+        $container = $this->loadContainer('command_bus_private_handler', new RoutePass(), new PluginsPass());
         $container->get('prooph_service_bus.main_command_bus')->dispatch(new AcmeRegisterUserCommand());
         $this->assertFalse(
-            $container->hasDefinition('Acme\\RegisterUserHandler'),
+            $container->getDefinition('Acme\\RegisterUserHandler')->isPublic(),
             'Handler is public but should not'
         );
     }
@@ -477,6 +478,7 @@ abstract class AbstractServiceBusExtensionTestCase extends TestCase
             ->withExtensions(new ProophServiceBusExtension())
             ->withConfigFiles($fixture)
             ->withCompilerPasses(...$compilerPasses)
+            ->withCompilerPasses(new ServiceLocatorTagPass())
             ->compile();
     }
 
