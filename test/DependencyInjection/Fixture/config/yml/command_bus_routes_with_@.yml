@@ -13,4 +13,3 @@ prooph_service_bus:
 services:
   'Acme\RegisterUserHandler':
     class: ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AcmeRegisterUserHandler
-    public: true

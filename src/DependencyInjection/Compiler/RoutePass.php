@@ -43,6 +43,16 @@ class RoutePass implements CompilerPassInterface
             foreach ($buses as $name => $bus) {
                 $router = $container->findDefinition(sprintf('prooph_service_bus.%s.router', $name));
                 $routerArguments = $router->getArguments();
+                /** @var string[] $handlers */
+                $handlers = $routerArguments[0];
+                foreach ($handlers as $eachHandlers) {
+                    $eachHandlers = (array) $eachHandlers;
+                    foreach ($eachHandlers as $eachHandler) {
+                        if ($container->has($eachHandler)) {
+                            $container->getDefinition($eachHandler)->setPublic(true);
+                        }
+                    }
+                }
 
                 $handlers = $container->findTaggedServiceIds(sprintf('prooph_service_bus.%s.route_target', $name));
 
