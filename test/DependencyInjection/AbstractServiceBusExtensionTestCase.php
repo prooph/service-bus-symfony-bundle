@@ -461,12 +461,13 @@ abstract class AbstractServiceBusExtensionTestCase extends TestCase
     }
 
     /** @test */
-    public function it_forces_handlers_to_be_public(): void
+    public function it_allows_private_handlers(): void
     {
         $container = $this->loadContainer('command_bus_private_handler', new RoutePass());
-        $this->assertTrue(
-            $container->getDefinition('Acme\\RegisterUserHandler')->isPublic(),
-            'Handler is not public but should'
+        $container->get('prooph_service_bus.main_command_bus')->dispatch(new AcmeRegisterUserCommand());
+        $this->assertFalse(
+            $container->hasDefinition('Acme\\RegisterUserHandler'),
+            'Handler is public but should not'
         );
     }
 
