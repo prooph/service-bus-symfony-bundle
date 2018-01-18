@@ -10,6 +10,5 @@ prooph_service_bus:
 services:
   Acme\UserListener:
     class: ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AcmeUserEventListener
-    public: true
     tags:
       - { name: 'prooph_service_bus.main_event_bus.route_target', message_detection: true }
