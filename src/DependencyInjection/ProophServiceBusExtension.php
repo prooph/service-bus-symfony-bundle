@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Stopwatch\Stopwatch;
 
@@ -202,10 +203,24 @@ final class ProophServiceBusExtension extends Extension
             $container->setDefinition($routerId, $routerDefinition);
         }
 
-        //Attach container plugin
-        $containerPluginId = 'prooph_service_bus.plugin.service_locator';
-        $containerPluginDefinition = $container->getDefinition($containerPluginId);
-        $containerPluginDefinition->addTag(sprintf('prooph_service_bus.%s.plugin', $name));
+        // define service locator
+        $routeTargets = array_values($options['router']['routes'] ?? []);
+        if ($type === 'event') {
+            $routeTargets = array_merge([], ...$routeTargets);
+        }
+        $routeTargets = array_unique($routeTargets);
+        $serviceLocatorId = sprintf('%s.plugin.service_locator.locator', $name);
+        $serviceLocator = $container->register($serviceLocatorId, ServiceLocator::class);
+        $serviceLocator->addTag('container.service_locator');
+        $serviceLocator->setArgument(0, array_map(function (string $id) {
+            return new Reference($id);
+        }, array_combine($routeTargets, $routeTargets)));
+
+        // and the plugin for it
+        $serviceLocatorPlugin = new ChildDefinition('prooph_service_bus.plugin.service_locator');
+        $serviceLocatorPlugin->setArgument(0, new Reference($serviceLocatorId));
+        $serviceLocatorPlugin->addTag(sprintf('prooph_service_bus.%s.plugin', $name));
+        $container->setDefinition(sprintf('%s.plugin.service_locator', $name), $serviceLocatorPlugin);
 
         $container->setParameter(sprintf('prooph_service_bus.%s.configuration', $name), $options);
     }
