@@ -7,7 +7,6 @@ namespace Prooph\Bundle\ServiceBus\DependencyInjection\Compiler;
 use Prooph\Bundle\ServiceBus\DependencyInjection\ProophServiceBusExtension;
 use Prooph\Bundle\ServiceBus\Exception\CompilerPassException;
 use Prooph\Common\Messaging\HasMessageName;
-use Prooph\Common\Messaging\Message;
 use ReflectionClass;
 use ReflectionMethod;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -17,11 +16,8 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class RoutePass implements CompilerPassInterface
 {
-    private static function tryToDetectMessageName(ReflectionClass $messageReflection): ?string
+    private static function detectMessageName(ReflectionClass $messageReflection): ?string
     {
-        if (! $messageReflection->implementsInterface(HasMessageName::class)) {
-            return null;
-        }
         $instance = $messageReflection->newInstanceWithoutConstructor(); /* @var $instance HasMessageName */
         if ($messageReflection->hasMethod('init')) {
             $init = $messageReflection->getMethod('init');
@@ -110,13 +106,13 @@ class RoutePass implements CompilerPassInterface
             function (ReflectionMethod $method) {
                 return ($method->getNumberOfRequiredParameters() === 1 || $method->getNumberOfRequiredParameters() === 2)
                     && $method->getParameters()[0]->getClass()
-                    && $method->getParameters()[0]->getClass()->getName() !== Message::class
-                    && $method->getParameters()[0]->getClass()->implementsInterface(Message::class);
+                    && $method->getParameters()[0]->getClass()->implementsInterface(HasMessageName::class)
+                    && $method->getParameters()[0]->getClass()->isInstantiable();
             }
         );
 
-        return array_filter(array_unique(array_map(function (ReflectionMethod $method) {
-            return self::tryToDetectMessageName($method->getParameters()[0]->getClass());
-        }, $methodsWithMessageParameter)));
+        return array_unique(array_map(function (ReflectionMethod $method) {
+            return self::detectMessageName($method->getParameters()[0]->getClass());
+        }, $methodsWithMessageParameter));
     }
 }
