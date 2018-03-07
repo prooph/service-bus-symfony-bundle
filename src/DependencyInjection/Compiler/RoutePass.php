@@ -8,7 +8,6 @@ use Prooph\Bundle\ServiceBus\DependencyInjection\ProophServiceBusExtension;
 use Prooph\Bundle\ServiceBus\Exception\CompilerPassException;
 use Prooph\Common\Messaging\HasMessageName;
 use Prooph\Common\Messaging\Message;
-use Prooph\ServiceBus\Plugin\Router\AsyncSwitchMessageRouter;
 use ReflectionClass;
 use ReflectionMethod;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
