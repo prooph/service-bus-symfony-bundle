@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
 class RoutePass implements CompilerPassInterface
 {
@@ -43,13 +44,13 @@ class RoutePass implements CompilerPassInterface
             $buses = $container->getParameter('prooph_service_bus.' . $type . '_buses');
 
             foreach ($buses as $name => $bus) {
-                $router = $container->findDefinition(sprintf('prooph_service_bus.%s.router', $name));
-                $routerArguments = $router->getArguments();
-                if ($router->getClass() == AsyncSwitchMessageRouter::class) {
-                    $router = $container->findDefinition((string) $routerArguments[0]);
-                    $routerArguments = $router->getArguments();
+                try {
+                    $router = $container->findDefinition(sprintf('prooph_service_bus.%s.decorated_router', $name));
+                } catch (ServiceNotFoundException $exception) {
+                    $router = $container->findDefinition(sprintf('prooph_service_bus.%s.router', $name));
                 }
 
+                $routerArguments = $router->getArguments();
                 $serviceLocator = $container->findDefinition(sprintf('%s.plugin.service_locator.locator', $name));
                 $serviceLocatorServices = $serviceLocator->getArgument(0);
 
