@@ -8,6 +8,7 @@ use Prooph\Bundle\ServiceBus\DependencyInjection\ProophServiceBusExtension;
 use Prooph\Bundle\ServiceBus\Exception\CompilerPassException;
 use Prooph\Common\Messaging\HasMessageName;
 use Prooph\Common\Messaging\Message;
+use Prooph\ServiceBus\Plugin\Router\AsyncSwitchMessageRouter;
 use ReflectionClass;
 use ReflectionMethod;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -44,6 +45,11 @@ class RoutePass implements CompilerPassInterface
             foreach ($buses as $name => $bus) {
                 $router = $container->findDefinition(sprintf('prooph_service_bus.%s.router', $name));
                 $routerArguments = $router->getArguments();
+                if ($router->getClass() == AsyncSwitchMessageRouter::class) {
+                    $router = $container->findDefinition((string) $routerArguments[0]);
+                    $routerArguments = $router->getArguments();
+                }
+
                 $serviceLocator = $container->findDefinition(sprintf('%s.plugin.service_locator.locator', $name));
                 $serviceLocatorServices = $serviceLocator->getArgument(0);
 
