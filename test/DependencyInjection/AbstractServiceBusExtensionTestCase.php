@@ -414,6 +414,27 @@ abstract class AbstractServiceBusExtensionTestCase extends TestCase
     /**
      * @test
      */
+    public function it_creates_a_event_bus_with_async_switch_message_router()
+    {
+        $container = $this->loadContainer('event_bus_async', new PluginsPass(), new RoutePass());
+
+        $config = $container->getDefinition('prooph_service_bus.event_bus_async');
+
+        self::assertEquals(EventBus::class, $config->getClass());
+
+        /* @var $eventBus EventBus */
+        $eventBus = $container->get('prooph_service_bus.event_bus_async');
+
+        self::assertInstanceOf(EventBus::class, $eventBus);
+
+        $router = $container->get('prooph_service_bus.event_bus_async.router');
+
+        self::assertInstanceOf(AsyncSwitchMessageRouter::class, $router);
+    }
+
+    /**
+     * @test
+     */
     public function it_dumps_async_switch_command_bus()
     {
         $this->dump('command_bus_async');

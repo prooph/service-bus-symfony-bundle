@@ -1,0 +1,18 @@
+prooph_service_bus:
+  event_buses:
+    event_bus_async:
+      plugins:
+        - 'prooph_service_bus.on_event_invoke_strategy'
+      message_factory: 'prooph_service_bus.message_factory'
+      router:
+        async_switch: 'async_message_producer'
+        type: 'prooph_service_bus.event_bus_router'
+
+services:
+  Acme\UserListener:
+    class: ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AcmeUserEventListener
+    tags:
+      - { name: 'prooph_service_bus.main_event_bus.route_target', message_detection: true }
+  'async_message_producer':
+    class: ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AsyncMessageProducer
+    public: true
