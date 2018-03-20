@@ -414,7 +414,7 @@ abstract class AbstractServiceBusExtensionTestCase extends TestCase
     /**
      * @test
      */
-    public function it_creates_a_event_bus_with_async_switch_message_router()
+    public function it_creates_an_event_bus_with_async_switch_message_router()
     {
         $container = $this->loadContainer('event_bus_async', new PluginsPass(), new RoutePass());
 
