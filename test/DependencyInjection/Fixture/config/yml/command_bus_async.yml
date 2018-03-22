@@ -3,12 +3,12 @@ prooph_service_bus:
     command_bus_async:
       router:
         async_switch: 'async_message_producer'
-        routes:
-          'Acme\RegisterUser': 'Acme\RegisterUserHandler'
 
 services:
   'Acme\RegisterUserHandler':
      class: ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AcmeRegisterUserHandler
+     tags:
+       - { name: 'prooph_service_bus.command_bus_async.route_target', message_detection: true }
   'async_message_producer':
      class: ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AsyncMessageProducer
      public: true
