@@ -83,7 +83,8 @@ class DataCollectorPlugin extends AbstractPlugin
             $data = $this->contextFactory->createFromActionEvent($actionEvent);
             $data['duration'] = $this->stopwatch->stop($uuid)->getDuration();
 
-            $this->data->addMessage($busName, $this->stopwatch->lap($busName)->getDuration(), $uuid, $data);
+            // int casting is possible because the stopwatch is created with less precision
+            $this->data->addMessage($busName, (int) $this->stopwatch->lap($busName)->getDuration(), $uuid, $data);
         }, MessageBus::PRIORITY_INVOKE_HANDLER - 100);
 
         $this->listenerHandlers[] = $messageBus->attach(MessageBus::EVENT_DISPATCH, function (ActionEvent $actionEvent) {
