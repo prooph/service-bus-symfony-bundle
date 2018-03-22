@@ -43,7 +43,7 @@ class RoutePass implements CompilerPassInterface
 
             foreach ($buses as $name => $bus) {
                 $routerServiceId = sprintf('prooph_service_bus.%s.decorated_router', $name);
-                if (!$container->has($routerServiceId)) {
+                if (! $container->has($routerServiceId)) {
                     $routerServiceId = sprintf('prooph_service_bus.%s.router', $name);
                 }
                 $router = $container->findDefinition($routerServiceId);
