@@ -19,5 +19,8 @@
         <srv:service id="Acme\RegisterUserHandler" class="ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AcmeRegisterUserHandler" public="true">
             <srv:tag name="prooph_service_bus.main_command_bus.route_target" message_detection="true" />
         </srv:service>
+        <srv:service id="ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\CommandHandlerForCommandWithPrivateConstructor">
+            <srv:tag name="prooph_service_bus.main_command_bus.route_target" message_detection="true" />
+        </srv:service>
     </srv:services>
 </srv:container>

@@ -31,6 +31,7 @@ use ProophTest\Bundle\ServiceBus\DependencyInjection\ContainerBuilder as ProophC
 use ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AcmeRegisterUserCommand;
 use ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AcmeRegisterUserHandler;
 use ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AcmeUserWasRegisteredEvent;
+use ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\CommandWithPrivateConstructor;
 use ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\MockPlugin;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -351,6 +352,9 @@ abstract class AbstractServiceBusExtensionTestCase extends TestCase
         $commandBus->dispatch($command);
 
         self::assertSame($command, $mockHandler->lastCommand());
+
+        // Test whether message detection works on commands with a private constructor
+        $commandBus->dispatch(CommandWithPrivateConstructor::create());
     }
 
     /**
