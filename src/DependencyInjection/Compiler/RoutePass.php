@@ -112,7 +112,9 @@ class RoutePass implements CompilerPassInterface
                 return ($method->getNumberOfRequiredParameters() === 1 || $method->getNumberOfRequiredParameters() === 2)
                     && $method->getParameters()[0]->getClass()
                     && $method->getParameters()[0]->getClass()->implementsInterface(HasMessageName::class)
-                    && $method->getParameters()[0]->getClass()->isInstantiable();
+                    && ! ($method->getParameters()[0]->getClass()->isInterface()
+                        || $method->getParameters()[0]->getClass()->isAbstract()
+                        || $method->getParameters()[0]->getClass()->isTrait());
             }
         );
 
