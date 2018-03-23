@@ -18,6 +18,7 @@ use Prooph\Bundle\ServiceBus\ProophServiceBusBundle;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
+/** @covers \Prooph\Bundle\ServiceBus\ProophServiceBusBundle */
 class BundleTest extends TestCase
 {
     /**

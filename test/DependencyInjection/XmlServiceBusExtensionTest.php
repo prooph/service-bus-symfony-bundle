@@ -15,6 +15,13 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder as SymfonyContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 
+/**
+ * @covers \Prooph\Bundle\ServiceBus\DependencyInjection\Configuration
+ * @covers \Prooph\Bundle\ServiceBus\DependencyInjection\ProophServiceBusExtension
+ * @covers \Prooph\Bundle\ServiceBus\DependencyInjection\Compiler\PluginsPass
+ * @covers \Prooph\Bundle\ServiceBus\DependencyInjection\Compiler\RoutePass
+ * @covers \Prooph\Bundle\ServiceBus\DependencyInjection\Compiler\StopwatchPass
+ */
 class XmlServiceBusExtensionTest extends AbstractServiceBusExtensionTestCase
 {
     protected function buildContainer(): ContainerBuilder

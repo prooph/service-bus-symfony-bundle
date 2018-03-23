@@ -14,6 +14,7 @@ use Prooph\Common\Messaging\Command;
 use Prooph\ServiceBus\MessageBus;
 use Symfony\Component\Stopwatch\Stopwatch;
 
+/** @covers \Prooph\Bundle\ServiceBus\Plugin\StopwatchPlugin */
 class StopwatchPluginTest extends TestCase
 {
     /** @test */

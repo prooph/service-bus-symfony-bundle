@@ -12,9 +12,7 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * @covers \Prooph\Bundle\ServiceBus\Plugin\DataCollector
- */
+/** @covers \Prooph\Bundle\ServiceBus\Plugin\DataCollector */
 class DataCollectorTest extends TestCase
 {
     /** @test */

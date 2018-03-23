@@ -17,9 +17,7 @@ use Prooph\ServiceBus\MessageBus;
 use Prooph\ServiceBus\QueryBus;
 use ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AcmeRegisterUserCommand;
 
-/**
- * @covers \Prooph\Bundle\ServiceBus\Plugin\DataCollectorPlugin
- */
+/** @covers \Prooph\Bundle\ServiceBus\Plugin\DataCollectorPlugin */
 class DataCollectorPluginTest extends TestCase
 {
     /** @test */
