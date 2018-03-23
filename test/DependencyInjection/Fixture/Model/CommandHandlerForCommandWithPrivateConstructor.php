@@ -6,7 +6,7 @@ namespace ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model;
 
 class CommandHandlerForCommandWithPrivateConstructor
 {
-    public function __invoke(CommandWithPrivateConstructor $command): void
+    public function handle(CommandWithPrivateConstructor $command): void
     {
     }
 }
