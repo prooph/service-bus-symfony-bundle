@@ -12,6 +12,9 @@ composer require prooph/service-bus-symfony-bundle
 ```
 at the root of your Symfony project.
 
+> **Important**: If you want to use the query bus, please ensure to also install react/promise via
+> `composer require react/promise`
+
 ## Enable the Bundle
 
 To start using this bundle, register the bundle in your application's kernel class:

@@ -68,3 +68,12 @@ prooph_service_bus:
             # Service IDs of plugins utilized by this query bus
             plugins: []
 ```
+
+## Tags
+
+ - `prooph_service_bus.<message-bus-name>.route_target` with either `message_detection: true`
+   or `message: <message-name>` to route messages.
+ - `prooph_service_bus.<message-bus-name>.plugin` to attach a plugin to a specific bus.
+ - `prooph_service_bus.command_bus.plugin` resp. `prooph_service_bus.query_bus.plugin`
+   resp. `prooph_service_bus.event_bus.plugin` to attach a plugin to every command bus resp. query bus resp. event bus.
+ - `prooph_service_bus.plugin` to attach a plugin to every bus.
