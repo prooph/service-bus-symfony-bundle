@@ -75,6 +75,7 @@
     "phpstan/phpstan": "^0.9"
   },
   "suggest": {
+      "react/promise": "^2.5 for using the query bus",
       "symfony/stopwatch": "~3.3|^4.0",
       "symfony/framework-bundle": "~3.3|^4.0"
   },
