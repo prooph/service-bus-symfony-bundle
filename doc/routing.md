@@ -101,3 +101,24 @@ This is necessary because events can be routed to multiple event handlers.
 
 Which way you choose to configure your routing is up to you.
 Each way has its benefits and drawbacks.
+
+## Async switch
+
+The async switch configuration allows to handle some messages asynchronously.
+For a general introduction into the `AsyncSwitchMessageRouter` please have a look at the [official documentation](http://docs.getprooph.org/service-bus/plugins.html#2-3-1-5).
+
+In short: The `AsyncSwitchMessageRouter` decorates the configured router and sends messages that 
+implement `Prooph\ServiceBus\Async\AsyncMessage` to a special message producer.
+Other messages will be handled by the decorated router.
+
+To use this switch with symfony, configure your own message producer (it must implement `Prooph\ServiceBus\Async\MessageProducer`)
+and pass its service id to the configuration:
+
+```yaml
+# app/config/config.yml or (flex) config/packages/prooph_service_bus.yaml
+prooph_service_bus:
+    command_buses:
+        acme_command_bus:
+            router:
+                async_switch: 'my_async_message_producer'
+```
