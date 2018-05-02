@@ -31,8 +31,10 @@ use ProophTest\Bundle\ServiceBus\DependencyInjection\ContainerBuilder as ProophC
 use ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AcmeRegisterUserCommand;
 use ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AcmeRegisterUserHandler;
 use ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AcmeUserWasRegisteredEvent;
+use ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\CommandHandlerForPopoCommand;
 use ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\CommandWithPrivateConstructor;
 use ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\MockPlugin;
+use ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\PopoCommand;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
@@ -355,6 +357,25 @@ abstract class AbstractServiceBusExtensionTestCase extends TestCase
 
         // Test whether message detection works on commands with a private constructor
         $commandBus->dispatch(CommandWithPrivateConstructor::create());
+    }
+
+    /**
+     * @test
+     */
+    public function it_supports_automatic_message_detection_with_popo_messages_and_invokable_handlers()
+    {
+        $container = $this->loadContainer('command_bus_with_tags', new PluginsPass(), new RoutePass());
+
+        /* @var $commandBus CommandBus */
+        $commandBus = $container->get('prooph_service_bus.main_command_bus');
+
+        /** @var CommandHandlerForPopoCommand $mockHandler */
+        $mockHandler = $container->get(CommandHandlerForPopoCommand::class);
+        $command = new PopoCommand();
+
+        $commandBus->dispatch($command);
+
+        self::assertSame($command, $mockHandler->lastCommand);
     }
 
     /**

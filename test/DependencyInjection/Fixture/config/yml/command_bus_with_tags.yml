@@ -19,3 +19,8 @@ services:
   ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\CommandHandlerForCommandWithPrivateConstructor:
     tags:
       - { name: 'prooph_service_bus.main_command_bus.route_target', message_detection: true }
+
+  ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\CommandHandlerForPopoCommand:
+    public: true
+    tags:
+      - { name: 'prooph_service_bus.main_command_bus.route_target', message_detection: true }
