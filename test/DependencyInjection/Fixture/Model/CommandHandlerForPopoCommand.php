@@ -13,4 +13,13 @@ final class CommandHandlerForPopoCommand
     {
         $this->lastCommand = $command;
     }
+
+    /**
+     * Do not take notice of this method.
+     * It is necessary to run the tests against prooph/service-bus:6.0.0
+     * @see https://github.com/prooph/service-bus/pull/159
+     */
+    public function handle(): void
+    {
+    }
 }
