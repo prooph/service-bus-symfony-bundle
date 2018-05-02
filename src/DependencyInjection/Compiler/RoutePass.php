@@ -18,6 +18,9 @@ class RoutePass implements CompilerPassInterface
 {
     private static function detectMessageName(ReflectionClass $messageReflection): ?string
     {
+        if (! $messageReflection->implementsInterface(HasMessageName::class)) {
+            return $messageReflection->getName();
+        }
         $instance = $messageReflection->newInstanceWithoutConstructor(); /* @var $instance HasMessageName */
         if ($messageReflection->hasMethod('init')) {
             $init = $messageReflection->getMethod('init');
@@ -111,7 +114,8 @@ class RoutePass implements CompilerPassInterface
             function (ReflectionMethod $method) {
                 return ($method->getNumberOfRequiredParameters() === 1 || $method->getNumberOfRequiredParameters() === 2)
                     && $method->getParameters()[0]->getClass()
-                    && $method->getParameters()[0]->getClass()->implementsInterface(HasMessageName::class)
+                    && ($method->getParameters()[0]->getClass()->implementsInterface(HasMessageName::class)
+                        || $method->getName() === '__invoke')
                     && ! ($method->getParameters()[0]->getClass()->isInterface()
                         || $method->getParameters()[0]->getClass()->isAbstract()
                         || $method->getParameters()[0]->getClass()->isTrait());
