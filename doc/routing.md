@@ -63,7 +63,7 @@ But don't worry about performance because this will happen on compiling.
 
 > **Important:** Automatic message detection can only detect handlers where either
 > the message implements `Prooph\Common\Messaging\HasMessageName` or the
-> name of the message is `__invoke`. In both cases the object must be a non abstract class.
+> name of the method is `__invoke`. In both cases the object must be a non abstract class.
 
 > **Hint:** If you rely on automatic message detection and your handler handles multiple messages of the same message bus,
 > you need to tag the handler just once.
