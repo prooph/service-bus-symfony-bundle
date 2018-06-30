@@ -41,22 +41,22 @@ class RoutePass implements CompilerPassInterface
             $buses = $container->getParameter('prooph_service_bus.' . $type . '_buses');
 
             foreach ($buses as $name => $bus) {
-                $routerServiceId = sprintf('prooph_service_bus.%s.decorated_router', $name);
+                $routerServiceId = \sprintf('prooph_service_bus.%s.decorated_router', $name);
                 if (! $container->has($routerServiceId)) {
-                    $routerServiceId = sprintf('prooph_service_bus.%s.router', $name);
+                    $routerServiceId = \sprintf('prooph_service_bus.%s.router', $name);
                 }
                 $router = $container->findDefinition($routerServiceId);
 
                 $routerArguments = $router->getArguments();
-                $serviceLocator = $container->findDefinition(sprintf('%s.plugin.service_locator.locator', $name));
+                $serviceLocator = $container->findDefinition(\sprintf('%s.plugin.service_locator.locator', $name));
                 $serviceLocatorServices = $serviceLocator->getArgument(0);
 
-                $handlers = $container->findTaggedServiceIds(sprintf('prooph_service_bus.%s.route_target', $name));
+                $handlers = $container->findTaggedServiceIds(\sprintf('prooph_service_bus.%s.route_target', $name));
 
                 foreach ($handlers as $id => $args) {
                     $serviceLocatorServices[$id] = new Reference($id);
                     // Safeguard to have only one tag per command / query
-                    if ($type !== 'event' && count($args) > 1) {
+                    if ($type !== 'event' && \count($args) > 1) {
                         throw CompilerPassException::tagCountExceeded($type, $id, $bus);
                     }
                     foreach ($args as $eachArgs) {
@@ -69,15 +69,15 @@ class RoutePass implements CompilerPassInterface
                             : $this->recognizeMessageNames($container, $container->getDefinition($id), $id, $type);
 
                         if ($type === 'event') {
-                            $routerArguments[0] = array_merge_recursive(
+                            $routerArguments[0] = \array_merge_recursive(
                                 $routerArguments[0],
-                                array_combine($messageNames, array_fill(0, count($messageNames), [$id]))
+                                \array_combine($messageNames, \array_fill(0, \count($messageNames), [$id]))
                             );
-                            $routerArguments[0] = array_map('array_unique', $routerArguments[0]);
+                            $routerArguments[0] = \array_map('array_unique', $routerArguments[0]);
                         } else {
-                            $routerArguments[0] = array_merge(
+                            $routerArguments[0] = \array_merge(
                                 $routerArguments[0],
-                                array_combine($messageNames, array_fill(0, count($messageNames), $id))
+                                \array_combine($messageNames, \array_fill(0, \count($messageNames), $id))
                             );
                         }
                     }
@@ -86,10 +86,10 @@ class RoutePass implements CompilerPassInterface
                 $serviceLocator->setArgument(0, $serviceLocatorServices);
 
                 // Update route configuration parameter
-                $configId = sprintf('prooph_service_bus.%s.configuration', $name);
+                $configId = \sprintf('prooph_service_bus.%s.configuration', $name);
 
-                $routes = is_array($routerArguments[0]) ? $routerArguments[0] : [];
-                $config = array_replace($container->getParameter($configId), ['router' => ['routes' => $routes]]);
+                $routes = \is_array($routerArguments[0]) ? $routerArguments[0] : [];
+                $config = \array_replace($container->getParameter($configId), ['router' => ['routes' => $routes]]);
 
                 $container->setParameter($configId, $config);
             }
@@ -109,7 +109,7 @@ class RoutePass implements CompilerPassInterface
             throw CompilerPassException::unknownHandlerClass($routeClass, $routeId, $busType);
         }
 
-        $methodsWithMessageParameter = array_filter(
+        $methodsWithMessageParameter = \array_filter(
             $handlerReflection->getMethods(ReflectionMethod::IS_PUBLIC),
             function (ReflectionMethod $method) {
                 return ($method->getNumberOfRequiredParameters() === 1 || $method->getNumberOfRequiredParameters() === 2)
@@ -122,7 +122,7 @@ class RoutePass implements CompilerPassInterface
             }
         );
 
-        return array_unique(array_map(function (ReflectionMethod $method) {
+        return \array_unique(\array_map(function (ReflectionMethod $method) {
             return self::detectMessageName($method->getParameters()[0]->getClass());
         }, $methodsWithMessageParameter));
     }

@@ -52,7 +52,7 @@ class ContainerBuilder
         $this->parameters = [
             'kernel.debug' => false,
             'kernel.bundles' => [],
-            'kernel.cache_dir' => sys_get_temp_dir(),
+            'kernel.cache_dir' => \sys_get_temp_dir(),
             'kernel.environment' => 'test',
             'kernel.root_dir' => __DIR__ . '/../../src',
         ];
@@ -60,28 +60,28 @@ class ContainerBuilder
 
     public function withParameters(array $parameters): self
     {
-        $this->parameters = array_merge($this->parameters, $parameters);
+        $this->parameters = \array_merge($this->parameters, $parameters);
 
         return $this;
     }
 
     public function withExtensions(ExtensionInterface ...$extensions): self
     {
-        $this->extensions = array_merge($this->extensions, $extensions);
+        $this->extensions = \array_merge($this->extensions, $extensions);
 
         return $this;
     }
 
     public function withCompilerPasses(CompilerPassInterface ...$compilerPasses): self
     {
-        $this->compilerPasses = array_merge($this->compilerPasses, $compilerPasses);
+        $this->compilerPasses = \array_merge($this->compilerPasses, $compilerPasses);
 
         return $this;
     }
 
     public function withConfigFiles(string ...$fileNames): self
     {
-        $this->configFiles = array_merge($this->configFiles, $fileNames);
+        $this->configFiles = \array_merge($this->configFiles, $fileNames);
 
         return $this;
     }
@@ -89,17 +89,17 @@ class ContainerBuilder
     public function compile(): SymfonyContainerBuilder
     {
         $container = new SymfonyContainerBuilder(new ParameterBag($this->parameters));
-        array_walk($this->extensions, [$container, 'registerExtension']);
+        \array_walk($this->extensions, [$container, 'registerExtension']);
 
-        $fileLoader = call_user_func($this->fileLoaderFactory, $container);
-        array_walk($this->configFiles, function (string $fileName) use ($fileLoader) {
+        $fileLoader = \call_user_func($this->fileLoaderFactory, $container);
+        \array_walk($this->configFiles, function (string $fileName) use ($fileLoader) {
             $fileLoader->load("$fileName.{$this->fileExtension}");
         });
 
         // array_walk is impossible here because the key will be passed as second parameter
-        array_map([$container, 'addCompilerPass'], $this->compilerPasses);
+        \array_map([$container, 'addCompilerPass'], $this->compilerPasses);
 
-        if (class_exists(ResolveChildDefinitionsPass::class)) {
+        if (\class_exists(ResolveChildDefinitionsPass::class)) {
             $container->getCompilerPassConfig()->setOptimizationPasses([new ResolveChildDefinitionsPass()]);
         } else {
             $container->getCompilerPassConfig()->setOptimizationPasses([new ResolveDefinitionTemplatesPass()]);

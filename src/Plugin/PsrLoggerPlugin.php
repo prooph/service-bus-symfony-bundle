@@ -36,8 +36,8 @@ class PsrLoggerPlugin extends AbstractPlugin
             $message = 'Dispatching {bus-type} "{message-name}"';
             if ($context['message-handler'] !== null) {
                 $message .= ' to handler "{message-handler}"';
-            } else if (count($context['event-listeners']) > 0) {
-                $context['event-listeners'] = implode(', ', $context['event-listeners']);
+            } elseif (\count($context['event-listeners']) > 0) {
+                $context['event-listeners'] = \implode(', ', $context['event-listeners']);
                 $message .= ' to listeners "{event-listeners}"';
             }
             $this->logger->info($message, $context);

@@ -517,7 +517,7 @@ abstract class AbstractServiceBusExtensionTestCase extends TestCase
         } else {
             $dumper = new YamlDumper($container);
         }
-        self::assertInstanceOf(Dumper::class, $dumper, sprintf('Test type "%s" not supported', get_class($this)));
+        self::assertInstanceOf(Dumper::class, $dumper, \sprintf('Test type "%s" not supported', \get_class($this)));
         self::assertNotEmpty($dumper->dump());
 
         self::assertNotEmpty((new PhpDumper($container))->dump(), 'PHP cache cannot be warmuped correctly.');
@@ -525,7 +525,7 @@ abstract class AbstractServiceBusExtensionTestCase extends TestCase
 
     private static function assertHasPlugin(string $className, CommandBus $bus)
     {
-        $plugins = array_filter(array_column($bus->plugins(), 'plugin'), function (Plugin $plugin) use ($className) {
+        $plugins = \array_filter(\array_column($bus->plugins(), 'plugin'), function (Plugin $plugin) use ($className) {
             return $plugin instanceof $className;
         });
         self::assertCount(1, $plugins, "No plugin of class $className has been attached");
@@ -533,7 +533,7 @@ abstract class AbstractServiceBusExtensionTestCase extends TestCase
 
     private static function assertNotHasPlugin(string $className, CommandBus $bus)
     {
-        $plugins = array_filter(array_column($bus->plugins(), 'plugin'), function (Plugin $plugin) use ($className) {
+        $plugins = \array_filter(\array_column($bus->plugins(), 'plugin'), function (Plugin $plugin) use ($className) {
             return $plugin instanceof $className;
         });
         self::assertCount(0, $plugins, "A plugin of class $className has been attached");
