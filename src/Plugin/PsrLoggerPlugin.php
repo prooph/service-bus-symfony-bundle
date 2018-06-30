@@ -33,41 +33,41 @@ class PsrLoggerPlugin extends AbstractPlugin
     {
         $this->listenerHandlers[] = $messageBus->attach(MessageBus::EVENT_DISPATCH, function (ActionEvent $event) {
             $context = $this->contextFactory->createFromActionEvent($event);
-            $message = 'Dispatched {bus-type}:{message-name}';
+            $message = 'Dispatching {bus-type} "{message-name}"';
             if ($context['message-handler'] !== null) {
-                $message = 'Dispatching {bus-type} {message-name} to handler {message-handler}';
+                $message .= ' to handler "{message-handler}"';
+            } else if (count($context['event-listeners']) > 0) {
+                $context['event-listeners'] = implode(', ', $context['event-listeners']);
+                $message .= ' to listeners "{event-listeners}"';
             }
             $this->logger->info($message, $context);
         }, MessageBus::PRIORITY_INVOKE_HANDLER + 2000);
 
         $this->listenerHandlers[] = $messageBus->attach(MessageBus::EVENT_FINALIZE, function (ActionEvent $event) {
             $context = $this->contextFactory->createFromActionEvent($event);
-            $message = 'Finished {bus-type}:{message-name}';
-            if ($context['message-handler'] !== null) {
-                $message = 'Finished {bus-type}: "{message-name}" by handler {message-handler}';
-            }
+            $message = 'Finished dispatch of {bus-type} "{message-name}"';
             $this->logger->info($message, $context);
         }, -2000);
 
         $this->listenerHandlers[] = $messageBus->attach(MessageBus::EVENT_DISPATCH, function (ActionEvent $event) {
             $context = $this->contextFactory->createFromActionEvent($event);
-            $this->logger->debug('Initialized {bus-type} message {message-name}', $context);
+            $this->logger->debug('Initialized {bus-type} message "{message-name}"', $context);
         }, MessageBus::PRIORITY_INITIALIZE - 100);
 
         $this->listenerHandlers[] = $messageBus->attach(MessageBus::EVENT_DISPATCH, function (ActionEvent $event) {
             $context = $this->contextFactory->createFromActionEvent($event);
-            $this->logger->debug('Detect {bus-type} message name for {message-name}', $context);
+            $this->logger->debug('Detected {bus-type} message name for "{message-name}"', $context);
         }, MessageBus::PRIORITY_DETECT_MESSAGE_NAME - 100);
 
         //Should be triggered because we did not provide a message-handler yet
         $this->listenerHandlers[] = $messageBus->attach(MessageBus::EVENT_DISPATCH, function (ActionEvent $event) {
             $context = $this->contextFactory->createFromActionEvent($event);
-            $this->logger->debug('Detect {bus-type} message route for {message-name}', $context);
+            $this->logger->debug('Detected {bus-type} message route for "{message-name}"', $context);
         }, MessageBus::PRIORITY_ROUTE - 100);
 
         $this->listenerHandlers[] = $messageBus->attach(MessageBus::EVENT_DISPATCH, function (ActionEvent $event) {
             $context = $this->contextFactory->createFromActionEvent($event);
-            $this->logger->debug('Locate {bus-type} handler for {message-name}', $context);
+            $this->logger->debug('Located {bus-type} handler for "{message-name}"', $context);
         }, MessageBus::PRIORITY_LOCATE_HANDLER - 100);
     }
 }

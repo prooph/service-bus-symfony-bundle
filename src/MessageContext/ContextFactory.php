@@ -6,6 +6,7 @@ namespace Prooph\Bundle\ServiceBus\MessageContext;
 
 use Prooph\Bundle\ServiceBus\NamedMessageBus;
 use Prooph\Common\Event\ActionEvent;
+use Prooph\ServiceBus\EventBus;
 use Prooph\ServiceBus\MessageBus;
 use ReflectionClass;
 
@@ -25,12 +26,14 @@ class ContextFactory
         $messageBus = $event->getTarget();
         $message = $event->getParam(MessageBus::EVENT_PARAM_MESSAGE);
         $handler = $event->getParam(MessageBus::EVENT_PARAM_MESSAGE_HANDLER);
+        $listeners = $event->getParam(EventBus::EVENT_PARAM_EVENT_LISTENERS, []);
 
         $context = [
             'message-data' => $this->messageConverter->convertMessageToArray($message),
             'message-name' => $event->getParam(MessageBus::EVENT_PARAM_MESSAGE_NAME),
             'message-handled' => $event->getParam(MessageBus::EVENT_PARAM_MESSAGE_HANDLED),
-            'message-handler' => is_object($handler) ? get_class($handler) : (string) $handler,
+            'message-handler' => $this->presentObjectOrScalar($handler),
+            'event-listeners' => \array_map([$this, 'presentObjectOrScalar'], $listeners),
         ];
 
         if ($messageBus instanceof NamedMessageBus) {
@@ -45,5 +48,14 @@ class ContextFactory
         $context['bus-name'] = 'anonymous';
 
         return $context;
+    }
+
+    private function presentObjectOrScalar($objectOrScalar): ?string
+    {
+        if (null === $objectOrScalar) {
+            return null;
+        }
+
+        return \is_object($objectOrScalar) ? \get_class($objectOrScalar) : (string) $objectOrScalar;
     }
 }

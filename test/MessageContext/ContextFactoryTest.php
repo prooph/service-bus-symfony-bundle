@@ -10,6 +10,7 @@ use Prooph\Bundle\ServiceBus\MessageContext\MessageDataConverter;
 use Prooph\Bundle\ServiceBus\NamedMessageBus;
 use Prooph\Common\Event\DefaultActionEvent;
 use Prooph\Common\Messaging\Message;
+use Prooph\ServiceBus\EventBus;
 use Prooph\ServiceBus\MessageBus;
 use stdClass;
 
@@ -32,6 +33,7 @@ class ContextFactoryTest extends TestCase
             MessageBus::EVENT_PARAM_MESSAGE_NAME => 'my-acme-message',
             MessageBus::EVENT_PARAM_MESSAGE_HANDLED => true,
             MessageBus::EVENT_PARAM_MESSAGE_HANDLER => new stdClass(),
+            EventBus::EVENT_PARAM_EVENT_LISTENERS => [new stdClass()],
         ]);
 
         $result = (new ContextFactory($messageConverter))->createFromActionEvent($actionEvent);
@@ -41,6 +43,7 @@ class ContextFactoryTest extends TestCase
             'message-name' => 'my-acme-message',
             'message-handled' => true,
             'message-handler' => 'stdClass',
+            'event-listeners' => ['stdClass'],
             'bus-type' => 'command',
             'bus-name' => 'acme_command_bus',
         ]);
