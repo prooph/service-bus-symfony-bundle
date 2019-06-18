@@ -66,7 +66,7 @@ final class Configuration implements ConfigurationInterface
                 ->prototype('scalar')
                     ->beforeNormalization()
                         ->ifTrue(function ($v) {
-                            return strpos($v, '@') === 0;
+                            return is_string($v) && strpos($v, '@') === 0;
                         })
                         ->then(function ($v) {
                             return substr($v, 1);
@@ -77,7 +77,7 @@ final class Configuration implements ConfigurationInterface
             $handlerNode
                 ->beforeNormalization()
                     ->ifTrue(function ($v) {
-                        return strpos($v, '@') === 0;
+                        return is_string($v) && strpos($v, '@') === 0;
                     })
                     ->then(function ($v) {
                         return substr($v, 1);
@@ -98,7 +98,7 @@ final class Configuration implements ConfigurationInterface
                     ->scalarNode('message_factory')
                         ->beforeNormalization()
                             ->ifTrue(function ($v) {
-                                return strpos($v, '@') === 0;
+                                return is_string($v) && strpos($v, '@') === 0;
                             })
                             ->then(function ($v) {
                                 return substr($v, 1);
@@ -109,7 +109,7 @@ final class Configuration implements ConfigurationInterface
                     ->scalarNode('message_data_converter')
                         ->beforeNormalization()
                             ->ifTrue(function ($v) {
-                                return strpos($v, '@') === 0;
+                                return is_string($v) && strpos($v, '@') === 0;
                             })
                             ->then(function ($v) {
                                 return substr($v, 1);
@@ -120,7 +120,7 @@ final class Configuration implements ConfigurationInterface
                     ->scalarNode('message_converter')
                         ->beforeNormalization()
                             ->ifTrue(function ($v) {
-                                return strpos($v, '@') === 0;
+                                return is_string($v) && strpos($v, '@') === 0;
                             })
                             ->then(function ($v) {
                                 return substr($v, 1);
@@ -138,7 +138,7 @@ final class Configuration implements ConfigurationInterface
                         ->prototype('scalar')
                             ->beforeNormalization()
                                 ->ifTrue(function ($v) {
-                                    return strpos($v, '@') === 0;
+                                    return is_string($v) && strpos($v, '@') === 0;
                                 })
                                 ->then(function ($v) {
                                     return substr($v, 1);
@@ -153,7 +153,7 @@ final class Configuration implements ConfigurationInterface
                             ->scalarNode('type')
                                 ->beforeNormalization()
                                     ->ifTrue(function ($v) {
-                                        return strpos($v, '@') === 0;
+                                        return is_string($v) && strpos($v, '@') === 0;
                                     })
                                     ->then(function ($v) {
                                         return substr($v, 1);
@@ -164,7 +164,7 @@ final class Configuration implements ConfigurationInterface
                             ->scalarNode('async_switch')
                                 ->beforeNormalization()
                                     ->ifTrue(function ($v) {
-                                        return strpos($v, '@') === 0;
+                                        return is_string($v) && strpos($v, '@') === 0;
                                     })
                                     ->then(function ($v) {
                                         return substr($v, 1);
