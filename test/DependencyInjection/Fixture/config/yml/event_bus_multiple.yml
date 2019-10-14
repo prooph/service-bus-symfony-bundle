@@ -1,3 +1,7 @@
+services:
+    'Prooph\ProophessorDo\Projection\Todo\TodoProjector': ~
+    'Prooph\ProophessorDo\Projection\User\UserProjector': ~
+
 prooph_service_bus:
   event_buses:
     main_event_bus:
