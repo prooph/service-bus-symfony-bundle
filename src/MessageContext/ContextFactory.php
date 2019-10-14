@@ -30,7 +30,7 @@ class ContextFactory
             'message-data' => $this->messageConverter->convertMessageToArray($message),
             'message-name' => $event->getParam(MessageBus::EVENT_PARAM_MESSAGE_NAME),
             'message-handled' => $event->getParam(MessageBus::EVENT_PARAM_MESSAGE_HANDLED),
-            'message-handler' => is_object($handler) ? get_class($handler) : (string) $handler,
+            'message-handler' => \is_object($handler) ? \get_class($handler) : (string) $handler,
         ];
 
         if ($messageBus instanceof NamedMessageBus) {

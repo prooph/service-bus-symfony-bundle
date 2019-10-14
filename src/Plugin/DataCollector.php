@@ -31,7 +31,7 @@ class DataCollector extends BaseDataCollector
     {
         foreach ($this->busNames as $busName) {
             $this->data['config'][$busName] = $this->container->getParameter(
-                sprintf('prooph_service_bus.%s.configuration', $busName)
+                \sprintf('prooph_service_bus.%s.configuration', $busName)
             );
         }
     }
@@ -46,12 +46,12 @@ class DataCollector extends BaseDataCollector
 
     public function totalMessageCount(): int
     {
-        return array_sum(array_map('count', $this->data['messages']));
+        return \array_sum(\array_map('count', $this->data['messages']));
     }
 
     public function totalBusCount(): int
     {
-        return count($this->data['messages']);
+        return \count($this->data['messages']);
     }
 
     public function messages(): array
@@ -76,7 +76,7 @@ class DataCollector extends BaseDataCollector
 
     public function totalBusDuration(): int
     {
-        return array_sum($this->data['duration']);
+        return \array_sum($this->data['duration']);
     }
 
     public function busType(): string
@@ -86,7 +86,7 @@ class DataCollector extends BaseDataCollector
 
     public function getName(): string
     {
-        return sprintf('prooph.%s_bus', $this->data['bus_type']);
+        return \sprintf('prooph.%s_bus', $this->data['bus_type']);
     }
 
     public function addMessageBus(string $busName): void

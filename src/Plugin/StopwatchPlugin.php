@@ -35,7 +35,7 @@ class StopwatchPlugin extends AbstractPlugin
             $message = $event->getParam(MessageBus::EVENT_PARAM_MESSAGE);
             $messageBus = $event->getTarget();
             if ($messageBus instanceof NamedMessageBus) {
-                return sprintf(
+                return \sprintf(
                     '%s:%s:%s',
                     $message->messageType(),
                     $messageBus->busName(),
@@ -43,7 +43,7 @@ class StopwatchPlugin extends AbstractPlugin
                 );
             }
 
-            return sprintf(
+            return \sprintf(
                 '%s:%s',
                 $message->messageType(),
                 $event->getParam(MessageBus::EVENT_PARAM_MESSAGE_NAME)

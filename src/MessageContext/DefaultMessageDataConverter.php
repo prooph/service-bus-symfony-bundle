@@ -29,7 +29,7 @@ final class DefaultMessageDataConverter implements MessageDataConverter
             }
         }
 
-        if (is_array($message)) {
+        if (\is_array($message)) {
             return $message;
         }
 
