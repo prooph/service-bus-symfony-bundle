@@ -14,6 +14,7 @@ namespace Prooph\Bundle\ServiceBus\DependencyInjection;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use function method_exists;
 
 final class Configuration implements ConfigurationInterface
 {
@@ -24,9 +25,11 @@ final class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder(): TreeBuilder
     {
-        $treeBuilder = new TreeBuilder();
+        $treeBuilder = new TreeBuilder('prooph_service_bus');
         /** @var ArrayNodeDefinition $rootNode Help phpstan */
-        $rootNode = $treeBuilder->root('prooph_service_bus');
+        $rootNode = method_exists(TreeBuilder::class, 'getRootNode') ?
+            $treeBuilder->getRootNode() :
+            $treeBuilder->root('prooph_event_store');
 
         foreach (ProophServiceBusExtension::AVAILABLE_BUSES as $type) {
             $this->addServiceBusSection($type, $rootNode);
@@ -45,9 +48,11 @@ final class Configuration implements ConfigurationInterface
      */
     private function addServiceBusSection(string $type, ArrayNodeDefinition $node): void
     {
-        $treeBuilder = new TreeBuilder();
+        $treeBuilder = new TreeBuilder('routes');
         /** @var ArrayNodeDefinition $routesNode */
-        $routesNode = $treeBuilder->root('routes');
+        $routesNode = method_exists(TreeBuilder::class, 'getRootNode') ?
+          $treeBuilder->getRootNode() :
+          $treeBuilder->root('routes');
         $routesNode->useAttributeAsKey($type);
         $handlerNode = $routesNode->prototype('event' === $type ? 'array' : 'scalar');
 
