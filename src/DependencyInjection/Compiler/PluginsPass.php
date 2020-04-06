@@ -29,10 +29,10 @@ class PluginsPass implements CompilerPassInterface
 
             foreach ($buses as $name => $bus) {
                 $globalPlugins = $container->findTaggedServiceIds('prooph_service_bus.plugin');
-                $typePlugins = $container->findTaggedServiceIds(sprintf('prooph_service_bus.%s.plugin', $type . '_bus'));
-                $localPlugins = $container->findTaggedServiceIds(sprintf('prooph_service_bus.%s.plugin', $name));
+                $typePlugins = $container->findTaggedServiceIds(\sprintf('prooph_service_bus.%s.plugin', $type . '_bus'));
+                $localPlugins = $container->findTaggedServiceIds(\sprintf('prooph_service_bus.%s.plugin', $name));
 
-                $plugins = array_merge(array_keys($globalPlugins), array_keys($typePlugins), array_keys($localPlugins));
+                $plugins = \array_merge(\array_keys($globalPlugins), \array_keys($typePlugins), \array_keys($localPlugins));
 
                 $busDefinition = $container->getDefinition($bus);
 

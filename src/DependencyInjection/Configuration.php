@@ -71,10 +71,10 @@ final class Configuration implements ConfigurationInterface
                 ->prototype('scalar')
                     ->beforeNormalization()
                         ->ifTrue(function ($v) {
-                            return is_string($v) && strpos($v, '@') === 0;
+                            return \is_string($v) && \strpos($v, '@') === 0;
                         })
                         ->then(function ($v) {
-                            return substr($v, 1);
+                            return \substr($v, 1);
                         })
                     ->end()
                 ->end();
@@ -82,10 +82,10 @@ final class Configuration implements ConfigurationInterface
             $handlerNode
                 ->beforeNormalization()
                     ->ifTrue(function ($v) {
-                        return is_string($v) && strpos($v, '@') === 0;
+                        return \is_string($v) && \strpos($v, '@') === 0;
                     })
                     ->then(function ($v) {
-                        return substr($v, 1);
+                        return \substr($v, 1);
                     })
                 ->end();
         }
@@ -103,10 +103,10 @@ final class Configuration implements ConfigurationInterface
                     ->scalarNode('message_factory')
                         ->beforeNormalization()
                             ->ifTrue(function ($v) {
-                                return is_string($v) && strpos($v, '@') === 0;
+                                return \is_string($v) && \strpos($v, '@') === 0;
                             })
                             ->then(function ($v) {
-                                return substr($v, 1);
+                                return \substr($v, 1);
                             })
                         ->end()
                         ->defaultValue('prooph_service_bus.message_factory')
@@ -114,10 +114,10 @@ final class Configuration implements ConfigurationInterface
                     ->scalarNode('message_data_converter')
                         ->beforeNormalization()
                             ->ifTrue(function ($v) {
-                                return is_string($v) && strpos($v, '@') === 0;
+                                return \is_string($v) && \strpos($v, '@') === 0;
                             })
                             ->then(function ($v) {
-                                return substr($v, 1);
+                                return \substr($v, 1);
                             })
                         ->end()
                         ->defaultValue('prooph_service_bus.message_data_converter.' . $type)
@@ -125,10 +125,10 @@ final class Configuration implements ConfigurationInterface
                     ->scalarNode('message_converter')
                         ->beforeNormalization()
                             ->ifTrue(function ($v) {
-                                return is_string($v) && strpos($v, '@') === 0;
+                                return \is_string($v) && \strpos($v, '@') === 0;
                             })
                             ->then(function ($v) {
-                                return substr($v, 1);
+                                return \substr($v, 1);
                             })
                         ->end()
                         ->defaultValue('prooph_service_bus.message_converter')
@@ -143,10 +143,10 @@ final class Configuration implements ConfigurationInterface
                         ->prototype('scalar')
                             ->beforeNormalization()
                                 ->ifTrue(function ($v) {
-                                    return is_string($v) && strpos($v, '@') === 0;
+                                    return \is_string($v) && \strpos($v, '@') === 0;
                                 })
                                 ->then(function ($v) {
-                                    return substr($v, 1);
+                                    return \substr($v, 1);
                                 })
                             ->end()
                         ->end()
@@ -158,10 +158,10 @@ final class Configuration implements ConfigurationInterface
                             ->scalarNode('type')
                                 ->beforeNormalization()
                                     ->ifTrue(function ($v) {
-                                        return is_string($v) && strpos($v, '@') === 0;
+                                        return \is_string($v) && \strpos($v, '@') === 0;
                                     })
                                     ->then(function ($v) {
-                                        return substr($v, 1);
+                                        return \substr($v, 1);
                                     })
                                 ->end()
                                 ->defaultValue('prooph_service_bus.' . $type . '_bus_router')
@@ -169,10 +169,10 @@ final class Configuration implements ConfigurationInterface
                             ->scalarNode('async_switch')
                                 ->beforeNormalization()
                                     ->ifTrue(function ($v) {
-                                        return is_string($v) && strpos($v, '@') === 0;
+                                        return \is_string($v) && \strpos($v, '@') === 0;
                                     })
                                     ->then(function ($v) {
-                                        return substr($v, 1);
+                                        return \substr($v, 1);
                                     })
                                 ->end()
                             ->end()

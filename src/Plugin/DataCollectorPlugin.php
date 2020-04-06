@@ -45,9 +45,9 @@ class DataCollectorPlugin extends AbstractPlugin
         }
 
         if (! $messageBus instanceof NamedMessageBus) {
-            throw new RuntimeException(sprintf(
+            throw new RuntimeException(\sprintf(
                 'To use the Symfony DataCollector, the Bus "%s" needs to implement "%s"',
-                get_class($messageBus),
+                \get_class($messageBus),
                 NamedMessageBus::class
             ));
         }
@@ -100,7 +100,7 @@ class DataCollectorPlugin extends AbstractPlugin
             $log = [
                 'id' => (string) $message->uuid(),
                 'message' => $messageName,
-                'handler' => is_object($handler) ? get_class($handler) : (string) $handler,
+                'handler' => \is_object($handler) ? \get_class($handler) : (string) $handler,
             ];
             foreach ($actionEvent->getParam('event-listeners', []) as $handler) {
                 $this->data->addCallstack($messageBus->busName(), $log);

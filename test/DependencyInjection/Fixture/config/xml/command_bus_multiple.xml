@@ -6,6 +6,11 @@
                xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd
                         http://getprooph.org/schemas/symfony-dic/prooph http://getprooph.org/schemas/symfony-dic/prooph/service_bus-5.1.xsd">
 
+    <srv:services>
+        <srv:service id="Prooph\ProophessorDo\Model\User\Handler\RegisterUserHandler"></srv:service>
+        <srv:service id="Prooph\ProophessorDo\Model\User\Handler\UpdateUserHandler"></srv:service>
+    </srv:services>
+
     <config>
         <command_bus name="main_command_bus" message_factory="prooph_service_bus.message_factory">
             <plugin>prooph_service_bus.handle_command_invoke_strategy</plugin>

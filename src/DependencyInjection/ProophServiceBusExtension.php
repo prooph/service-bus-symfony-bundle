@@ -76,21 +76,21 @@ final class ProophServiceBusExtension extends Extension
         $loader->load($type . '_bus.xml');
 
         $serviceBuses = [];
-        foreach (array_keys($config) as $name) {
+        foreach (\array_keys($config) as $name) {
             $serviceBuses[$name] = 'prooph_service_bus.' . $name;
         }
         $container->setParameter("prooph_service_bus.{$type}_buses", $serviceBuses);
 
         // Add DataCollector
-        if ($type !== 'query' && $container->getParameter('kernel.debug') && class_exists(Stopwatch::class)) {
+        if ($type !== 'query' && $container->getParameter('kernel.debug') && \class_exists(Stopwatch::class)) {
             $container
                 ->setDefinition(
-                    sprintf('prooph_service_bus.plugin.symfony_data_collector.%s_bus', $type),
+                    \sprintf('prooph_service_bus.plugin.symfony_data_collector.%s_bus', $type),
                     new ChildDefinition('prooph_service_bus.plugin.symfony_data_collector')
                 )
                 ->addArgument($type)
                 ->addTag('data_collector', [
-                    'id' => sprintf('prooph.%s_bus', $type),
+                    'id' => \sprintf('prooph.%s_bus', $type),
                     'template' => '@ProophServiceBus/Collector/debug_view.html.twig',
                 ]);
         }
@@ -120,7 +120,7 @@ final class ProophServiceBusExtension extends Extension
             new ChildDefinition('prooph_service_bus.' . $type . '_bus')
         );
         $serviceBusDefinition->setPublic(true);
-        if (in_array(NamedMessageBus::class, class_implements($container->getDefinition('prooph_service_bus.'.$type.'_bus')->getClass()))) {
+        if (\in_array(NamedMessageBus::class, \class_implements($container->getDefinition('prooph_service_bus.'.$type.'_bus')->getClass()))) {
             $serviceBusDefinition->addMethodCall('setBusName', [$name]);
             $serviceBusDefinition->addMethodCall('setBusType', [$type]);
         }
@@ -138,35 +138,35 @@ final class ProophServiceBusExtension extends Extension
             )
             ->addArgument(new Reference($options['message_converter']));
 
-        $contextFactoryId = sprintf('prooph_service_bus.message_context_factory.%s', $serviceBusId);
+        $contextFactoryId = \sprintf('prooph_service_bus.message_context_factory.%s', $serviceBusId);
         $container
             ->setDefinition($contextFactoryId, new ChildDefinition('prooph_service_bus.message_context_factory'))
             ->addArgument(new Reference($options['message_data_converter']));
 
         // Collecting data for each configured service bus
-        if ($type !== 'query' && $container->getParameter('kernel.debug') && class_exists(Stopwatch::class)) {
+        if ($type !== 'query' && $container->getParameter('kernel.debug') && \class_exists(Stopwatch::class)) {
             $container
                 ->setDefinition(
-                    sprintf('%s.plugin.data_collector', $serviceBusId),
+                    \sprintf('%s.plugin.data_collector', $serviceBusId),
                     new ChildDefinition('prooph_service_bus.plugin.data_collector')
                 )
                 ->addArgument(new Reference($contextFactoryId))
-                ->addArgument(new Reference(sprintf('prooph_service_bus.plugin.symfony_data_collector.%s_bus', $type)))
+                ->addArgument(new Reference(\sprintf('prooph_service_bus.plugin.symfony_data_collector.%s_bus', $type)))
                 ->addTag("prooph_service_bus.{$type}_bus.plugin");
         }
 
         // Logging for each configured service bus
         $container
             ->setDefinition(
-                sprintf('%s.plugin.psr_logger', $serviceBusId),
+                \sprintf('%s.plugin.psr_logger', $serviceBusId),
                 new ChildDefinition('prooph_service_bus.plugin.psr_logger')
             )
             ->setArguments([
                 new Reference($contextFactoryId),
                 new Reference('logger', ContainerInterface::NULL_ON_INVALID_REFERENCE),
             ])
-            ->addTag('monolog.logger', ['channel' => sprintf('%s_bus.%s', $type, $name)])
-            ->addTag(sprintf('prooph_service_bus.%s.plugin', $name));
+            ->addTag('monolog.logger', ['channel' => \sprintf('%s_bus.%s', $type, $name)])
+            ->addTag(\sprintf('prooph_service_bus.%s.plugin', $name));
 
         // define message factory
         $messageFactoryId = 'prooph_service_bus.message_factory.' . $name;
@@ -176,7 +176,7 @@ final class ProophServiceBusExtension extends Extension
         $messageFactoryPluginId = 'prooph_service_bus.message_factory_plugin.' . $name;
         $messageFactoryPluginDefinition = new ChildDefinition('prooph_service_bus.message_factory_plugin');
         $messageFactoryPluginDefinition->setArguments([new Reference($messageFactoryId)]);
-        $messageFactoryPluginDefinition->addTag(sprintf('prooph_service_bus.%s.plugin', $name));
+        $messageFactoryPluginDefinition->addTag(\sprintf('prooph_service_bus.%s.plugin', $name));
 
         $container->setDefinition($messageFactoryPluginId, $messageFactoryPluginDefinition);
 
@@ -198,30 +198,30 @@ final class ProophServiceBusExtension extends Extension
                     new Reference($options['router']['async_switch']),
                 ]);
             }
-            $routerDefinition->addTag(sprintf('prooph_service_bus.%s.plugin', $name));
+            $routerDefinition->addTag(\sprintf('prooph_service_bus.%s.plugin', $name));
 
             $container->setDefinition($routerId, $routerDefinition);
         }
 
         // define service locator
-        $routeTargets = array_values($options['router']['routes'] ?? []);
+        $routeTargets = \array_values($options['router']['routes'] ?? []);
         if ($type === 'event') {
-            $routeTargets = array_merge([], ...$routeTargets);
+            $routeTargets = \array_merge([], ...$routeTargets);
         }
-        $routeTargets = array_unique($routeTargets);
-        $serviceLocatorId = sprintf('%s.plugin.service_locator.locator', $name);
+        $routeTargets = \array_unique($routeTargets);
+        $serviceLocatorId = \sprintf('%s.plugin.service_locator.locator', $name);
         $serviceLocator = $container->register($serviceLocatorId, ServiceLocator::class);
         $serviceLocator->addTag('container.service_locator');
-        $serviceLocator->setArgument(0, array_map(function (string $id) {
+        $serviceLocator->setArgument(0, \array_map(function (string $id) {
             return new Reference($id);
-        }, array_combine($routeTargets, $routeTargets)));
+        }, \array_combine($routeTargets, $routeTargets)));
 
         // and the plugin for it
         $serviceLocatorPlugin = new ChildDefinition('prooph_service_bus.plugin.service_locator');
         $serviceLocatorPlugin->setArgument(0, new Reference($serviceLocatorId));
-        $serviceLocatorPlugin->addTag(sprintf('prooph_service_bus.%s.plugin', $name));
-        $container->setDefinition(sprintf('%s.plugin.service_locator', $name), $serviceLocatorPlugin);
+        $serviceLocatorPlugin->addTag(\sprintf('prooph_service_bus.%s.plugin', $name));
+        $container->setDefinition(\sprintf('%s.plugin.service_locator', $name), $serviceLocatorPlugin);
 
-        $container->setParameter(sprintf('prooph_service_bus.%s.configuration', $name), $options);
+        $container->setParameter(\sprintf('prooph_service_bus.%s.configuration', $name), $options);
     }
 }

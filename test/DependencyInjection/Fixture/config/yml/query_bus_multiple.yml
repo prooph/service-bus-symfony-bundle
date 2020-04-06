@@ -1,3 +1,7 @@
+services:
+    Prooph\ProophessorDo\Model\User\Query\UserListUserHandler: ~
+    Prooph\ProophessorDo\Model\User\Query\TodoListHandler: ~
+
 prooph_service_bus:
   query_buses:
     main_query_bus:
