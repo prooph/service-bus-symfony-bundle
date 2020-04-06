@@ -1,3 +1,7 @@
+services:
+    'Prooph\ProophessorDo\Model\User\Handler\RegisterUserHandler': ~
+    'Prooph\ProophessorDo\Model\User\Handler\UpdateUserHandler': ~
+
 prooph_service_bus:
   command_buses:
     main_command_bus:
