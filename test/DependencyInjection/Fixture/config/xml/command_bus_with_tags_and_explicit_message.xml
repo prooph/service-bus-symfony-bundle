@@ -1,23 +1,20 @@
 <?xml version="1.0" ?>
-
-<srv:container xmlns="http://getprooph.org/schemas/symfony-dic/prooph"
+<container xmlns="http://symfony.com/schema/dic/services"
                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-               xmlns:srv="http://symfony.com/schema/dic/services"
+               xmlns:prooph="http://getprooph.org/schemas/symfony-dic/prooph"
                xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd
                         http://getprooph.org/schemas/symfony-dic/prooph http://getprooph.org/schemas/symfony-dic/prooph/service_bus-5.1.xsd">
 
-    <config>
-        <command_bus name="main_command_bus" message_factory="prooph_service_bus.message_factory">
-            <plugin>prooph_service_bus.handle_command_invoke_strategy</plugin>
-            <router type="prooph_service_bus.command_bus_router">
-                <route command="Acme\UpdateUser">Acme\UpdateUserHandler</route>
-            </router>
-        </command_bus>
-    </config>
+    <prooph:config>
+        <prooph:command_bus name="main_command_bus" message_factory="prooph_service_bus.message_factory">
+            <prooph:plugin>prooph_service_bus.handle_command_invoke_strategy</prooph:plugin>
+            <prooph:router type="prooph_service_bus.command_bus_router" />
+        </prooph:command_bus>
+    </prooph:config>
 
-    <srv:services>
-        <srv:service id="Acme\RegisterUserHandler" class="ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AcmeRegisterUserHandler" public="true">
-            <srv:tag name="prooph_service_bus.main_command_bus.route_target" message="Acme\RegisterUser"/>
-        </srv:service>
-    </srv:services>
-</srv:container>
+    <services>
+        <service id="ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\AcmeRegisterUserHandler" public="true">
+            <tag name="prooph_service_bus.main_command_bus.route_target" message="Acme\RegisterUser"/>
+        </service>
+    </services>
+</container>

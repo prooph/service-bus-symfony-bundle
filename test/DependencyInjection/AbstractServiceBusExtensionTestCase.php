@@ -121,7 +121,7 @@ abstract class AbstractServiceBusExtensionTestCase extends TestCase
         $commandBus = $container->get('prooph_service_bus.main_command_bus');
 
         /** @var AcmeRegisterUserHandler $mockHandler */
-        $mockHandler = $container->get('Acme\RegisterUserHandler');
+        $mockHandler = $container->get(AcmeRegisterUserHandler::class);
 
         $command = new AcmeRegisterUserCommand(['name' => 'John Doe']);
 
@@ -311,7 +311,7 @@ abstract class AbstractServiceBusExtensionTestCase extends TestCase
         $commandBus = $container->get('prooph_service_bus.main_command_bus');
 
         /** @var AcmeRegisterUserHandler $mockHandler */
-        $mockHandler = $container->get('Acme\RegisterUserHandler');
+        $mockHandler = $container->get(AcmeRegisterUserHandler::class);
 
         $command = new AcmeRegisterUserCommand(['name' => 'John Doe']);
 
@@ -347,7 +347,7 @@ abstract class AbstractServiceBusExtensionTestCase extends TestCase
         $commandBus = $container->get('prooph_service_bus.main_command_bus');
 
         /** @var AcmeRegisterUserHandler $mockHandler */
-        $mockHandler = $container->get('Acme\RegisterUserHandler');
+        $mockHandler = $container->get(AcmeRegisterUserHandler::class);
 
         $command = new AcmeRegisterUserCommand(['name' => 'John Doe']);
 
@@ -390,7 +390,7 @@ abstract class AbstractServiceBusExtensionTestCase extends TestCase
         $commandBus = $container->get('prooph_service_bus.main_command_bus');
 
         /** @var AcmeRegisterUserHandler $mockHandler */
-        $mockHandler = $container->get('Acme\RegisterUserHandler');
+        $mockHandler = $container->get(AcmeRegisterUserHandler::class);
 
         $command = new AcmeRegisterUserCommand(['name' => 'John Doe']);
 

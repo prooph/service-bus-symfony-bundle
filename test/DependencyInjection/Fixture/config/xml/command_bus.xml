@@ -15,7 +15,7 @@
     </prooph:config>
 
     <services>
-        <defaults autowire="true" autoconfigure="false" public="false"/>
+        <defaults autowire="true" autoconfigure="false" public="true" />
         <prototype namespace="ProophTest\Bundle\ServiceBus\" resource="../../../../*" />
     </services>
 </container>

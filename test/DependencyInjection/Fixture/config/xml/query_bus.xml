@@ -1,22 +1,26 @@
 <?xml version="1.0" ?>
-
-<srv:container xmlns="http://getprooph.org/schemas/symfony-dic/prooph"
+<container xmlns="http://symfony.com/schema/dic/services"
                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-               xmlns:srv="http://symfony.com/schema/dic/services"
+               xmlns:prooph="http://getprooph.org/schemas/symfony-dic/prooph"
                xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd
                         http://getprooph.org/schemas/symfony-dic/prooph http://getprooph.org/schemas/symfony-dic/prooph/service_bus-5.1.xsd">
 
-    <config>
-        <query_bus name="main_query_bus" message_factory="prooph_service_bus.message_factory">
-            <plugin>prooph_service_bus.finder_invoke_strategy</plugin>
-            <router type="prooph_service_bus.query_bus_router">
-                <route query="Prooph\ProophessorDo\Model\User\Query\UserList">
-                    Prooph\ProophessorDo\Model\User\Query\UserListUserHandler
-                </route>
-                <route query="Prooph\ProophessorDo\Model\Todo\Query\TodoList">
-                    Prooph\ProophessorDo\Model\User\Query\TodoListHandler
-                </route>
-            </router>
-        </query_bus>
-    </config>
-</srv:container>
+    <prooph:config>
+        <prooph:query_bus name="main_query_bus" message_factory="prooph_service_bus.message_factory">
+            <prooph:plugin>prooph_service_bus.finder_invoke_strategy</prooph:plugin>
+            <prooph:router type="prooph_service_bus.query_bus_router">
+                <prooph:route query="Prooph\ProophessorDo\Model\User\Query\UserList">
+                    ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\UserListUserHandler
+                </prooph:route>
+                <prooph:route query="Prooph\ProophessorDo\Model\Todo\Query\TodoList">
+                    ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\TodoListHandler
+                </prooph:route>
+            </prooph:router>
+        </prooph:query_bus>
+    </prooph:config>
+
+    <services>
+        <defaults autowire="true" autoconfigure="false" public="true" />
+        <prototype namespace="ProophTest\Bundle\ServiceBus\" resource="../../../../*" />
+    </services>
+</container>

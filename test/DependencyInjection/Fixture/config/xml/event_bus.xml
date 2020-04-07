@@ -1,19 +1,23 @@
 <?xml version="1.0" ?>
-
-<srv:container xmlns="http://getprooph.org/schemas/symfony-dic/prooph"
+<container xmlns="http://symfony.com/schema/dic/services"
                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-               xmlns:srv="http://symfony.com/schema/dic/services"
+               xmlns:prooph="http://getprooph.org/schemas/symfony-dic/prooph"
                xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd
                         http://getprooph.org/schemas/symfony-dic/prooph http://getprooph.org/schemas/symfony-dic/prooph/service_bus-5.1.xsd">
-    <config>
-        <event_bus name="main_event_bus" message_factory="prooph_service_bus.message_factory">
-            <plugin>prooph_service_bus.on_event_invoke_strategy</plugin>
-            <router type="prooph_service_bus.event_bus_router">
-                <route event="Prooph\ProophessorDo\Model\Todo\Event\TodoWasPosted">
-                    <listener>Prooph\ProophessorDo\Projection\Todo\TodoProjector</listener>
-                    <listener>Prooph\ProophessorDo\Projection\Todo\UserProjector</listener>
-                </route>
-            </router>
-        </event_bus>
-    </config>
-</srv:container>
+    <prooph:config>
+        <prooph:event_bus name="main_event_bus" message_factory="prooph_service_bus.message_factory">
+            <prooph:plugin>prooph_service_bus.on_event_invoke_strategy</prooph:plugin>
+            <prooph:router type="prooph_service_bus.event_bus_router">
+                <prooph:route event="Prooph\ProophessorDo\Model\Todo\Event\TodoWasPosted">
+                    <prooph:listener>ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\TodoProjector</prooph:listener>
+                    <prooph:listener>ProophTest\Bundle\ServiceBus\DependencyInjection\Fixture\Model\UserProjector</prooph:listener>
+                </prooph:route>
+            </prooph:router>
+        </prooph:event_bus>
+    </prooph:config>
+
+    <services>
+        <defaults autowire="true" autoconfigure="false" public="true" />
+        <prototype namespace="ProophTest\Bundle\ServiceBus\" resource="../../../../*" />
+    </services>
+</container>
