@@ -6,7 +6,6 @@
          convertNoticesToExceptions="true"
          convertWarningsToExceptions="true"
          forceCoversAnnotation="true"
-         syntaxCheck="true"
          backupGlobals="true"
          backupStaticAttributes="false">
 

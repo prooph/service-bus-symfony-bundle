@@ -27,7 +27,7 @@ class DataCollector extends BaseDataCollector
         $this->data['message_callstack'] = [];
     }
 
-    public function collect(Request $request, Response $response, Exception $exception = null): void
+    public function collect(Request $request, Response $response, \Throwable $exception = null): void
     {
         foreach ($this->busNames as $busName) {
             $this->data['config'][$busName] = $this->container->getParameter(

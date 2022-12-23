@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Prooph\Bundle\ServiceBus\DependencyInjection;
 
+use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Prooph\Bundle\ServiceBus\NamedMessageBus;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ChildDefinition;
@@ -33,12 +34,12 @@ final class ProophServiceBusExtension extends Extension
         'query',
     ];
 
-    public function getNamespace()
+    public function getNamespace(): string
     {
         return 'http://getprooph.org/schemas/symfony-dic/prooph';
     }
 
-    public function getConfiguration(array $config, ContainerBuilder $container)
+    public function getConfiguration(array $config, ContainerBuilder $container): ?ConfigurationInterface
     {
         return new Configuration();
     }
@@ -48,7 +49,7 @@ final class ProophServiceBusExtension extends Extension
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
 
-        $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
+        $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/../../config'));
         $loader->load('service_bus.xml');
 
         if ($container->getParameter('kernel.debug')) {

@@ -15,9 +15,9 @@ use Prooph\Bundle\ServiceBus\DependencyInjection\Compiler\PluginsPass;
 use Prooph\Bundle\ServiceBus\DependencyInjection\Compiler\RoutePass;
 use Prooph\Bundle\ServiceBus\DependencyInjection\Compiler\StopwatchPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
 
-final class ProophServiceBusBundle extends Bundle
+final class ProophServiceBusBundle extends AbstractBundle
 {
     public function build(ContainerBuilder $container)
     {

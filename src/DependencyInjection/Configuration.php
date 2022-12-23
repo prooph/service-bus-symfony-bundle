@@ -29,7 +29,7 @@ final class Configuration implements ConfigurationInterface
         /** @var ArrayNodeDefinition $rootNode Help phpstan */
         $rootNode = method_exists(TreeBuilder::class, 'getRootNode') ?
             $treeBuilder->getRootNode() :
-            $treeBuilder->root('prooph_event_store');
+            $treeBuilder->root('prooph_event_store'); /** @phpstan-ignore-line */
 
         foreach (ProophServiceBusExtension::AVAILABLE_BUSES as $type) {
             $this->addServiceBusSection($type, $rootNode);
@@ -52,7 +52,7 @@ final class Configuration implements ConfigurationInterface
         /** @var ArrayNodeDefinition $routesNode */
         $routesNode = method_exists(TreeBuilder::class, 'getRootNode') ?
           $treeBuilder->getRootNode() :
-          $treeBuilder->root('routes');
+          $treeBuilder->root('routes'); /** @phpstan-ignore-line */
         $routesNode->useAttributeAsKey($type);
         $handlerNode = $routesNode->prototype('event' === $type ? 'array' : 'scalar');
 
